@@ -1,42 +1,73 @@
 [[command]]
 writes_cwd = "named"
 name = "zip"
-description = "Info-ZIP zip — package and compress files into a .zip archive. Bare `zip archive files...` adds entries; -u/--update and -f/--freshen update; -d/--delete removes entries; -U/--copy copies entries between archives; -FS synchronizes archive with the filesystem (can delete archive entries); -F/-FF repair. -e/--encrypt prompts for a password and encrypts entries using the legacy (weak) ZIP encryption. -T tests after building; -@ reads file list from stdin."
+description = "Info-ZIP zip — package and compress files into a .zip archive. Bare `zip archive files...` reads each named file and writes the archive; -u/--update and -f/--freshen update; -d/--delete removes entries; -U/--copy-entries copies entries between archives; -FS synchronizes the archive with the filesystem (can delete archive entries); -m/--move deletes the original files once they are archived; -F/-FF repair into an --out archive; -O/--out writes a different archive; -b/--temp-path picks the directory for the temporary archive. -e/--encrypt prompts for a password and -P/--password takes one on the command line, both using the legacy (weak) ZIP encryption. -lf/--logfile-path writes (or with -la, appends to) a log file at any path. -T tests the new archive with `unzip -tqq`, and -TT/--unzip-command names the command line zip passes to the shell for that test instead, so it runs a caller-chosen program. -@ reads the file list from stdin; -i/-x take include and exclude patterns, and `-i@file`/`-x@file` read the patterns from a file. Short options may be one or two letters (-FS, -ll, -lf, -TT) and zip reads the longest match, so a cluster like -TTcmd is -TT with a value. Stable: 3.0 is the last release (July 2008); the 3.1 betas were never released."
 url = "https://infozip.sourceforge.net/Zip.html"
-examples_safe = ["zip -r ./out.zip ./src"]
+examples_safe = ["zip -r ./out.zip ./src", "zip -r - .", "zip -rn.y - .", "zip -r -lf ./zip.log ./out.zip ./src"]
+examples_denied = [
+    "zip -r o.zip . -TT 'sh x'", "zip -T -TT sh o.zip f", "zip -TTsh o.zip f", "zip -qTTsh o.zip f",
+    "zip -T --unzip-command sh o.zip f", "zip -r o.zip . -lf ~/.zshrc", "zip -r o.zip . -la -lf=/etc/x",
+]
 researched_version = "Info-ZIP 3.0 (2008-07-07)"
 level = "SafeWrite"
 bare = false
-tolerate_unknown_short = true
 standalone = [
-    "--absolute-path", "--delete",
-    "--encrypt", "--exclude", "--filesync",
-    "--fix", "--fixfix", "--freshen", "--help",
-    "--include", "--junk-paths", "--license",
-    "--move", "--paths", "--quiet",
-    "--recurse-paths", "--symlinks", "--test",
-    "--update", "--verbose",
-    "-0", "-1", "-9", "-?", "-@", "-A", "-C",
-    "-D", "-DF", "-E", "-F", "-FF", "-FS",
-    "-J", "-L", "-M", "-O", "-P", "-Q", "-R",
-    "-S", "-T", "-U", "-V", "-X", "-Z",
-    "-a", "-c", "-d", "-e", "-f", "-g", "-h",
-    "-i", "-j", "-k", "-l", "-m", "-n", "-o",
-    "-p", "-q", "-r", "-s", "-t", "-u", "-v",
-    "-w", "-x", "-y", "-z",
+    "--DOS-names", "--absolute-path", "--adjust-sfx", "--archive-comment",
+    "--compress-1", "--compress-2", "--compress-3", "--compress-4", "--compress-5",
+    "--compress-6", "--compress-7", "--compress-8", "--compress-9",
+    "--copy", "--copy-entries", "--delete", "--dif", "--difference-archive",
+    "--display-bytes", "--display-counts", "--display-dots", "--display-globaldots",
+    "--display-usize", "--display-volume",
+    "--encrypt", "--entry-comments", "--exclude", "--fifo", "--filesync",
+    "--fix", "--fixfix", "--force-descriptors", "--force-zip64", "--freshen",
+    "--from-crlf", "--grow", "--help", "--include", "--junk-paths", "--junk-sfx",
+    "--latest-time", "--license", "--log-append", "--log-info", "--more-help",
+    "--move", "--must-match", "--names-stdin", "--no-dir-entries", "--no-wild",
+    "--paths", "--quiet", "--recurse-paths", "--recurse-patterns", "--regex",
+    "--show-command", "--show-debug", "--show-files", "--show-options",
+    "--split-bell", "--split-pause", "--split-verbose", "--store", "--strip-extra",
+    "--symlinks", "--test", "--to-crlf", "--update", "--verbose", "--version",
+    "--wild-stop-dirs",
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-?", "-@", "-A", "-AC", "-AS", "-C", "-D", "-DF", "-E",
+    "-F", "-FF", "-FI", "-FS", "-H", "-J", "-L", "-M", "-MM",
+    "-Q", "-R", "-RE", "-S", "-T", "-U", "-V", "-X", "-X-",
+    "-a", "-c", "-d", "-db", "-dc", "-dd", "-dg", "-du", "-dv",
+    "-e", "-f", "-fd", "-fz", "-fz-", "-g", "-h", "-h2",
+    "-i", "-ic", "-j", "-k", "-l", "-la", "-li", "-ll", "-m",
+    "-nw", "-o", "-p", "-q", "-r", "-sb", "-sc", "-sd", "-sf",
+    "-so", "-sp", "-su", "-sU", "-sv", "-u", "-v", "-w", "-ws",
+    "-x", "-y", "-z",
 ]
 valued = [
-    "--compression-method", "--password",
-    "--temp-path",
+    "--before-date", "--compression-method", "--dot-size", "--from-date",
+    "--logfile-path", "--out", "--output-file", "--password", "--split-size",
+    "--suffixes", "--temp-path",
     "-O", "-P", "-Z",
-    "-b", "-n", "-s", "-t", "-tt",
+    "-b", "-ds", "-lf", "-n", "-s", "-t", "-tt",
 ]
+
+[command.path_gate]
+flags = { "-lf" = "write", "--logfile-path" = "write", "-b" = "write", "--temp-path" = "write", "-O" = "write", "--out" = "write", "--output-file" = "write" }
+
+[[command.flag]]
+name = "-TT"
+classifies = "unclassified"
+fact = "`zip -T -TT CMD` hands CMD, with the archive name appended, to the shell to test the new archive instead of `unzip -tqq`, so it runs whatever program the caller names."
+source = "https://infozip.sourceforge.net/zip.html (-TT/--unzip-command)"
+
+[[command.flag]]
+name = "--unzip-command"
+classifies = "unclassified"
+fact = "Long spelling of -TT: the command line zip runs through the shell to test the archive."
+source = "https://infozip.sourceforge.net/zip.html (-TT/--unzip-command)"
 
 [[command]]
 name = "zipcloak"
 description = "Encrypt all unencrypted entries (or with -d/--decrypt, decrypt encrypted entries) in an existing zipfile using the legacy ZIP encryption algorithm. -O/--output-file writes results to a new archive instead of editing in place."
 url = "https://infozip.sourceforge.net/"
 examples_safe = ["zipcloak ./out.zip"]
+examples_denied = ["zipcloak ~/.ssh/k.zip", "zipcloak -O ~/.zshrc ./out.zip"]
 researched_version = "Info-ZIP zipcloak v3.0 (2008-05-08)"
 level = "SafeWrite"
 bare = false
@@ -48,13 +79,15 @@ standalone = [
 valued = ["--output-file", "--temp-path", "-O"]
 
 [command.path_gate]
-flags = { "--output-file" = "write" }
+positional = "write"
+flags = { "--output-file" = "write", "-O" = "write", "--temp-path" = "write" }
 
 [[command]]
 name = "zipnote"
 description = "Read or rewrite zipfile comments and entry names. Default mode dumps comments to stdout. -w reads a previously-dumped (and possibly edited) comment listing from stdin and rewrites the zipfile's comments and entry names accordingly."
 url = "https://infozip.sourceforge.net/"
 examples_safe = ["zipnote ./out.zip"]
+examples_denied = ["zipnote ~/.ssh/k.zip", "zipnote -w /etc/x.zip"]
 researched_version = "Info-ZIP zipnote v3.0 (2008-05-08)"
 level = "SafeWrite"
 bare = false
@@ -63,11 +96,15 @@ standalone = [
     "-L", "-b", "-h", "-v", "-w",
 ]
 
+[command.path_gate]
+positional = "write"
+
 [[command]]
 name = "zipsplit"
 description = "Split a zipfile into smaller zipfiles. -n sets the maximum size per output file, -r reserves room on the first disk, -b sets the output path, -t reports counts without writing, -i builds an index, -p pauses between files, -s forces sequential split."
 url = "https://infozip.sourceforge.net/"
 examples_safe = ["zipsplit -n 100000 ./out.zip"]
+examples_denied = ["zipsplit ~/.ssh/k.zip", "zipsplit -b ~/.ssh ./out.zip"]
 researched_version = "Info-ZIP zipsplit v3.0 (2008-05-08)"
 level = "SafeWrite"
 bare = false
@@ -77,11 +114,16 @@ standalone = [
 ]
 valued = ["-b", "-n", "-r"]
 
+[command.path_gate]
+positional = "read"
+flags = { "-b" = "write" }
+
 [[command]]
 name = "zipmerge"
 description = "Copy entries from one or more source zip archives into a target zip archive. -i prompts before overwriting, -k preserves stored (uncompressed) entries, -S skips identical entries, -D ignores directory components when comparing names, -I ignores case."
 url = "https://libzip.org/"
 examples_safe = ["zipmerge ./all.zip ./a.zip ./b.zip"]
+examples_denied = ["zipmerge ~/.ssh/k.zip ./a.zip", "zipmerge ./all.zip ~/.ssh/k.zip"]
 researched_version = "libzip 1.x"
 level = "SafeWrite"
 bare = false
@@ -90,11 +132,15 @@ standalone = [
     "-h", "-i", "-k", "-s",
 ]
 
+[command.path_gate]
+positional = "write"
+
 [[command]]
 name = "zipcmp"
 description = "Compare contents of two zip archives (or zip vs directory) by name, uncompressed size, and CRC. -C validates archive consistency, -p enables paranoid checks (extra fields, comments), -t verifies checksums, -T compares timestamps, -i is case-insensitive."
 url = "https://libzip.org/"
 examples_safe = ["zipcmp ./a.zip ./b.zip"]
+examples_denied = ["zipcmp ~/.ssh/k.zip ./b.zip"]
 researched_version = "libzip 1.x"
 level = "Inert"
 bare = false
@@ -103,21 +149,29 @@ standalone = [
     "-h", "-i", "-p", "-q", "-s", "-t", "-v",
 ]
 
+[command.path_gate]
+positional = "read"
+
 [[command]]
 name = "zipdetails"
 description = "Display the internal record structure of a zip file (offsets, signatures, field decoding) using prior knowledge of the zip APPNOTE format. -v adds field length and hex dump per record; --scan searches the file for signatures when the central directory is damaged."
 url = "https://perldoc.perl.org/zipdetails"
 examples_safe = ["zipdetails ./out.zip"]
+examples_denied = ["zipdetails ~/.ssh/k.zip"]
 researched_version = "Perl IO::Compress 2.x"
 level = "Inert"
 bare = false
 standalone = ["--scan", "--version", "-h", "-v"]
+
+[command.path_gate]
+positional = "read"
 
 [[command]]
 name = "zipgrep"
 description = "Run egrep across the contents of files inside a ZIP archive. egrep options precede the archive name; trailing positional args restrict which archive members are searched; -x excludes members. Behaves like egrep(1) on the decompressed text."
 url = "https://infozip.sourceforge.net/"
 examples_safe = ["zipgrep TODO ./bundle.zip"]
+examples_denied = ["zipgrep key ~/.ssh/k.zip"]
 researched_version = "Info-ZIP zipgrep (2009)"
 level = "Inert"
 bare = false
@@ -125,13 +179,13 @@ tolerate_unknown_short = true
 
 [[command]]
 name = "ziptool"
-description = "Reference modify-zip CLI from libzip. Takes a zip-archive path then one or more commands (add, add_dir, add_file, add_from_zip, cat, delete, rename, set_file_compression, set_file_encryption, set_archive_comment, set_file_comment, set_file_mtime, get_*, stat, name_locate, etc.). The cat / get_* / stat / name_locate / count_* commands are read-only; the others mutate the archive."
-url = "https://libzip.org/"
-examples_safe = ["ziptool ./out.zip stat 0"]
-researched_version = "libzip 1.x"
+description = "Reference modify-zip CLI from libzip. Takes a zip-archive path, opened for writing whenever a command changes it (and created with -n), then one or more commands with their arguments. cat, stat, name_locate, get_* and count_* only read the archive (cat prints an entry to stdout). add, add_dir, delete, rename, replace_file_contents and the set_* commands rewrite the archive in place. add_file NAME FILE OFFSET LEN reads FILE from anywhere on disk into the archive, and add_from_zip NAME ARCHIVE INDEX OFFSET LEN reads an entry out of a second archive. Options: -c check consistency, -e error if the archive exists, -g/-r/-s name-encoding modes for stat, -l/-o length and offset for the source, -n create, -t truncate. Ships with every libzip release (current: 1.12.1)."
+url = "https://libzip.org/documentation/ziptool.html"
+examples_safe = ["ziptool ./out.zip stat 0", "ziptool ./out.zip add_file a ./src/a.txt 0 0"]
+examples_denied = ["ziptool /etc/x.zip delete 0", "ziptool ~/.ssh/k.zip add a b", "ziptool o.zip add_file a ~/.ssh/id_ed25519 0 0", "ziptool o.zip add_from_zip a ~/.ssh/k.zip 0 0 0"]
+researched_version = "libzip 1.12.1"
 level = "SafeWrite"
 bare = false
-tolerate_unknown_short = true
 standalone = [
     "-c", "-e", "-g", "-h", "-n", "-r", "-s", "-t",
 ]
@@ -139,7 +193,8 @@ valued = ["-l", "-o"]
 
 [[command]]
 name = "funzip"
-description = "Extract the first member of a ZIP archive (or first gzip stream) to stdout. With no filename, reads from stdin. Optional `-password` (a single dash followed by the password) decrypts encrypted entries. There is no way to extract any member but the first."
+description = "Extract the first member of a ZIP archive (or first gzip stream) to stdout. The file it is given can be anywhere on disk and the member it prints enters the caller's output; with no filename, reads from stdin. Optional `-password` (a single dash followed by the password) decrypts encrypted entries. There is no way to extract any member but the first. Part of Info-ZIP UnZip; unchanged since 6.0 (April 2009)."
+examples_denied = ["funzip ~/.ssh/id_ed25519", "funzip ~/.aws/credentials", "funzip /etc/master.passwd"]
 url = "https://infozip.sourceforge.net/UnZip.html"
 examples_safe = ["funzip ./out.zip"]
 researched_version = "Info-ZIP funzip 3.95 (2009-04-20)"
@@ -149,13 +204,14 @@ tolerate_unknown_short = true
 
 [[command]]
 name = "streamzip"
-description = "Read data from stdin, package it in a zip container, and (by default) write the streamed zip to stdout. -zipfile=F writes to a file instead. -method picks the compression algorithm (store, deflate, bzip2, lzma, xz, zstd). -member-name names the single entry. -0..-9 sets deflate level."
+description = "Read data from stdin, package it in a zip container, and (by default) write the streamed zip to stdout. -zipfile F (or -zipfile=F) writes the archive to the file F instead, creating or overwriting it at any path. -method picks the compression algorithm (store, deflate, bzip2, lzma, xz, zstd). -member-name names the single entry. -0..-9 sets deflate level; -stream forces streaming mode; -zip64 forces Zip64. Options are parsed by Perl's Getopt::Long with its defaults, so `--zipfile` and any unambiguous abbreviation (`-zipf`) are the same option; leftover operands are an error. The script (version 1.00) ships with IO::Compress and changes rarely."
 url = "https://perldoc.perl.org/streamzip"
-examples_safe = ["streamzip"]
-researched_version = "Perl IO::Compress 2.x"
+examples_safe = ["streamzip", "streamzip -zipfile ./out.zip", "streamzip -zipfile=./out.zip -method store"]
+examples_denied = ["streamzip -zipfile ~/.zshrc", "streamzip -zipfile /etc/x", "streamzip -zipfile=/etc/x", "streamzip -zipf ~/.zshrc", "streamzip --zipfile ~/.zshrc"]
+researched_version = "IO::Compress 2.225 (streamzip 1.00)"
 level = "SafeWrite"
 bare = true
-tolerate_unknown_short = true
+max_positional = 0
 standalone = [
     "-0", "-1", "-2", "-3", "-4", "-5",
     "-6", "-7", "-8", "-9",
@@ -163,11 +219,15 @@ standalone = [
 ]
 valued = ["-member-name", "-method", "-zipfile"]
 
+[command.path_gate]
+flags = { "-zipfile" = "write" }
+
 [[command]]
 name = "unzipsfx"
 description = "Self-extracting stub prepended to a zip archive. When the resulting binary is run, it locates itself by name and extracts (or with -t, tests) the appended archive. Supports the same extract/test flags as unzip but omits listing, help, and obsolete-format decoders."
 url = "https://infozip.sourceforge.net/UnZip.html"
 examples_safe = ["unzipsfx ./out.exe"]
+examples_denied = ["unzipsfx -d ~/.ssh ./out.exe"]
 researched_version = "Info-ZIP unzipsfx 6.0"
 level = "SafeWrite"
 bare = true
@@ -178,3 +238,6 @@ standalone = [
     "-v", "-z", "-$",
 ]
 valued = ["-d", "-x"]
+
+[command.path_gate]
+flags = { "-d" = "write" }

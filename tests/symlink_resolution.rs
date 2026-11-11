@@ -152,6 +152,22 @@ fn a_cd_through_a_link_moves_to_the_target() {
 }
 
 #[test]
+fn a_repository_tool_through_a_link_out_of_the_project_is_refused() {
+    let p = project();
+    let elsewhere = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("outside folder");
+    symlink(elsewhere.path(), format!("{}/link", p.root)).expect("link");
+    for cmd in [
+        "cd link && jj diff", "cd link && jj log", "jj -R link diff", "jj --repository=link log", "cd link && jjpr",
+        "cd link && git status", "cd link && tig",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+    for cmd in ["jj diff", "cd src && jj log", "jj -R src log", "jjpr status"] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
 fn a_link_loop_is_refused() {
     let p = project();
     symlink(format!("{}/b", p.root), format!("{}/a", p.root)).expect("link");

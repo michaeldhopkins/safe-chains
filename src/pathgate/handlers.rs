@@ -9,13 +9,15 @@ use crate::parse::Token;
 
 pub(crate) mod jj;
 mod jq;
+mod pax;
 mod plist;
 
 /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
 #[cfg(test)]
 pub(super) const NAMES: &[&str] = &[
     "ar_archive", "defaults_domain", "exiftool_mode", "jj_destination", "jj_repository", "jq_program", "jupytext_mode", "mtree_mode",
-    "ncu_mode", "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode", "xcodebuild_settings", "yq_program",
+    "ncu_mode", "pax_mode", "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode", "xcodebuild_settings",
+    "yq_program",
 ];
 
 pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
@@ -29,6 +31,7 @@ pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         "jupytext_mode" => jupytext_mode(tokens),
         "mtree_mode" => mtree_mode(tokens),
         "ncu_mode" => ncu_mode(tokens),
+        "pax_mode" => pax::pax_mode(tokens),
         "plutil_mode" => plist::plutil_mode(tokens),
         "rdfind_mode" => rdfind_mode(tokens),
         "textutil_mode" => textutil_mode(tokens),

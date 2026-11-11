@@ -54,7 +54,11 @@ pub fn engine_verdict(tokens: &[Token]) -> Option<Verdict> {
 pub fn gated_engine_verdict(tokens: &[Token]) -> Option<Verdict> {
     let verdict = engine_verdict(tokens)?;
     let cmd = crate::registry::canonical_name(tokens.first()?.command_name());
-    Some(if verdict.is_allowed() && crate::pathgate::should_deny(cmd, tokens) { Verdict::Denied } else { verdict })
+    Some(if verdict.is_allowed() && (crate::pathgate::should_deny(cmd, tokens) || crate::handlers::refuses_its_arguments(tokens)) {
+        Verdict::Denied
+    } else {
+        verdict
+    })
 }
 
 /// Project a resolved profile to a legacy [`Verdict`]: the **lowest** authored level

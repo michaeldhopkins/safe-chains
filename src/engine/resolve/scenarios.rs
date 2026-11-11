@@ -115,6 +115,8 @@ mod tests {
             ],
             &[
                 "cat /proc/self/environ", "cat /proc/1234/environ", "cat /proc/self/mem", "cat /proc/1234/cmdline",
+                "cat /proc/self/task/1/environ", "cat /proc/1/task/1/environ", "cat /proc/self/task/7/mem",
+                "cat /proc/1234/task/1234/cmdline",
                 // auth logs carry credentials outright — a password mistyped at a username
                 // prompt is written to them in the clear
                 "cat /var/log/auth.log", "cat /var/log/secure", "dd if=./a of=/dev/sda",

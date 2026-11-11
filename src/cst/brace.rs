@@ -14,10 +14,11 @@ use super::eval::{BRACE_EXPANSION_CAP, UNPINNABLE, UNRESOLVED_BRACE};
 /// `{}` there as plain text.
 pub(super) fn spanning_open(s: &str, word_start: bool) -> Option<usize> {
     let chars: Vec<char> = s.chars().collect();
+    let params = parameter_spans(&chars);
     let offsets: Vec<usize> = s.char_indices().map(|(offset, _)| offset).collect();
     (leading_pair(s, word_start)..chars.len())
-        .filter(|&i| chars[i] == '{')
-        .find(|&i| closed_group(&chars, i).is_none_or(|group| matches!(group.kind, GroupKind::Literal | GroupKind::Dotted)))
+        .filter(|&i| chars[i] == '{' && !params[i])
+        .find(|&i| closed_group(&chars, &params, i).is_none_or(|group| matches!(group.kind, GroupKind::Literal | GroupKind::Dotted)))
         .map(|i| offsets[i])
 }
 
@@ -41,9 +42,10 @@ fn expand_from(s: &str, word_start: bool) -> Vec<String> {
         return vec![UNPINNABLE.to_string()];
     }
     let chars: Vec<char> = s.chars().collect();
+    let params = parameter_spans(&chars);
     let mut i = leading_pair(s, word_start);
     while i < chars.len() {
-        if let Some(group) = closed_group(&chars, i) {
+        if let Some(group) = closed_group(&chars, &params, i) {
             let content = group_text(&chars, group.open + 1, group.close);
             let expanded = match group.kind {
                 GroupKind::Comma => Some(expand_alts(&chars, &group, &split_top_commas(&content), true)),
@@ -83,8 +85,8 @@ enum GroupKind {
 /// The group that opens at `open`, classified by what bash expands. A `}` that closes text with
 /// no comma and no valid sequence does not end the group when a later `}` can: bash keeps looking,
 /// so `{ab},x}` is the group `ab},x`. A `{}` pair is plain text.
-fn closed_group(chars: &[char], open: usize) -> Option<Group> {
-    if chars.get(open) != Some(&'{') {
+fn closed_group(chars: &[char], params: &[bool], open: usize) -> Option<Group> {
+    if chars.get(open) != Some(&'{') || params[open] {
         return None;
     }
     let mut depth = 1;
@@ -94,6 +96,10 @@ fn closed_group(chars: &[char], open: usize) -> Option<Group> {
     let mut ends_at_close = false;
     let mut first_close = None;
     while j < chars.len() {
+        if params[j] {
+            j += 1;
+            continue;
+        }
         match chars[j] {
             '{' if chars.get(j + 1) == Some(&'}') => j += 1,
             '{' => depth += 1,
@@ -290,15 +296,21 @@ fn unresolved_span(chars: &[char], group: &Group) -> Vec<String> {
 /// Split on commas at brace-nesting depth 0, so `a,{b,c},d` → [`a`, `{b,c}`, `d`]. A `{}` pair
 /// and a `}` with nothing open are plain text, as bash reads them.
 fn split_top_commas(s: &str) -> Vec<String> {
+    let all: Vec<char> = s.chars().collect();
+    let params = parameter_spans(&all);
     let mut parts = Vec::new();
     let mut depth = 0i32;
     let mut cur = String::new();
-    let mut chars = s.chars().peekable();
-    while let Some(c) = chars.next() {
+    let mut chars = all.iter().copied().zip(params).peekable();
+    while let Some((c, param)) = chars.next() {
+        if param {
+            cur.push(c);
+            continue;
+        }
         match c {
-            '{' if chars.peek() == Some(&'}') => {
+            '{' if chars.peek().is_some_and(|&(next, _)| next == '}') => {
                 cur.push(c);
-                cur.extend(chars.next());
+                cur.extend(chars.next().map(|(next, _)| next));
             }
             '{' => {
                 depth += 1;
@@ -314,4 +326,33 @@ fn split_top_commas(s: &str) -> Vec<String> {
     }
     parts.push(cur);
     parts
+}
+
+/// Which characters sit inside a `${…}` parameter expansion, braces included. Bash does not
+/// brace-expand that text: `${PATH}` is a parameter, not a group. An unclosed one runs to the end.
+fn parameter_spans(chars: &[char]) -> Vec<bool> {
+    let mut inside = vec![false; chars.len()];
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i] != '$' || chars.get(i + 1) != Some(&'{') {
+            i += 1;
+            continue;
+        }
+        let mut depth = 0usize;
+        let mut end = chars.len() - 1;
+        for (j, &c) in chars.iter().enumerate().skip(i + 1) {
+            match c {
+                '{' => depth += 1,
+                '}' => depth -= 1,
+                _ => {}
+            }
+            if depth == 0 {
+                end = j;
+                break;
+            }
+        }
+        inside[i..=end].fill(true);
+        i = end + 1;
+    }
+    inside
 }

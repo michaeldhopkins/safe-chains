@@ -92,12 +92,50 @@ deny	read-shield	cat ~/Library/Keychains/login.keychain-db
 deny	read-shield	cat ~/Library/Cookies/Cookies.binarycookies
 deny	read-shield	cat /root/.bashrc
 deny	read-shield	cat /var/root/x
+deny	read-shield	cat ~/.claude/.credentials.json
+deny	read-shield	cat ~/.codex/auth.json
+deny	read-shield	cat ~/.gemini/oauth_creds.json
+deny	read-shield	cat ~/.qwen/oauth_creds.json
+deny	read-shield	cat ~/.grok/auth.json
+deny	read-shield	cat ~/.local/share/opencode/auth.json
+deny	read-shield	cat ~/.config/github-copilot/apps.json
+deny	read-shield	cat ~/.gemini/.env
+deny	read-shield	cat ~/.gemini/mcp-oauth-tokens.json
+deny	read-shield	cat ~/.copilot/config.json
+deny	read-shield	cat ~/.local/share/amp/secrets.json
+deny	read-shield	cat ~/.claude.json
+deny	read-shield	jq .mcpServers ~/.claude.json
+deny	read-shield	grep token ~/.codex/auth.json
+deny	read-shield	cat ~/.claude.json.backup
+deny	read-shield	cat ~/.claude/backups/.claude.json.backup.1700000000
+deny	read-shield	grep -r key ~/.claude/backups
+deny	read-shield	jq . ~/.claude/.credentials.json
+deny	read-shield	cat ~/.config/hub
+deny	read-shield	cat ~/.s3cfg
+deny	read-shield	cat ~/.env
+deny	read-shield	cat ~/.cursor/mcp.json
+deny	read-shield	cat ~/.codeium/windsurf/mcp_config.json
+deny	read-shield	cat ~/.continue/config.json
+deny	read-shield	cat ~/.continue/config.yaml
+deny	read-shield	cat ~/.config/goose/config.yaml
+deny	read-shield	cat ~/.config/goose/secrets.yaml
+deny	read-shield	cat ~/.aider.conf.yml
+deny	read-shield	cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
+deny	read-shield	cat ~/Library/Application\ Support/Claude/config.json
+deny	read-shield	jq .mcpServers ~/Library/"Application Support"/Claude/claude_desktop_config.json
+deny	read-shield	cat ~/.codex/history.jsonl
+deny	read-shield	cat ~/.codex/sessions/2026/10/20/rollout.jsonl
+deny	read-shield	tail -n 5 ~/.codex/history.jsonl
+allow	read-home	cat ~/.codex/config.toml
+allow	read-home	cat ~/.gemini/settings.json
 
 # ── Writes: the workspace and below ────────────────────────────────────────────────────────
 allow	write-workspace	touch out.txt
 allow	write-workspace	touch ./build/artifact.o
 allow	write-workspace	cp a.txt sub/b.txt
 allow	write-workspace	rm ./build/artifact.o
+allow	write-workspace	gitleaks detect --report-path report.json
+allow	write-workspace	gitleaks protect -r ./build/report.json
 
 # ── Writes: sibling workspaces. Create and mutate yes; DESTROY is deliberately withheld —
 # DECIDED 2026-08-16, marked for revisit on feel. See TODO.md. ─────────────────────────────
@@ -119,6 +157,9 @@ deny	write-home	touch ~/x
 deny	write-home	cp a.txt ~/notes.txt
 deny	write-home	echo hi > ~/.zshrc
 deny	write-home	rm ~/notes.txt
+deny	write-home	gitleaks detect --report-path ~/.zshrc
+deny	write-home	gitleaks protect -r ~/.zshrc
+deny	write-home	gitleaks detect --log-opts=--output=~/.zshrc
 
 # ── Writes: the shield and the machine stay closed ─────────────────────────────────────────
 deny	write-shield	echo x > ~/.ssh/authorized_keys
@@ -134,6 +175,10 @@ deny	write-autoexec	echo x >> .jj/repo/config.toml
 deny	write-autoexec	tee .jj/workspace-config.toml
 deny	write-autoexec	cp conf.toml sub/.jj/repo/config.toml
 deny	write-autoexec	echo x > .git/config
+deny	write-autoexec	gitleaks detect -r.git/config
+deny	write-autoexec	gitleaks detect --report-path=.git/config
+deny	write-autoexec	gitleaks detect --log-opts=-o.git/config
+deny	write-autoexec	gitleaks detect --log-opts="--all --output=.git/config"
 deny	write-autoexec	echo x > .hg/hgrc
 deny	write-autoexec	echo x > .sl/config
 deny	write-autoexec	jj git init /tmp/r && printf x > /tmp/r/.jj/repo/config.toml && jj -R /tmp/r diff

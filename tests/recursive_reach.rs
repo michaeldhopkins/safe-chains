@@ -20,6 +20,11 @@ fn project(dirs: &[&str]) -> Project {
     Project { _dir: dir, root }
 }
 
+fn climb_to(p: &Project, target: &std::path::Path) -> String {
+    let depth = std::path::Path::new(&p.root).components().count() - 1;
+    format!("{}{}", "../".repeat(depth), target.to_str().expect("utf-8").trim_start_matches('/'))
+}
+
 fn at(p: &Project, cmd: &str) -> Verdict {
     command_verdict_in(cmd, PathCtx { cwd: Some(p.root.clone()), root: Some(p.root.clone()), session_id: None })
 }
@@ -203,6 +208,169 @@ fn a_walk_that_follows_links_is_judged_where_they_lead() {
     }
 }
 
+fn with_secret_link(link: bool) -> Project {
+    let project = project(&["src"]);
+    if link {
+        std::os::unix::fs::symlink("/etc/ssh/not-a-real-key", format!("{}/k", project.root)).expect("symlink to a fake secret");
+    }
+    project
+}
+
+#[test]
+fn tar_follows_a_link_from_the_directory_in_effect() {
+    let secret = "/etc/ssh/not-a-real-key";
+    let linked = project(&["src", "sub/deep"]);
+    std::os::unix::fs::symlink(secret, format!("{}/sub/deep/s", linked.root)).expect("link under the member");
+    let plain = project(&["src", "sub/deep"]);
+    for cmd in ["tar -chf - -C sub deep", "tar -chf - --directory=sub deep", "tar -h -c -f - -C sub deep", "tar -chf - -C sub -C deep ."] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+
+    let outside = tempfile::tempdir_in("/tmp").expect("directory outside the project");
+    let abs = outside.path().canonicalize().expect("canonical directory").to_str().expect("utf-8").to_string();
+    let beside = format!("tar -chf - -C {} .", climb_to(&plain, std::path::Path::new(&abs)));
+    let absolute = format!("tar -chf - -C {abs} .");
+    assert!(at(&plain, &beside).is_allowed(), "{beside} was refused with nothing linked there");
+    assert!(at(&plain, &absolute).is_allowed(), "an absolute directory with no link was refused");
+    std::os::unix::fs::symlink(secret, outside.path().join("s")).expect("link in the other directory");
+    assert!(!at(&plain, &beside).is_allowed(), "{beside} was approved over a link to a secret");
+    assert!(!at(&plain, &absolute).is_allowed(), "an absolute directory was approved over a link to a secret");
+    let replaced = format!("tar -chf - -C sub -C {abs} .");
+    assert!(!at(&plain, &replaced).is_allowed(), "a later absolute directory was ignored");
+    std::fs::remove_file(outside.path().join("s")).expect("remove the link");
+    assert!(at(&plain, &replaced).is_allowed(), "a later absolute directory with no link was refused");
+}
+
+#[test]
+fn zip_follows_links_in_names_read_from_stdin() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in ["git ls-files | zip -@ -", "git ls-files | zip -@ out.zip", "git ls-files | zip out.zip -@"] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+}
+
+#[test]
+fn ag_follows_links_into_the_path_after_its_pattern() {
+    let secret = "/etc/ssh/not-a-real-key";
+    let plain = project(&["src"]);
+    let scratch = tempfile::tempdir_in("/tmp").expect("folder outside the project");
+    let parent = scratch.path().canonicalize().expect("canonical folder");
+    let other = parent.join("other");
+    let nested = parent.join("p2").join("sub");
+    std::fs::create_dir_all(&other).expect("sibling directory");
+    std::fs::create_dir_all(&nested).expect("nested sibling");
+    let abs = tempfile::tempdir_in("/tmp").expect("absolute directory");
+    let abs_path = abs.path().canonicalize().expect("canonical directory");
+    let absolute = format!("ag -f x {}", abs_path.display());
+    let (to_other, to_nested) = (format!("ag -f x {}", climb_to(&plain, &other)), format!("ag -f x {}", climb_to(&plain, &nested)));
+    for cmd in [to_other.as_str(), to_nested.as_str(), absolute.as_str()] {
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused with no link");
+    }
+    std::os::unix::fs::symlink(secret, other.join("s")).expect("link");
+    std::os::unix::fs::symlink(secret, nested.join("s")).expect("link");
+    std::os::unix::fs::symlink(secret, abs_path.join("s")).expect("link");
+    for cmd in [to_other.as_str(), to_nested.as_str(), absolute.as_str()] {
+        assert!(!at(&plain, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+
+    let linked = with_secret_link(true);
+    let clean = with_secret_link(false);
+    for cmd in ["ag -f --depth 9 x", "ag -f --ignore foo x", "ag --follow --depth 9 x"] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&clean, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+}
+
+#[test]
+fn ripgrep_follows_links_when_a_valued_option_precedes_the_pattern() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in [
+        "rg -L --max-depth 9 x", "rg -L -E utf8 x", "rg -L --iglob '*' x", "rg -L --sort path x", "rg --follow --sort path x",
+        "rg -L --encoding utf8 x", "rg -L --color never x", "rg -L --colors 'match:fg:red' x", "rg -L --ignore-file .ignore x",
+        "rg -L --path-separator / x", "rg -L --engine default x", "rg -L --max-columns 10 x",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+}
+
+#[test]
+fn ripgrep_follows_links_when_its_config_path_is_set() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in [
+        "RIPGREP_CONFIG_PATH=./rgrc rg x", "RIPGREP_CONFIG_PATH=rgrc rg x", "env RIPGREP_CONFIG_PATH=./rgrc rg x",
+        "env RIPGREP_CONFIG_PATH=rgrc rg x",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+    for cmd in [
+        "rg x",
+        "RIPGREP_CONFIG_PATH= rg x",
+        "RIPGREP_CONFIG_PATH=./rgrc rg --no-config x",
+        "env RIPGREP_CONFIG_PATH=./rgrc rg --no-config x",
+    ] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn pax_7z_ack_and_diff_follow_links_in_the_tree_they_read() {
+    let secret = "/etc/ssh/not-a-real-key";
+    let linked = project(&["src", "sub", "empty"]);
+    std::os::unix::fs::symlink(secret, format!("{}/sub/s", linked.root)).expect("link");
+    let plain = project(&["src", "sub", "empty"]);
+    for cmd in [
+        "pax -wL sub", "pax -w -L sub", "pax -w -H sub", "git ls-files | pax -wL", "7z a -l out.7z sub", "7z a out.7z sub",
+        "ack --follow x", "diff -rN sub empty", "diff -ruN empty sub",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a tree with no such link");
+    }
+    for cmd in [
+        "pax -w sub", "pax -w -L -P sub", "7z a -snl out.7z sub", "ack x", "ack --follow --nofollow x", "diff sub empty",
+        "diff -rN --no-dereference sub empty",
+    ] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn a_command_that_follows_links_is_refused_when_one_leads_to_a_secret() {
+    let linked = with_secret_link(true);
+    let plain = with_secret_link(false);
+    for cmd in [
+        "git ls-files | cpio -oL", "tar -chf - .", "tar -cf - --dereference .", "rg -L x", "rg --follow x", "ag -f x", "zip -r - .",
+        "zip -0r - .",
+    ] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+        assert!(at(&plain, cmd).is_allowed(), "{cmd} was refused in a project with no such link");
+    }
+    for cmd in ["git ls-files | cpio -o", "tar -cf - .", "rg x", "ag x", "zip -y -r - .", "zip -yr - ."] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused though it does not follow the link");
+    }
+}
+
+#[test]
+fn a_link_to_an_ordinary_outside_file_is_read() {
+    let linked = project(&["src"]);
+    let link = format!("{}/k", linked.root);
+    std::os::unix::fs::symlink("/etc/hosts", &link).expect("link to an ordinary file");
+    for cmd in ["zip -r out.zip .", "7z a out.7z .", "tar -chf - ."] {
+        assert!(at(&linked, cmd).is_allowed(), "{cmd} was refused over a link to an ordinary file");
+    }
+    std::fs::remove_file(&link).expect("remove the ordinary link");
+    std::os::unix::fs::symlink("/etc/ssh/not-a-real-key", &link).expect("link to a secret");
+    for cmd in ["zip -r out.zip .", "7z a out.7z .", "tar -chf - ."] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+}
+
 #[test]
 fn a_read_that_follows_links_is_judged_where_they_lead() {
     let p = project(&["src", "work/x"]);
@@ -245,4 +413,50 @@ fn a_prune_find_does_not_test_above_its_minimum_depth_keeps_nothing_away() {
     ] {
         assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
     }
+}
+
+#[test]
+fn a_pax_copy_is_judged_by_what_it_writes_below_its_destination() {
+    let p = project(&["src", ".git/hooks", "other/.git/hooks", "hooks", "dest"]);
+    for cmd in [
+        "pax -rw other dest", "pax -r -w other dest", "pax -wr other dest", "pax -rw hooks .git", "pax -rw src .", "pax -rw src .jj",
+        "pax -rwk src .git/hooks", "pax -rw -s ,^,../../, src dest",
+    ] {
+        assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
+    }
+    for cmd in ["pax -rw src dest", "pax -r -w -p e src dest", "pax -w -f out.tar src", "pax -f out.tar"] {
+        assert!(at(&p, cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn every_spelling_of_a_pax_copy_into_frozen_metadata_is_refused() {
+    let p = project(&["src", "dest"]);
+    for mode in ["-rw", "-wr", "-r -w", "-w -r", "-rwv", "-v -r -k -w", "-rwpe"] {
+        for frozen in [".git", ".jj", ".hg", ".sl", ".envrc", "sub/.git/hooks", "dest/.jj/repo"] {
+            let cmd = format!("pax {mode} src {frozen}");
+            assert!(!at(&p, &cmd).is_allowed(), "{cmd} was approved");
+        }
+        let cmd = format!("pax {mode} src dest");
+        assert!(at(&p, &cmd).is_allowed(), "{cmd} was refused");
+    }
+}
+
+#[test]
+fn zip_reading_names_from_a_pipe_is_refused_when_the_source_of_names_is_unknown() {
+    let plain = with_secret_link(false);
+    for cmd in ["cat names.txt | zip -@ out.zip", "cat names.txt | zip -y -@ out.zip", "cat names.txt | zip -y --names-stdin out.zip"] {
+        assert!(!at(&plain, cmd).is_allowed(), "{cmd} was approved with names nothing can check");
+    }
+}
+
+#[test]
+fn zip_after_the_option_terminator_reads_its_operands_but_not_the_terminator() {
+    let linked = with_secret_link(true);
+    for cmd in ["zip -r out.zip -- k", "zip -r -- out.zip k"] {
+        assert!(!at(&linked, cmd).is_allowed(), "{cmd} was approved over a link to a secret");
+    }
+    // A file named `--` is no operand: the terminator itself is not read as an input.
+    std::os::unix::fs::symlink("/etc/ssh/not-a-real-key", format!("{}/--", linked.root)).expect("link named as the terminator");
+    assert!(at(&linked, "zip -r out.zip -- src").is_allowed(), "the option terminator was read as an input");
 }

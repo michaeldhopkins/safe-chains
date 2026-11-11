@@ -1,0 +1,9 @@
+[[command]]
+name = "ps2ascii"
+description = "Ghostscript wrapper script. Runs gs with -sDEVICE=txtwrite to extract text from a PostScript or PDF document. Reads the first positional argument (or stdin); writes text to the second positional (or stdout when only one positional is given, or when invoked as a stdin filter). Supports Unicode extraction. The wrapper takes no flags of its own. Ghostscript releases roughly once a year; the wrapper script surface has been stable for decades."
+url = "https://ghostscript.readthedocs.io/en/latest/"
+researched_version = "Ghostscript 10.06.0 (Sept 2025)"
+level = "SafeWrite"
+bare = true
+max_positional = 2
+examples_safe = ["ps2ascii input.pdf output.txt"]

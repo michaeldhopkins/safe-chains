@@ -37,6 +37,25 @@
 #   toolchain-name  the value names a rustup toolchain → allowed only in the shape `cargo +name`
 #                accepts (letters, digits, `.`, `_`, `-`, starting with a letter or digit); rustup
 #                reads a value with a path separator as a toolchain directory and runs its binaries.
+#   shell-program  the value names the shell a program starts for a new window or a shell escape →
+#                allowed only as a shell (sh, bash, zsh, dash, ksh, tcsh, csh, fish) named in full
+#                in a standard system bin directory (/bin, /usr/bin, /usr/local/bin,
+#                /opt/homebrew/bin). A bare name is refused, so the program started is always one
+#                named in full whatever PATH holds; a relative, home or temp path, a word carrying
+#                arguments, or another program in those directories (make, an interpreter) is
+#                refused too.
+#   remote-shell the value is the remote shell rsync starts → allowed only as ssh or rsh with plain
+#                options (no ProxyCommand, LocalCommand or config file), then gated as exec-path,
+#                the same rule as rsync -e.
+#   command-search the value is the list of directories the shell searches for a bare command name
+#                → every element must be `$PATH` itself, a standard system bin directory (/bin,
+#                /usr/bin, /usr/local/bin, /opt/homebrew/bin, /sbin, /usr/sbin), or an absolute
+#                directory the exec-path rule admits (the project). An empty value or element, or a
+#                relative one, searches the working directory, which can change, so it is refused.
+#   shell-text   the value is pasted into a shell command line the program evaluates (macOS man is a
+#                shell script that evaluates page paths and the output of `locale`) → refused when it
+#                holds a backtick, $, a double quote, a backslash, ; | & ( ) < > or a line break;
+#                otherwise inert.
 #
 # An entry may also carry `twin_flag` / `twin_base`, naming the FLAG spelling of the same thing:
 #   twin_flag = "rsync -e {v} ./src/ ./dst/"   the flag invocation, `{v}` marking the value
@@ -182,12 +201,118 @@ measured = false
 [env.PS4]
 shape = "opaque"
 because = "expanded before each traced command, so a command substitution in it runs once tracing is on (measured: executes with SHELLOPTS=xtrace)"
+[env.PROMPT_COMMAND]
+shape = "command"
+because = "an interactive bash runs it before each prompt, so a shell tmux or screen starts for a new window runs it with nothing on the screen"
+measured = false
+[env.PS0]
+shape = "opaque"
+because = "an interactive bash expands it after reading each command, so a command substitution in it runs"
+measured = false
+[env.PS1]
+shape = "opaque"
+because = "an interactive bash or ksh expands it before each prompt, so a command substitution in it runs (zsh too with PROMPT_SUBST)"
+measured = false
+[env.PS2]
+shape = "opaque"
+because = "expanded like PS1 before each continuation line"
+measured = false
+[env.PS3]
+shape = "opaque"
+because = "the select prompt, expanded like PS1 by ksh and zsh"
+measured = false
+[env.PROMPT]
+shape = "opaque"
+because = "zsh's name for PS1, expanded before each prompt, so a command substitution in it runs with PROMPT_SUBST"
+measured = false
+[env.PROMPT2]
+shape = "opaque"
+because = "zsh's name for PS2"
+measured = false
+[env.PROMPT3]
+shape = "opaque"
+because = "zsh's name for PS3"
+measured = false
+[env.PROMPT4]
+shape = "opaque"
+because = "zsh's name for PS4, expanded before each traced command"
+measured = false
+[env.RPROMPT]
+shape = "opaque"
+because = "zsh's right-hand prompt, expanded like PROMPT"
+measured = false
+[env.RPS1]
+shape = "opaque"
+because = "zsh's other name for RPROMPT"
+measured = false
+[env.RPROMPT2]
+shape = "opaque"
+because = "zsh's right-hand continuation prompt"
+measured = false
+[env.RPS2]
+shape = "opaque"
+because = "zsh's other name for RPROMPT2"
+measured = false
+[env.SPROMPT]
+shape = "opaque"
+because = "zsh's spelling-correction prompt, expanded like PROMPT"
+measured = false
 [env."BASH_FUNC_*"]
 shape = "opaque"
 because = "bash imports BASH_FUNC_<name>%% as a function definition, so the command it names runs the value's body instead (measured: executes)"
 [env."__BASH_FUNC*"]
 shape = "opaque"
 because = "the macOS /bin/bash spelling of BASH_FUNC_ (__BASH_FUNC<name>%%)"
+measured = false
+
+# ── Command lookup ───────────────────────────────────────────────────────────
+# A bare name is trusted because it is found through PATH, so a PATH that names another folder makes
+# every later bare name a program from that folder: `PATH=/tmp/evil ls` runs /tmp/evil/ls. An element
+# placed after `$PATH` still matters, since a name the earlier folders lack is found there. zsh ties
+# the `path` array to PATH, so `path+=/tmp/evil` appends a folder in the same way.
+[env.PATH]
+shape = "command-search"
+because = "the shell finds every bare command name in these folders, in order (measured: PATH=<dir> and an empty PATH both ran a planted program named after a safe tool)"
+[env.path]
+shape = "command-search"
+because = "zsh ties the path array to PATH, so assigning or appending to it changes where bare names are found (measured: path+=(.) ran a planted program)"
+
+# ── Terminal multiplexers ────────────────────────────────────────────────────
+# screen and tmux start the user's shell for every new window, and screen reads an rc file whose
+# `screen` and `exec` lines start programs. A detached session needs no terminal, so each of these
+# ran a planted script with nothing on the screen.
+[env.SHELL]
+shape = "shell-program"
+because = "screen and tmux start it for each new window and run their command strings through it (measured: SHELL=./x.sh tmux new -d and screen -dm executed x.sh)"
+[env.SCREENRC]
+shape = "opaque"
+because = "screen reads it in place of ~/.screenrc, and a screen line in it starts a program (measured: executes)"
+[env.SYSSCREENRC]
+shape = "opaque"
+because = "screen reads it in place of /etc/screenrc, with the same commands as SCREENRC"
+measured = false
+
+# ── mise ─────────────────────────────────────────────────────────────────────
+# mise reads every one of its settings from a MISE_<SETTING> variable, in front of mise itself and
+# in front of any shim it installed (`cargo`, `node`). Several decide which config files load and
+# whether they are trusted: MISE_TRUSTED_CONFIG_PATHS, MISE_YES and MISE_PARANOID skip the trust
+# prompt; MISE_CONFIG_FILE, MISE_GLOBAL_CONFIG_FILE, MISE_SYSTEM_CONFIG_FILE, MISE_CONFIG_DIR,
+# MISE_OVERRIDE_CONFIG_FILENAMES and MISE_ENV pick the files; MISE_DATA_DIR picks the plugins that
+# run. A trusted config runs its hooks, tasks and [env] scripts, so the whole prefix is refused.
+[env."MISE_*"]
+shape = "opaque"
+because = "every mise setting, including which config files load and whether they are trusted (measured: MISE_TRUSTED_CONFIG_PATHS made mise env run an untrusted config's _.source script)"
+
+# ── codex ────────────────────────────────────────────────────────────────────
+# codex reads its config.toml from CODEX_HOME, and that file names the notify program and the MCP
+# servers it starts. The cloud subcommands send the sign-in token to CODEX_CLOUD_TASKS_BASE_URL.
+[env.CODEX_HOME]
+shape = "opaque"
+because = "codex reads config.toml from it, whose notify program and MCP server commands run"
+measured = false
+[env.CODEX_CLOUD_TASKS_BASE_URL]
+shape = "opaque"
+because = "codex cloud sends the ChatGPT sign-in token to this server"
 measured = false
 
 # ── Command substitution: the value IS a command ─────────────────────────────
@@ -273,6 +398,25 @@ measured = false
 shape = "command"
 because = "man pipes the page through this, ahead of PAGER"
 measured = false
+[env.WHATISPAGER]
+shape = "command"
+because = "man -k, man -f, apropos and whatis pipe their output through this on macOS"
+[env.MANOPT]
+shape = "opaque"
+because = "man-db parses this as options before its arguments, --pager and --config-file among them"
+measured = false
+[env.MANPATH]
+shape = "shell-text"
+because = "macOS man is a shell script that evaluates each page path it builds from these folders"
+measured = false
+[env.MANSECT]
+shape = "shell-text"
+because = "macOS man builds page paths from these sections and evaluates them"
+measured = false
+[env.LANG]
+shape = "shell-text"
+because = "macOS man evaluates the output of locale, which prints LANG exactly as set"
+measured = true
 [env.GH_PAGER]
 shape = "command"
 because = "gh pipes output through this, ahead of PAGER"
@@ -379,6 +523,36 @@ measured = false
 shape = "opaque"
 because = "Ex commands vim runs at startup in place of the vimrc, and :! runs a program"
 measured = false
+[env.VIM]
+shape = "opaque"
+because = "vim sources $VIM/vimrc at startup, as -u would"
+[env.VIMRUNTIME]
+shape = "opaque"
+because = "vim sources every $VIMRUNTIME/plugin/*.vim at startup"
+[env.GVIMINIT]
+shape = "opaque"
+because = "as VIMINIT, for gvim"
+measured = false
+[env.NVIM_APPNAME]
+shape = "opaque"
+because = "names the folder under XDG_CONFIG_HOME whose init.lua or init.vim nvim runs, and ../ climbs out of it"
+measured = false
+[env.EMACSLOADPATH]
+shape = "opaque"
+because = "emacs loads site-start.el and every library it requires from these folders"
+measured = false
+[env.EMACSPATH]
+shape = "opaque"
+because = "the folders emacs searches for the helper programs it runs"
+measured = false
+[env.EMACSDATA]
+shape = "opaque"
+because = "emacs's data folder, which holds files it loads at startup"
+measured = false
+[env.EMACSNATIVELOADPATH]
+shape = "opaque"
+because = "folders of natively compiled code emacs loads"
+measured = false
 [env.EXINIT]
 shape = "opaque"
 because = "as VIMINIT, for vi and ex"
@@ -435,6 +609,117 @@ because = "git config can define aliases and core.pager, so a caller-controlled 
 [env.GIT_CONFIG_SYSTEM]
 shape = "config-file"
 because = "as GIT_CONFIG_GLOBAL"
+[env.ANSIBLE_CONFIG]
+shape = "config-file"
+because = "ansible.cfg can name a vault password file, which ansible runs when it is executable, and plugin and module folders it loads code from"
+[env.ANSIBLE_VAULT_PASSWORD_FILE]
+shape = "opaque"
+because = "ansible runs the named file when it is executable and reads its output as the vault password; a relative name is read from the working directory, not PATH"
+measured = false
+[env.ANSIBLE_LOG_PATH]
+shape = "data-write"
+because = "ansible appends a line for every message it displays to this file, creating it when absent"
+measured = false
+[env.ANSIBLE_VAULT_IDENTITY_LIST]
+shape = "opaque"
+because = "label@source pairs whose sources ansible runs when they are executable, as ANSIBLE_VAULT_PASSWORD_FILE"
+measured = false
+[env.ANSIBLE_ACTION_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for action plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_BECOME_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for become plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CACHE_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for cache plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CALLBACK_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for callback plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CLICONF_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for cliconf plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_CONNECTION_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for connection plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_DOC_FRAGMENT_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for doc fragment plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_FILTER_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for filter plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_HTTPAPI_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for httpapi plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_INVENTORY_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for inventory plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_LOOKUP_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for lookup plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_NETCONF_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for netconf plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_STRATEGY_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for strategy plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_TERMINAL_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for terminal plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_TEST_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for test plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_VARS_PLUGINS]
+shape = "exec-path"
+because = "folders ansible searches for vars plugins, Python it imports and runs"
+measured = false
+[env.ANSIBLE_LIBRARY]
+shape = "exec-path"
+because = "folders ansible searches for modules, which it runs when a task names them"
+measured = false
+[env.ANSIBLE_MODULE_UTILS]
+shape = "exec-path"
+because = "folders of module_utils that ansible bundles into the modules it runs"
+measured = false
+[env.ANSIBLE_COLLECTIONS_PATH]
+shape = "exec-path"
+because = "folders ansible loads collections from, whose plugins it imports and runs"
+measured = false
+[env.ANSIBLE_COLLECTIONS_PATHS]
+shape = "exec-path"
+because = "the older spelling of ANSIBLE_COLLECTIONS_PATH, still read"
+measured = false
+[env.ANSIBLE_ROLES_PATH]
+shape = "exec-path"
+because = "folders ansible loads roles from, whose tasks and bundled plugins it runs"
+measured = false
+[env.ANSIBLE_HOME]
+shape = "exec-path"
+because = "the folder under which ansible looks for collections and plugins by default"
+measured = false
+[env.ANSIBLE_PLAYBOOK_DIR]
+shape = "exec-path"
+because = "the folder ansible treats as the playbook's, loading the collections and plugins beside it"
+measured = false
+[env.ANSIBLE_INVENTORY]
+shape = "opaque"
+because = "comma-separated inventory sources; ansible runs any that is an executable script to list the hosts"
+measured = false
 [env.ZDOTDIR]
 shape = "config-dir"
 because = "zsh sources .zshenv (and for a login or interactive shell .zprofile and .zshrc) from this directory"
@@ -645,13 +930,44 @@ because = "as ACK_PAGER, when output is colored"
 shape = "opaque"
 because = "ack parses this as options before its arguments, including --pager"
 [env.ACKRC]
-shape = "exec-path"
-because = "an ack config file, which can set --pager"
+shape = "opaque"
+because = "an ack config file, which can set --pager or --follow; the one the user already has is read where it is"
 [env.GHCRTS]
 shape = "opaque"
 twin_flag = "pandoc +RTS {v} -RTS README.md"
 twin_base = "pandoc README.md"
 because = "GHC runtime options in the environment (the +RTS twin): -t, -s and -S write statistics to a named file"
+[env.COMMAND_MODE]
+shape = "opaque"
+because = "macOS commands read it to pick legacy behaviour, where ps -e shows each process's environment as -E does"
+[env.GREP_OPTIONS]
+shape = "opaque"
+because = "BSD grep, as macOS ships it, parses this as options before its arguments, so -r turns a read of one file into a sweep of the folder"
+[env.TAR_OPTIONS]
+shape = "opaque"
+because = "GNU tar parses this as options before its arguments, including --to-command and --use-compress-program, which run programs"
+[env.TAPE]
+shape = "opaque"
+because = "tar, cpio and mt use this as the archive when -f is absent, so it is the -f twin for both reading and writing"
+measured = false
+[env.ZIPOPT]
+shape = "opaque"
+because = "Info-ZIP zip parses this as options before its arguments, including -TT, which names a command to run"
+[env.ZIP]
+shape = "opaque"
+because = "as ZIPOPT, read by Info-ZIP zip"
+[env.UNZIP]
+shape = "opaque"
+because = "Info-ZIP unzip parses this as options before its arguments, including -d, which sets where it extracts"
+[env.UNZIPOPT]
+shape = "opaque"
+because = "as UNZIP, read by Info-ZIP unzip"
+[env.ZIPINFO]
+shape = "opaque"
+because = "Info-ZIP zipinfo parses this as options before its arguments"
+[env.ZIPINFOOPT]
+shape = "opaque"
+because = "as ZIPINFO, read by Info-ZIP zipinfo"
 
 # ── Interpreter option strings ───────────────────────────────────────────────
 # These carry a FLAG STRING for an interpreter, so the value is parsed as flags and every token must
@@ -966,6 +1282,10 @@ allowed = [
 ]
 path_flags = [{ flag = "-XX:HeapDumpPath", role = "write" }]
 because = "passed to the JVM running the Gradle client and daemon"
+measured = false
+[env.MAVEN_ARGS]
+shape = "opaque"
+because = "Maven 3.9+ adds these words to its command line, so the phases, -D properties, settings and extension paths the mvn handler refuses as arguments arrive through it unread"
 measured = false
 [env.MAVEN_OPTS]
 shape = "option-string"
@@ -1393,15 +1713,43 @@ measured = false
 shape = "opaque"
 because = "less parses this as options before its arguments, including +cmd and -o log-file"
 measured = false
+[env.LESS_IS_MORE]
+shape = "opaque"
+because = "puts less in more mode, where -p takes a command less runs at startup instead of a search pattern (measured: executes)"
+[env.MORE]
+shape = "opaque"
+because = "more parses this as options before its arguments, as less does LESS, including +cmd, -p cmd and --lesskey-src (measured: executes)"
 [env.LESSKEYIN]
-shape = "exec-path"
-single_value = true
-because = "less reads key bindings and shell-escape macros from this file"
-measured = false
+shape = "opaque"
+because = "less reads key bindings from this file, and its #env section can set LESSOPEN, which less runs (measured: executes, even with output to a pipe)"
+[env.LESSKEYIN_SYSTEM]
+shape = "opaque"
+because = "as LESSKEYIN, for the system-wide lesskey file (measured: executes)"
 [env.LESSKEY]
-shape = "exec-path"
-single_value = true
-because = "older compiled lesskey file path"
+shape = "opaque"
+because = "an older compiled lesskey file, which can carry the same #env section as LESSKEYIN"
+measured = false
+[env.LESSKEY_SYSTEM]
+shape = "opaque"
+because = "as LESSKEY, for the system-wide compiled lesskey file"
+measured = false
+[env.LESSKEY_CONTENT]
+shape = "opaque"
+because = "less parses the value as lesskey source, #env section included (measured: executes)"
+[env.LESSKEY_CONTENT_SYSTEM]
+shape = "opaque"
+because = "as LESSKEY_CONTENT, for the system-wide lesskey source (measured: executes)"
+[env.LESSHISTFILE]
+shape = "data-write"
+because = "less writes its search and shell-command history to this file"
+measured = false
+[env.LESSEDIT]
+shape = "command"
+because = "the editor command less runs for its v key"
+measured = false
+[env.LESSGLOBALTAGS]
+shape = "command"
+because = "less runs this command to look up a tag for -t when the tags file is GTAGS"
 measured = false
 [env.DOCKER_HOST]
 shape = "opaque"
@@ -1456,6 +1804,49 @@ single_value = true
 twin_flag = "borg --remote-path {v} list repo"
 twin_base = "borg list repo"
 because = "the borg executable invoked on the far side (the --remote-path twin)"
+[env.BORG_PASSCOMMAND]
+shape = "command"
+because = "borg runs this command and reads the repository passphrase from its output"
+measured = false
+[env.BORG_NEW_PASSCOMMAND]
+shape = "command"
+because = "borg runs this command and reads the new passphrase from its output when a key is created or changed"
+measured = false
+[env.BORG_BASE_DIR]
+shape = "exec-path"
+single_value = true
+because = "the base of borg's config, keys, cache and security folders, which borg writes and trusts on the next run"
+measured = false
+[env.BORG_CONFIG_DIR]
+shape = "exec-path"
+single_value = true
+because = "where borg keeps its keys and security records, written and trusted on the next run"
+measured = false
+[env.BORG_KEYS_DIR]
+shape = "exec-path"
+single_value = true
+because = "where borg reads and writes the keys of keyfile-mode repositories"
+measured = false
+[env.BORG_KEY_FILE]
+shape = "exec-path"
+single_value = true
+because = "the key file borg decrypts a repository with, and writes when one is created"
+measured = false
+[env.BORG_SECURITY_DIR]
+shape = "exec-path"
+single_value = true
+because = "borg's record of each repository's location and key type, written and checked on the next run, so another one hides a relocated or downgraded repository"
+measured = false
+[env.BORG_CACHE_DIR]
+shape = "exec-path"
+single_value = true
+because = "borg's chunk and file cache, written and trusted on the next run to decide what is already stored"
+measured = false
+[env.TASK_TEMP_DIR]
+shape = "exec-path"
+single_value = true
+because = "where go-task writes the checksums that decide whether a task is skipped as up to date"
+measured = false
 [env.RESTIC_PASSWORD_COMMAND]
 shape = "exec-path"
 single_value = true
@@ -1463,7 +1854,7 @@ twin_flag = "restic --password-command {v} snapshots"
 twin_base = "restic snapshots"
 because = "restic runs this to obtain the repository password (the --password-command twin)"
 [env.RSYNC_RSH]
-shape = "exec-path"
+shape = "remote-shell"
 single_value = true
 twin_flag = "rsync -e {v} ./src/ ./dst/"
 twin_base = "rsync ./src/ ./dst/"
@@ -1478,9 +1869,35 @@ single_value = true
 twin_flag = "xcrun --toolchain {v} swift-format lint Sources/"
 twin_base = "xcrun swift-format lint Sources/"
 because = "selects the xctoolchain xcrun dispatches tools from (the --toolchain twin)"
+[env.RSYNC_PARTIAL_DIR]
+shape = "data-write"
+single_value = true
+twin_flag = "rsync --partial --partial-dir={v} ./src/ ./dst/"
+twin_base = "rsync --partial ./src/ ./dst/"
+because = "the folder rsync keeps partly sent files in when --partial is given (the --partial-dir twin)"
+[env.RSYNC_CONNECT_PROG]
+shape = "opaque"
+because = "rsync runs it through the shell, with %H replaced by the host, to reach an rsync daemon in place of a TCP connection, so any value is a command line"
+measured = false
 [env.KUBECONFIG]
 shape = "exec-path"
 because = "a kubeconfig can carry a users[].user.exec credential plugin the client RUNS (the --kubeconfig twin)"
+[env.KUBECTL_EXTERNAL_DIFF]
+shape = "command"
+because = "kubectl diff runs this program, with its arguments, in place of diff -u -N"
+measured = false
+[env.KUBERC]
+shape = "opaque"
+because = "kubectl reads aliases and per-command default flags from this file (the --kuberc twin)"
+measured = false
+[env.KUBECTL_KUBERC]
+shape = "opaque"
+because = "switches kubectl's reading of a kuberc file on or off"
+measured = false
+[env.KUBECACHEDIR]
+shape = "opaque"
+because = "kubectl writes its discovery and HTTP caches here, and reads them back as API answers (the --cache-dir twin)"
+measured = false
 [env.HEAVY_SLOT_PERL]
 shape = "exec-path"
 single_value = true

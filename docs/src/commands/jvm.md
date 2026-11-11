@@ -40,7 +40,8 @@ Aliases: `gradlew`
 ### `jarsigner`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jarsigner.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/jarsigner.html</a></p>
 
-- Requires -verify. - Allowed standalone flags: -certs, -strict, -verbose, -verify, -help, -h
+- Requires -verify.
+- Allowed standalone flags: -certs, -strict, -verbose, -verify, -help, -h
 
 ### `javap`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html</a></p>
@@ -133,7 +134,7 @@ Aliases: `gradlew`
 ### `mvn / mvnw`
 <p class="cmd-url"><a href="https://maven.apache.org/ref/current/maven-embedder/cli.html">https://maven.apache.org/ref/current/maven-embedder/cli.html</a></p>
 
-- Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
+- Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify. Properties (-D): cmd, detail, excludedGroups, excludes, failIfNoTests, goal, groups, includes, it.test, maven.compiler.release, maven.compiler.source, maven.compiler.target, maven.javadoc.skip, maven.main.skip, maven.test.failure.ignore, maven.test.skip, medium, minimal, plugin, scope, skipITs, skipTests, style.color, surefire.failIfNoSpecifiedTests, test, verbose.
 
 ### `sbt`
 <p class="cmd-url"><a href="https://www.scala-sbt.org/">https://www.scala-sbt.org/</a></p>

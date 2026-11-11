@@ -96,6 +96,7 @@ owed = [
 "src/cst/parse/function.rs" = ["src/cst/proptests.rs::roundtrip", "src/cst/proptests.rs::a_redirect_written_on_a_function_body_applies_to_each_call"]
 "src/cst/parse.rs" = [
   "a_random_unclosed_nest_parses_in_linear_work",
+  "src/cst/funsub_tests.rs::a_function_substitution_is_never_approved",
   "src/cst/proptests.rs::roundtrip",
   "src/cst/proptests.rs::parse_never_panics",
   "src/cst/escape_tests.rs::a_line_continuation_inside_a_word_never_changes_the_verdict",
@@ -130,11 +131,17 @@ owed = [
   "every_prefix_of_a_pattern_long_flag_supplies_a_pattern",
   "a_bare_word_never_supplies_a_pattern",
 ]
+"src/handlers/env_print.rs" = [
+  "a_p_flag_lists_and_assignments_alone_do_not",
+  "a_name_beside_remove_is_printed_and_a_removal_alone_is_not",
+]
 "src/handlers/perl_load.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/brace.rs" = ["src/cst/brace_bash_tests.rs::a_brace_word_is_exact_or_unresolved", "src/cst/brace_bash_tests.rs::a_sequence_brace_is_exact_or_unresolved"]
 "src/cst/budget.rs" = []
 "src/cst/classify_budget.rs" = ["src/cst/classify_budget_tests.rs::delegation_never_parses_more_than_the_allowance"]
 "src/cst/scope_budget.rs" = ["src/cst/scope_budget.rs::sources_never_multiply_the_binding_set"]
+"src/cst/search_quote.rs" = ["src/cst/search_quote_tests.rs::a_dollar_the_shell_keeps_in_a_search_path_is_refused"]
+"src/cst/stdin_fed.rs" = ["src/cst/stdin_fed_tests.rs::an_editor_is_refused_exactly_when_its_standard_input_is_fed", "src/cst/stdin_fed_tests.rs::only_a_line_number_passes_as_a_plus_operand"]
 "src/cst/reserved.rs" = []
 "src/pathctx/anchor.rs" = [
   "src/pathctx/anchor_tests.rs::a_placed_write_is_plain_and_stays_put",
@@ -153,7 +160,12 @@ owed = [
 "src/registry/cwd_writes.rs" = ["only_a_well_formed_declaration_lowers"]
 "src/registry/build_archetype_flags.rs" = ["valued_joins_the_flag_and_command_lists"]
 "src/registry/build_lower.rs" = ["output_lowers_only_a_known_source"]
-"src/registry/glob_flags.rs" = ["an_undeclared_family_refuses_nothing", "only_an_undeclared_flag_refuses"]
+"src/registry/glob_flags.rs" = ["an_undeclared_family_refuses_nothing", "only_an_undeclared_flag_refuses", "a_value_is_judged_alike_in_every_spelling", "ascii_letter_flag_admits_any_letter_word_in_every_spelling", "ascii_letter_flag_refuses_any_non_letter_in_every_spelling"]
+"src/registry/dispatch/credential_args.rs" = ["a_credential_name_is_found_in_any_position", "a_pattern_that_could_spell_a_credential_name_is_one"]
+"src/registry/dispatch/pre_flags.rs" = ["the_listed_flags_in_front_are_skipped_with_their_values"]
+"src/registry/dispatch/delegate.rs" = ["only_listed_flags_pass_before_the_separator"]
+"src/engine/resolve/regions/home_spelling.rs" = ["a_prefix_strips_in_any_case_only_at_a_component_boundary"]
+"src/engine/resolve/regions/path_text.rs" = ["a_path_is_below_a_root_only_past_a_component_boundary", "the_folded_prefix_agrees_with_lowercasing", "a_hidden_component_is_found_wherever_it_is"]
 "src/engine/archetype.rs" = []
 "src/engine/authoring.rs" = [
   "union_levels_admit_everything_but_their_declared_gap",
@@ -201,23 +213,78 @@ owed = [
   "src/handler_property_tests.rs::tagged_substitution_residue_cannot_escape",
   "a_temp_directory_is_not_lifted_into_the_worktree_by_a_substitution_tag",
 ]
+"src/engine/resolve/locus_url.rs" = [
+  "a_file_url_names_the_local_path_inside_it",
+  "a_path_or_a_hostless_scheme_is_not_a_url",
+]
+"src/engine/resolve/lookup_prefix.rs" = [
+  "a_run_of_lookup_prefixes_strips_to_the_path_after_it",
+  "a_path_without_a_lookup_prefix_is_left_alone",
+]
 "src/envvars.rs" = []
 "src/envvars/option_string.rs" = []
+"src/ghc_rts.rs" = ["a_runtime_option_anywhere_among_the_arguments_denies"]
+"src/registry/types/hooks.rs" = ["src/ghc_rts.rs::a_runtime_option_anywhere_among_the_arguments_denies"]
 "src/envvars/config_dir.rs" = [
   "src/envvars/config_dir_tests.rs::any_config_location_under_a_temp_root_is_refused",
   "src/envvars/config_dir_tests.rs::a_config_directory_outside_the_scratch_places_is_allowed",
   "src/envvars/config_dir_tests.rs::the_refusal_is_the_same_with_and_without_the_prefix_spellings",
   "src/envvars/config_dir_tests.rs::a_case_variant_of_a_temp_root_is_refused",
 ]
+"src/envvars/command_search.rs" = [
+  "src/envvars/command_search_tests.rs::a_foreign_search_folder_anywhere_in_path_is_refused",
+  "src/envvars/command_search_tests.rs::a_path_of_standard_folders_keeps_the_commands_verdict",
+]
+"src/envvars/exported.rs" = [
+  "src/envvars/exported_tests.rs::an_operand_that_could_be_any_assignment_is_refused",
+  "src/envvars/exported_tests.rs::an_exported_assignment_agrees_with_the_statement",
+]
 "src/envvars/rebind.rs" = [
   "src/envvars/rebind_tests.rs::a_loop_variable_agrees_with_the_same_assignment",
   "src/envvars/rebind_tests.rs::reading_into_a_listed_variable_is_always_refused",
   "src/cst/proptests.rs::a_hook_array_filled_by_a_command_is_refused",
 ]
+"src/envvars/shell_words.rs" = [
+  "src/envvars/shell_words_tests.rs::only_a_named_shell_in_a_standard_bin_is_allowed",
+  "src/envvars/shell_words_tests.rs::every_standard_shell_is_allowed",
+  "src/envvars/shell_words_tests.rs::shell_text_is_refused_and_plain_text_is_not",
+]
 "src/handlers/android/adb.rs" = [
   "a_dash_s_prefix_serial_does_not_change_the_verdict",
   "a_shell_bare_command_is_inert_regardless_of_trailing_args",
   "dispatch_routes_only_adb_to_is_safe_adb_and_returns_none_otherwise",
+]
+"src/handlers/coreutils/chmod_mode.rs" = [
+  "an_octal_mode_sets_an_id_bit_exactly_when_its_value_has_one",
+  "adding_s_for_any_class_sets_an_id_bit",
+  "a_mode_without_s_or_high_octal_bits_sets_none",
+  "a_mode_given_to_mkdir_or_rsync_is_judged_as_chmod_judges_it",
+]
+"src/handlers/coreutils/archive_extract.rs" = [
+  "an_extraction_is_refused_and_a_listing_is_not",
+]
+"src/handlers/coreutils/rsync_remote.rs" = [
+  "a_remote_option_is_judged_as_the_same_option_given_locally",
+]
+"src/handlers/make_dirs.rs" = [
+  "a_second_move_is_refused",
+  "a_move_with_a_relative_makefile_is_refused",
+]
+"src/handlers/make_text.rs" = [
+  "an_assignment_operand_is_refused",
+  "a_makefile_from_stdin_is_refused",
+  "a_target_is_not_refused",
+]
+"src/handlers/mise_global.rs" = ["no_audited_variable_is_set_globally_in_any_spelling"]
+"src/handlers/coreutils/rsync_shell.rs" = [
+  "a_connect_program_is_refused_in_every_spelling",
+  "a_remote_shell_variable_agrees_with_its_flag_in_every_spelling",
+  "a_remote_shell_other_than_ssh_is_never_approved",
+  "a_relative_remote_shell_is_approved_only_inside_the_project",
+  "a_login_name_that_is_an_option_is_refused",
+]
+"src/handlers/coreutils/stdin_names.rs" = [
+  "a_name_from_stdin_is_approved_only_where_reading_it_is",
 ]
 "src/handlers/coreutils/awk.rs" = [
   "an_awk_program_that_runs_code_is_never_approved",
@@ -225,6 +292,13 @@ owed = [
   "awk_operands_and_the_option_policy_count_the_same_operands",
 ]
 "src/engine/resolve/link_mode.rs" = ["a_follow_flag_before_the_operands_end_always_follows"]
+"src/engine/resolve/tar_paths.rs" = ["a_relative_path_lands_below_the_change_directory_and_an_anchored_one_ignores_it", "only_a_colon_before_the_first_slash_names_a_host"]
+"src/cst/pager_set.rs" = ["naming_the_pager_marks_the_line"]
+"src/cst/opaque/glob/dot_names.rs" = [
+  "src/engine/resolve/frozen_walk_tests.rs::a_glob_after_the_line_turns_on_dot_names_reaches_frozen_names",
+  "src/cst/glob_tests.rs::no_quoting_of_dotglob_hides_it",
+]
+"src/registry/shapes.rs" = ["a_shaped_sub_refuses_a_repository_address_and_keeps_a_local_folder"]
 "src/handlers/coreutils/find_skip.rs" = ["src/handlers/coreutils/find_skip_tests.rs::only_a_word_that_keeps_entries_away_keeps_any"]
 "src/handlers/coreutils/find.rs" = [
   "dispatch_routes_find_to_is_safe_find_with_some_wrapper",
@@ -258,6 +332,7 @@ owed = [
   "every_documented_libxo_combination_is_allowed",
   "any_unlisted_libxo_token_is_denied",
 ]
+"src/handlers/direct_script.rs" = ["a_direct_worktree_script_matches_bash_on_every_level_and_target", "a_decorated_identity_name_still_spells_that_name", "an_extension_is_dropped_only_for_an_identity_name"]
 "src/handlers/fd.rs" = [
   "fd_exec_follows_the_inner_command_locus",
   "fd_batch_without_placeholder_gates_the_base",
@@ -294,6 +369,9 @@ owed = [
   "unknown_phase_is_always_denied",
   "appending_a_standalone_flag_preserves_verdict_and_level",
   "version_phase_is_inert_only_when_solitary",
+  "an_operand_that_is_not_a_listed_phase_or_goal_denies",
+  "an_unlisted_property_denies_in_every_spelling",
+  "a_file_flag_judges_its_value_the_same_in_every_spelling",
 ]
 "src/handlers/magick.rs" = [
   "magick_with_fewer_than_two_tokens_is_denied",
@@ -339,7 +417,7 @@ owed = [
   "a_script_outside_the_project_is_not_run_under_its_basename",
 ]
 "src/handlers/ruby/bundle.rs" = []
-"src/handlers/safe_chains.rs" = ["no_rule_change_is_ever_approved"]
+"src/handlers/safe_chains.rs" = ["no_rule_change_is_ever_approved", "no_rule_change_is_approved_through_cargo_run"]
 "src/handlers/shell.rs" = [
   "loop_control_bare_or_single_digit_is_inert",
   "loop_control_other_inputs_are_denied",
@@ -347,11 +425,30 @@ owed = [
   "a_cluster_holding_any_letter_outside_the_policy_never_approves",
   "src/cst/printed_tests.rs::the_utility_is_never_replaced",
 ]
+"src/handlers/shell_text.rs" = [
+  "src/handlers/shell_text_tests.rs::a_zless_flag_follows_whether_the_line_sets_the_pager",
+  "src/handlers/shell_text_tests.rs::a_word_the_man_script_would_evaluate_is_refused",
+  "src/handlers/shell_text_tests.rs::a_variable_the_man_script_would_evaluate_is_refused",
+  "src/handlers/shell_text_tests.rs::a_plain_word_is_not_shell_text",
+  "src/handlers/shell_text_tests.rs::a_zless_flag_the_shell_would_split_is_refused",
+  "src/handlers/shell_text_tests.rs::a_zless_word_the_shell_keeps_whole_is_not_refused_for_splitting",
+]
 "src/handlers/system/plutil.rs" = [
   "convert_dash_o_dash_is_inert_and_dash_o_other_value_is_safe_write",
   "convert_format_outside_allowlist_is_denied_for_any_modifier_tail",
   "convert_help_or_h_in_two_token_slice_is_inert",
   "convert_reordering_dash_r_and_dash_s_preserves_the_verdict",
+]
+"src/handlers/system/screen.rs" = [
+  "an_option_takes_one_session_name_and_never_starts_a_detached_session",
+  "options_that_only_shape_a_new_session_never_pass",
+  "a_reattach_with_a_valued_option_still_takes_one_session_name",
+]
+"src/handlers/system/open.rs" = [
+  "an_operand_that_is_not_a_web_address_is_denied_without_a_document_flag",
+  "a_document_flag_lets_the_same_operand_through",
+  "a_url_flag_value_must_be_a_web_address_even_with_a_document_flag",
+  "an_operand_with_a_scheme_other_than_the_web_is_denied_with_any_flag",
 ]
 "src/handlers/system/ssh.rs" = [
   "a_file_named_to_the_auth_probe_is_refused_in_every_spelling",
@@ -363,6 +460,7 @@ owed = [
   "sysctl_safe_standalone_flag_does_not_change_verdict",
 ]
 "src/handlers/system/tmux.rs" = ["a_sequence_is_as_strict_as_its_strictest_command", "global_flags_alone_never_name_a_command"]
+"src/handlers/system/tmux_formats.rs" = ["an_unknown_name_is_refused_wherever_it_is_looked_up"]
 "src/handlers/system/tmux_keys.rs" = [
   "src/handlers/system/tmux_keys_tests.rs::navigation_alone_is_always_approved",
   "src/handlers/system/tmux_keys_tests.rs::submitted_text_is_never_more_permissive_than_running_it",
@@ -374,10 +472,16 @@ owed = [
   "a_lua_suffixed_writer_is_refused_in_every_spelling",
   "pdf_is_refused_with_any_extensions",
   "a_writer_flag_with_a_path_value_is_denied_in_every_spelling",
-  "any_runtime_option_token_is_denied",
 ]
 "src/handlers/hadolint.rs" = ["any_runtime_option_token_is_denied"]
 "src/handlers/shellcheck.rs" = ["any_runtime_option_token_is_denied"]
+"src/handlers/printf.rs" = [
+  "any_spelling_of_the_store_conversion_is_refused",
+  "a_format_without_a_percent_is_never_refused",
+  "an_escaped_percent_never_starts_a_conversion",
+  "a_store_inside_parentheses_is_refused_unless_they_close_a_time_conversion",
+  "no_format_makes_the_scan_panic",
+]
 "src/handlers/tilt.rs" = [
   "get_with_random_resource_is_safe_read",
   "describe_with_random_resource_is_safe_read",
@@ -447,6 +551,7 @@ owed = [
   "src/pathgate.rs::textutil_convert_never_more_permissive_than_info",
   "src/pathgate/handlers/plist.rs::plist_readers_are_never_laxer_than_cat",
 ]
+"src/pathgate/role.rs" = ["roles_parse_by_name_and_rank_along_the_ladder"]
 "src/pathgate/handlers/jj.rs" = ["the_repository_is_read_only_with_the_flag_and_an_observing_sub"]
 "src/pathgate/handlers/jq.rs" = [
   "src/pathgate/handlers/jq_tests.rs::a_directive_at_any_directive_position_is_seen",
@@ -464,6 +569,9 @@ owed = [
   "no_entry_after_a_single_assignment_names_program_and_assignment",
   "no_entry_with_only_assignments_uses_the_trimmed_input_and_no_swallow",
 ]
+"src/registry/build_eval_safe.rs" = ["bare_literal_eval_safe_values_are_accepted", "a_non_literal_eval_safe_value_is_rejected"]
+"src/registry/build_sub.rs" = ["aliases_inherit_the_canonical_declaration"]
+"src/registry/operands.rs" = ["an_operand_holding_a_marker_is_refused", "operands_without_a_marker_are_unaffected", "no_patterns_refuse_nothing", "glob_agrees_with_a_recursive_reading", "a_literal_name_matches_its_assignment_only"]
 "src/registry/build.rs" = [
   "build_policy_optional_valued_mechanism_appends_to_both_lists",
   "build_policy_unknown_tolerance_tracks_the_boolean_pair",
@@ -512,6 +620,11 @@ owed = [
   "src/userconfig/tests.rs::normalizing_twice_is_normalizing_once",
   "src/userconfig/tests.rs::nothing_inside_a_credential_store_is_grantable",
 ]
+"src/handlers/followed_read/search.rs" = [
+  "every_valued_flag_is_consumed_when_ripgrep_follows",
+  "every_valued_flag_is_consumed_when_ag_follows",
+  "every_valued_flag_is_consumed_when_ack_follows",
+]
 "src/verdict.rs" = [
   "combine_takes_the_max_of_levels_when_both_allowed",
   "combine_is_denied_iff_either_operand_is_denied",
@@ -523,6 +636,8 @@ owed = [
 "src/allowlist.rs" = "reads Claude Code's settings files for permissions.allow patterns"
 "src/bin/gen_fuzz_corpus.rs" = "writes the fuzz dictionary and seed files"
 "src/cli.rs" = "clap argument declarations only"
+"src/handlers/cargo_runs_this.rs" = "reads the nearest Cargo.toml to learn which package cargo run starts"
+"src/handlers/ruby/gemfile.rs" = "reads the folders above the working directory for the Gemfile Bundler loads"
 "src/config_cli.rs" = "prints what a config change did and exits"
 "src/decisionlog.rs" = "appends to the decision log under HOME"
 "src/docs.rs" = "renders the command docs and writes the mdbook tree"
@@ -533,6 +648,8 @@ owed = [
 "src/engine/resolve/regions/metadata.rs" = "reads the process-wide region table and the running OS"
 "src/engine/resolve/regions/hypothetical.rs" = "holds the thread-local hypothetical grant and reads HOME"
 "src/engine/resolve/regions/protection.rs" = "reads the process-wide region table and HOME"
+"src/engine/resolve/regions/unicode_spelling.rs" = "reads the process-wide region table and HOME"
+"src/pathgate/handlers/pax.rs" = "walks the copy's destination and sources on disk for frozen names"
 "src/folder_cli.rs" = "prints the --explain section for --unknown-folder"
 "src/registry/folder_config.rs" = "reads ~/.config/safe-chains.toml"
 "src/handlers/android/mod.rs" = "module declaration only"
@@ -557,6 +674,10 @@ owed = [
 "src/pathctx/lexical.rs" = "reads HOME, and the process-wide region table to keep a protected place absolute"
 "src/engine/resolve/frozen_reach.rs" = "lists the folders below a recursive operand on disk"
 "src/engine/resolve/frozen_walk.rs" = "walks the folders below a recursive operand on disk, following links when asked"
+"src/engine/resolve/frozen_walk/listing.rs" = "lists one directory of a walk on disk"
+"src/handlers/followed_read.rs" = "lists the tree a command that follows links would read"
+"src/handlers/followed_read/ackrc.rs" = "reads the environment and the ack config files it names"
+"src/handlers/followed_read/archive.rs" = "lists the trees pax, 7z and diff read when they follow links"
 "src/pathctx/physical.rs" = "reads the filesystem: lstat, readlink and directory listings along a path"
 "src/pathctx/placing.rs" = "reads the thread-local directory context and, through physical, the filesystem"
 "src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
@@ -565,6 +686,8 @@ owed = [
 "src/registry/types.rs" = "type declarations and their serde shapes only"
 "src/registry/transfer.rs" = "type declarations and their serde shapes only"
 "src/registry/types_tables.rs" = "type declarations and their serde shapes only"
+"src/registry/types_behavior.rs" = "type declarations only"
+"src/registry/types_sub.rs" = "type declarations and their serde shapes only"
 "src/suggest_cli.rs" = "reads and writes .safe-chains.toml for --suggest"
 "src/targets/agy.rs" = "reads and writes the harness's settings file"
 "src/targets/claude.rs" = "reads and writes the harness's settings file"
@@ -582,10 +705,17 @@ owed = [
 
 [test_only]
 "src/registry/harness.rs" = "the in-process config harness (#[cfg(test)] mod in registry/custom.rs)"
+"src/cst/funsub_tests.rs" = "the function substitution suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/cst/search_quote_tests.rs" = "the kept-dollar search path suite (#[cfg(test)] mod in cst/search_quote.rs)"
+"src/cst/stdin_fed_tests.rs" = "the fed-standard-input suite (#[cfg(test)] mod in cst/stdin_fed.rs)"
 "src/allowlist/rule_scope_tests.rs" = "the rules-in-scope suite (#[cfg(test)] mod in allowlist.rs)"
 "src/pathctx/anchor_tests.rs" = "the anchor suite (#[cfg(test)] mod in pathctx/anchor.rs)"
+"src/envvars/command_search_tests.rs" = "the command search path suite (#[cfg(test)] mod in envvars/command_search.rs)"
 "src/envvars/config_dir_tests.rs" = "the config-location suite (#[cfg(test)] mod in envvars/config_dir.rs)"
+"src/envvars/description_twins_tests.rs" = "the description variable-twin guard (#[cfg(test)] mod in envvars.rs)"
+"src/envvars/exported_tests.rs" = "the export operand suite (#[cfg(test)] mod in envvars/exported.rs)"
 "src/envvars/rebind_tests.rs" = "the loop and read rebinding suite (#[cfg(test)] mod in envvars/rebind.rs)"
+"src/envvars/shell_words_tests.rs" = "the shell program and shell text suite (#[cfg(test)] mod in envvars/shell_words.rs)"
 "src/pathctx/folder_tests.rs" = "the unknown-folder suite (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/folder_soundness_tests.rs" = "the anchor-soundness property (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/physical_tests.rs" = "the link-following suite (#[cfg(test)] mod in pathctx/physical.rs)"
@@ -610,6 +740,7 @@ owed = [
 "src/cst/brace_bash_tests.rs" = "the brace-expansion-against-bash suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/glob_tests.rs" = "the glob-listing suite (#[cfg(test)] mod in cst/mod.rs)"
 "src/cst/classify_budget_tests.rs" = "the classification-budget suite (#[cfg(test)] mod in cst/mod.rs)"
+"src/handlers/shell_text_tests.rs" = "the man shell-text suite (#[cfg(test)] mod in handlers/shell_text.rs)"
 "src/handlers/signal_tests.rs" = "the process-signal suite (#[cfg(test)] mod in handlers/mod.rs)"
 "src/decisionlog/tests.rs" = "decisionlog's test suite"
 "src/engine/plain/tests.rs" = "the plain-words dictionary's test suite"
@@ -625,6 +756,8 @@ owed = [
 "src/registry/arity_tests.rs" = "short-flag arity worklist guards (#[cfg(test)] mod in registry/mod.rs)"
 "src/registry/overlap_tests.rs" = "the standalone+valued overlap guard and its properties (#[cfg(test)] mod in registry/mod.rs)"
 "src/registry/gate_consistency.rs" = "path-gate consistency tests (#[cfg(test)] mod in registry/mod.rs)"
+"src/registry/guard_values.rs" = "the registry-wide guard on a required flag given as another flag's value (#[cfg(test)] mod in registry/mod.rs)"
+"src/registry/glob_scope_tests.rs" = "the registry-wide guard on flags after a first_arg glob argument (#[cfg(test)] mod in registry/mod.rs)"
 "src/registry/tests.rs" = "the registry test suite"
 "src/suggest/tests.rs" = "suggest's test suite"
 "src/tests.rs" = "the crate's example test suite"

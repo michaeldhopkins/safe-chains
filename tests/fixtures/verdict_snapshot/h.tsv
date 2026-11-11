@@ -264,12 +264,15 @@ hash --help	denied
 hash --version	denied
 hash -d	inert
 hash -d -l	inert
-hash -d -p x	denied
 hash -d x	inert
+hash -d x=/tmp	denied
 hash -l	inert
-hash -p x	denied
+hash -p /tmp/x/ls ls	denied
 hash -r	inert
 hash -t	inert
+hash -t ls	inert
+hash ls	inert
+hash ls=/tmp/x/ls	denied
 hash x	inert
 hatch	denied
 hatch --cache-dir x	denied
@@ -3618,6 +3621,9 @@ hlint -q	safe-read
 hlint -r	safe-read
 hlint -t	safe-read
 hlint -v	safe-read
+hlint src '+RTS' -tpwned	denied
+hlint src +RTS -tpwned	denied
+hlint src -- +RTS -tpwned	denied
 hlint x	safe-read
 home-manager	denied
 home-manager --help	inert

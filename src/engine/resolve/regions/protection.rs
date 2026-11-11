@@ -35,9 +35,7 @@ pub(super) fn role_is_protective(role: &Role) -> bool {
 pub(crate) fn keeps_absolute(abs: &str, root: &str) -> bool {
     let root = comparable(root);
     let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'));
-    let under = |inner: &str, outer: &str| outer == "/" || inner == outer || inner.strip_prefix(outer).is_some_and(|r| r.starts_with('/'));
-    let homes = ["/Users", "/home", "/private"].into_iter().map(str::to_string).chain(home.clone());
-    if homes.map(|h| comparable(&h)).any(|h| under(&h, &root)) {
+    if holds_a_home(&root, home.as_deref()) {
         return true;
     }
     let path = comparable(&literal_dir(abs));
@@ -54,6 +52,29 @@ pub(crate) fn keeps_absolute(abs: &str, root: &str) -> bool {
             };
             under(&place, &root) && ((subtree && under(&path, &place)) || under(&place, &path))
         })
+}
+
+fn under(inner: &str, outer: &str) -> bool {
+    outer == "/" || inner == outer || inner.strip_prefix(outer).is_some_and(|r| r.starts_with('/'))
+}
+
+fn holds_a_home(root: &str, home: Option<&str>) -> bool {
+    ["/Users", "/home", "/private"].into_iter().chain(home).map(comparable).any(|h| under(&h, root))
+}
+
+/// Whether a grant hands `path` over for writing: the user named the folder as one they work in,
+/// so a repository there is theirs as the project's is.
+pub(crate) fn granted_for_writing(path: &str) -> bool {
+    super::best_grant(&super::super::locus::canonicalize(path), None).is_some_and(|(_, write)| write)
+}
+
+/// Whether the absolute `abs` lies at or below the project root, which `keeps_absolute` does not
+/// say for a project that is itself a protected place (a session working in `~/.claude`). A root
+/// at or above a home directory contains nothing, as there.
+pub(crate) fn lies_in_root(abs: &str, root: &str) -> bool {
+    let root = comparable(root);
+    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'));
+    root != "/" && !holds_a_home(&root, home.as_deref()) && under(&comparable(abs), &root)
 }
 
 /// `path` up to its first component holding a glob character: the directory a glob can reach into.

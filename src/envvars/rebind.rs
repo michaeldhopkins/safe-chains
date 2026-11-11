@@ -46,6 +46,7 @@ pub(crate) fn rebinding_verdict(words: &[Word]) -> Verdict {
     let tie = || ties(args) && (unread() || ties_a_listed_variable(args));
     let refused = match name.as_str() {
         "read" => unread() || unread_option() || args.iter().any(|w| names_a_listed_variable(w)),
+        "unset" => args.iter().any(|w| super::rule_of(w).is_some_and(|r| r.shape == super::Shape::CommandSearch)),
         "declare" | "typeset" | "local" => {
             (args.iter().any(|w| w.starts_with('-') && w.contains('n')) && args.iter().any(|w| !w.starts_with(['-', '+'])))
                 || unread_option()

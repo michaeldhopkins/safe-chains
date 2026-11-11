@@ -90,6 +90,101 @@ pub fn is_safe_git(tokens: &[Token]) -> Verdict {
     crate::registry::toml_dispatch(&filtered).unwrap_or(Verdict::Denied)
 }
 
+/// Whether git runs in a folder outside the project, where the repository it finds carries
+/// configuration no one reviewed: `core.fsmonitor` and `core.pager` name programs git runs. Only
+/// `--version`, which reads no repository, is left to run anywhere. A folder that cannot be placed
+/// counts as outside.
+pub(crate) fn runs_in_a_repository_outside_the_project(tokens: &[Token]) -> bool {
+    !only_asks_the_version(tokens) && lands_outside_the_project(crate::pathgate::chdir::landing("git", tokens))
+}
+
+/// Whether a tool that opens a repository and obeys its configuration opens one outside the
+/// project: branchdiff and tig run git there, hg runs the hooks and extensions its `.hg/hgrc`
+/// names, git-lfs and gitleaks call git in it, jj reads the repository's own config (which can name
+/// a diff tool, a pager or a fix tool), and jjpr runs jj there. The repository is the folder the
+/// tool runs in, or the one it is pointed at: branchdiff's operand, every `tig -C` in turn, each
+/// `gitleaks --source`, each `jj -R`. Only asking a tool other than hg or jj for its version or
+/// help is left to run anywhere, since hg loads the repository's extensions and jj its config
+/// before either reads its options.
+pub(crate) fn opens_a_repository_outside_the_project(cmd: &str, tokens: &[Token]) -> bool {
+    if !matches!(cmd, "hg" | "jj")
+        && tokens.len() == 2
+        && matches!(tokens[1].as_str(), "--version" | "-V" | "-v" | "version" | "--help" | "-h")
+    {
+        return false;
+    }
+    let words: Vec<&str> = tokens.iter().skip(1).map(Token::as_str).collect();
+    let here = crate::pathctx::cwd();
+    match cmd {
+        "branchdiff" => lands_outside_the_project(match words.iter().copied().find(|word| !word.starts_with('-')) {
+            Some(dir) => crate::pathgate::chdir::moved_into(here, dir),
+            None => here,
+        }),
+        "tig" => lands_outside_the_project(flag_values(&words, &["-C"]).into_iter().fold(here, crate::pathgate::chdir::moved_into)),
+        "gitleaks" => any_lands_outside(here, &flag_values(&words, &["-s", "--source"])),
+        "jj" => any_lands_outside(here, &flag_values(&words, &["-R", "--repository"])),
+        _ => lands_outside_the_project(here),
+    }
+}
+
+fn any_lands_outside(here: Option<String>, dirs: &[&str]) -> bool {
+    if dirs.is_empty() {
+        return lands_outside_the_project(here);
+    }
+    dirs.iter()
+        .any(|dir| lands_outside_the_project(crate::pathgate::chdir::moved_into(here.clone(), dir)))
+}
+
+fn flag_values<'a>(words: &[&'a str], names: &[&str]) -> Vec<&'a str> {
+    words
+        .iter()
+        .enumerate()
+        .filter_map(|(at, word)| {
+            names.iter().find_map(|name| match word.strip_prefix(name) {
+                Some("") => words.get(at + 1).copied(),
+                Some(rest) => rest.strip_prefix('=').or(if name.starts_with("--") { None } else { Some(rest) }),
+                None => None,
+            })
+        })
+        .collect()
+}
+
+fn lands_outside_the_project(dir: Option<String>) -> bool {
+    let (Some(root), Some(dir)) = (crate::pathctx::root(), dir) else {
+        return false;
+    };
+    if crate::pathctx::folder::is_unknown(&dir) {
+        return false;
+    }
+    if dir == crate::pathctx::UNRESOLVED_CWD {
+        return true;
+    }
+    let _here = crate::pathctx::enter_cwd(Some(dir));
+    let placed = crate::pathctx::resolve(".");
+    if placed.starts_with('/')
+        && !placed.contains("__SAFE_CHAINS_")
+        && (crate::pathctx::placed_in_root(&placed) || crate::engine::resolve::regions::granted_for_writing(&placed))
+    {
+        return false;
+    }
+    root.is_empty() || placed.starts_with(['/', '~']) || placed.contains("__SAFE_CHAINS_") || placed.split('/').any(|part| part == "..")
+}
+
+fn only_asks_the_version(tokens: &[Token]) -> bool {
+    let mut asked = false;
+    let mut words = tokens.iter().skip(1).map(Token::as_str);
+    while let Some(word) = words.next() {
+        match word {
+            "-C" | "-c" => {
+                words.next();
+            }
+            "--version" => asked = true,
+            _ => return false,
+        }
+    }
+    asked
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;

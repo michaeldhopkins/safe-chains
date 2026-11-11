@@ -9,7 +9,7 @@
 //! guard makes every new scope say it.
 
 use super::build::build_policy;
-use super::types::{TomlCommand, TomlFile, TomlSub};
+use super::types::{DispatchKind, SubSpec, TomlCommand, TomlFile, TomlSub};
 use crate::parse::Token;
 use crate::policy::{FlagTolerance, UnknownTolerance, count_positionals};
 use proptest::prelude::*;
@@ -142,6 +142,60 @@ fn a_flag_is_never_both_standalone_and_valued_in_one_scope() {
     );
 }
 
+/// The flag lists a dispatch walks to find where the subcommand, verb or inner command starts:
+/// the pre-flags of every `Branching` level, a `Wrapper`'s flags and a verb chain's main flags.
+fn boundary_lists<'a>(label: &str, kind: &'a DispatchKind, out: &mut Vec<(String, &'a [String], &'a [String])>) {
+    let subs: &[SubSpec] = match kind {
+        DispatchKind::Branching { subs, pre_standalone, pre_valued, .. } => {
+            out.push((format!("{label} [pre-flags]"), pre_standalone, pre_valued));
+            subs
+        }
+        DispatchKind::Custom { subs, .. } => subs,
+        DispatchKind::Wrapper { standalone, valued, .. } => {
+            out.push((format!("{label} [wrapper]"), standalone, valued));
+            return;
+        }
+        DispatchKind::VerbChain(vc) => {
+            out.push((format!("{label} [verb_chain]"), &vc.main_standalone, &vc.main_valued));
+            return;
+        }
+        _ => return,
+    };
+    for sub in subs {
+        boundary_lists(&format!("{label} {}", sub.name), &sub.kind, out);
+    }
+}
+
+/// No flag in front of a subcommand, a verb or a wrapped command is both standalone and valued,
+/// in any built command, with no pinned exceptions.
+///
+/// Those walks decide where the next word belongs. A flag in both lists is read as taking a
+/// value, so the word after it is skipped and the one after that is dispatched as the
+/// subcommand: `borg --bypass-lock delete info ./repo` was judged as `info` while borg ran
+/// `delete`. Read the other way it is just as wrong for a flag that does take a value. Walks the
+/// BUILT registry, so a list a sub inherits from its wrapper is covered as well as one it declares.
+#[test]
+fn no_flag_before_a_subcommand_or_wrapped_command_is_both_standalone_and_valued() {
+    let mut lists = Vec::new();
+    for (name, spec) in super::TOML_REGISTRY.iter().chain(super::CUSTOM_REGISTRY.iter()) {
+        boundary_lists(name, &spec.kind, &mut lists);
+    }
+    assert!(lists.len() > 300, "only {} boundary flag lists walked — the registry walk is broken", lists.len());
+    let mut found: Vec<String> = lists
+        .iter()
+        .flat_map(|(label, standalone, valued)| raw_overlap(standalone, valued).into_iter().map(move |f| format!("  {label}\t{f}")))
+        .collect();
+    found.sort();
+    found.dedup();
+    assert!(
+        found.is_empty(),
+        "these flags sit in front of a subcommand, verb or wrapped command and are declared both \
+         standalone and valued ({}). Read the tool's option table and keep the flag in one list:\n{}",
+        found.len(),
+        found.join("\n"),
+    );
+}
+
 fn long_flag() -> impl Strategy<Value = String> {
     "--[a-e]{1,2}"
 }
@@ -150,7 +204,8 @@ fn tokens(words: &[&str]) -> Vec<Token> {
     words.iter().map(|w| Token::from_test(w)).collect()
 }
 
-const STRICT: FlagTolerance = FlagTolerance { unknown: UnknownTolerance::Strict, numeric_dash: false, single_dash_words: false };
+const STRICT: FlagTolerance =
+    FlagTolerance { unknown: UnknownTolerance::Strict, numeric_dash: false, single_dash_words: false, ..FlagTolerance::strict() };
 
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(512))]

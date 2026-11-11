@@ -62,6 +62,7 @@ pub mod docs;
 pub mod engine;
 mod envvars;
 pub mod explain_fix;
+mod ghc_rts;
 #[cfg(test)]
 mod handler_property_tests;
 mod handlers;

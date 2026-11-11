@@ -1471,38 +1471,81 @@ scp ./local host:/tmp	denied
 scp x	safe-write
 scp x /etc/hosts	denied
 scp ~/.ssh/id_rsa host:/tmp	denied
-screen	safe-read
+screen	denied
+screen -- sh	denied
 screen --help	safe-read
 screen --help --version	safe-read
 screen --help -S x	safe-read
-screen --help x	safe-read
+screen --help x	denied
 screen --version	safe-read
-screen -A	safe-read
+screen -A	denied
+screen -A -dm	denied
 screen -D	safe-read
-screen -L	safe-read
-screen -O	safe-read
-screen -R	safe-read
-screen -S x	safe-read
-screen -T x	safe-read
-screen -U	safe-read
-screen -a	safe-read
-screen -c x	safe-read
+screen -D -R work	denied
+screen -D -m	denied
+screen -D work	safe-read
+screen -Dm	denied
+screen -L	denied
+screen -O	denied
+screen -Q windows	denied
+screen -R	denied
+screen -R work	denied
+screen -R work sh -c id	denied
+screen -RR	denied
+screen -S -d	denied
+screen -S -r	denied
+screen -S work	denied
+screen -S work -X exec rm -rf ~	denied
+screen -S work -X stuff 'rm -rf ~\\n'	denied
+screen -S work -d -m	denied
+screen -S x	denied
+screen -Swork	denied
+screen -T x	denied
+screen -U	denied
+screen -U -dmS work	denied
+screen -X stuff x	denied
+screen -a	denied
+screen -c evil.rc	denied
 screen -d	safe-read
-screen -e x	safe-read
-screen -h	safe-read
-screen -l	safe-read
+screen -d -S work	safe-read
+screen -d -r -R work	denied
+screen -dm	denied
+screen -dm sh -c 'rm -rf ~'	denied
+screen -dmS work	denied
+screen -dmS work rm -rf ~	denied
+screen -dmr work	denied
+screen -dr work	safe-read
+screen -e x	denied
+screen -h -x	denied
+screen -h 5000	denied
+screen -h 5000 -r work	safe-read
+screen -h x	denied
+screen -l	denied
 screen -list	safe-read
+screen -list work	safe-read
 screen -ls	safe-read
-screen -m	safe-read
-screen -p x	safe-read
-screen -q	safe-read
+screen -ls work	safe-read
+screen -m	denied
+screen -p x	denied
+screen -q	denied
+screen -q sh	denied
 screen -r	safe-read
-screen -s x	safe-read
-screen -t x	safe-read
+screen -r -R work	denied
+screen -r work	safe-read
+screen -r work -m	denied
+screen -r work sh	denied
+screen -rR work	denied
+screen -s /tmp/evil.sh -dm	denied
+screen -t x	denied
 screen -v	safe-read
 screen -wipe	safe-read
+screen -wipe work	safe-read
 screen -x	safe-read
-screen x	safe-read
+screen -x -R work	denied
+screen -x work	safe-read
+screen sh	denied
+screen sh -c 'rm -rf ~'	denied
+screen x	denied
 screencapture	denied
 screencapture --help	denied
 screencapture --version	denied
@@ -3205,16 +3248,16 @@ shellcheck script.sh --RTS	denied
 shellcheck script.sh -RTS	denied
 shellcheck x	inert
 shfmt	safe-read
+shfmt --apply-ignore	safe-read
+shfmt --apply-ignore --check x	safe-read
+shfmt --apply-ignore --from-json	safe-read
 shfmt --apply-ignore x	safe-read
 shfmt --check x	safe-read
 shfmt --filename x	safe-read
-shfmt --from-json x	safe-read
+shfmt --from-json	safe-read
 shfmt --help	safe-read
-shfmt --help --apply-ignore x	safe-read
-shfmt --help --write	safe-write
-shfmt --help x	safe-read
 shfmt --lang x	safe-read
-shfmt --list x	safe-read
+shfmt --list	safe-read
 shfmt --version	denied
 shfmt --write	safe-write
 shfmt --write ./a.sh /etc/hosts	denied
@@ -3223,9 +3266,10 @@ shfmt -bn	safe-read
 shfmt -ci	safe-read
 shfmt -d	safe-read
 shfmt -d ./script.sh	safe-read
+shfmt -d ~/.ssh/config	denied
 shfmt -filename x	safe-read
 shfmt -fn	safe-read
-shfmt -from-json x	safe-read
+shfmt -from-json	safe-read
 shfmt -h	safe-read
 shfmt -i	safe-read
 shfmt -i x	safe-read
@@ -3242,6 +3286,7 @@ shfmt -sr	safe-read
 shfmt -tojson	safe-read
 shfmt -version	safe-read
 shfmt -w	safe-write
+shfmt -w --apply-ignore ~/.zshrc	denied
 shfmt -w ./a.sh ./b.sh	safe-write
 shfmt -w ./a.sh ~/.ssh/config	denied
 shfmt -w ./script.sh	safe-write
@@ -6460,6 +6505,9 @@ stack ls x	denied
 stack new	denied
 stack new x	denied
 stack path	safe-read
+stack path '+RTS' -tpwned	denied
+stack path +RTS -tpwned	denied
+stack path -- +RTS -tpwned	denied
 stack path --bin-path	safe-read
 stack path --bin-path --compiler-bin	safe-read
 stack path --bin-path x	safe-read
@@ -7038,10 +7086,11 @@ stern x	inert
 streamzip	safe-write
 streamzip --help	denied
 streamzip --version	denied
+streamzip --zipfile ~/.zshrc	denied
 streamzip -0	safe-write
 streamzip -0 -1	safe-write
 streamzip -0 -member-name x	safe-write
-streamzip -0 x	safe-write
+streamzip -0 x	denied
 streamzip -1	safe-write
 streamzip -2	safe-write
 streamzip -3	safe-write
@@ -7057,8 +7106,14 @@ streamzip -method x	safe-write
 streamzip -stream	safe-write
 streamzip -version	safe-write
 streamzip -zip64	safe-write
+streamzip -zipf ~/.zshrc	denied
+streamzip -zipfile ./out.zip	safe-write
+streamzip -zipfile /etc/x	denied
 streamzip -zipfile x	safe-write
-streamzip x	safe-write
+streamzip -zipfile ~/.zshrc	denied
+streamzip -zipfile=./out.zip -method store	safe-write
+streamzip -zipfile=/etc/x	denied
+streamzip x	denied
 stree	denied
 stree --config x	denied
 stree --extension x	denied

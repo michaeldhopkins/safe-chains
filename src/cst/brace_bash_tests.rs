@@ -171,3 +171,65 @@ proptest! {
         prop_assert_eq!(mismatch(&word), None);
     }
 }
+
+fn bash_words_with_x(bash: &str, word: &str) -> Vec<String> {
+    let script = format!("set -f; x=Q; printf '%s\\n' {word}");
+    let out = std::process::Command::new(bash)
+        .args(["--noprofile", "--norc", "-c", &script])
+        .env_clear()
+        .env("PATH", "/usr/bin:/bin")
+        .env("LC_ALL", "C")
+        .output()
+        .unwrap_or_else(|err| panic!("{bash}: {err}"));
+    assert!(out.status.success(), "{bash} rejected {word}: {}", String::from_utf8_lossy(&out.stderr));
+    String::from_utf8(out.stdout)
+        .expect("utf-8")
+        .split_terminator('\n')
+        .filter(|w| !w.is_empty())
+        .map(str::to_string)
+        .collect()
+}
+
+/// A word with `${x}` in it, expanded by us with `${x}` then read as `Q`, against every bash with
+/// `x=Q`. `None` when we fail closed; any other `$` left in our words is a mismatch.
+fn parameter_mismatch(word: &str) -> Option<String> {
+    let ours: Vec<String> = our_words(word).into_iter().map(|w| w.replace("${x}", "Q")).filter(|w| !w.is_empty()).collect();
+    if ours.iter().any(|w| w.contains(UNRESOLVED_BRACE) || w.contains(UNPINNABLE)) {
+        return None;
+    }
+    bashes().into_iter().find_map(|bash| {
+        let theirs = bash_words_with_x(bash, word);
+        (theirs != ours).then(|| format!("{word}: ours {ours:?}, {bash} {theirs:?}"))
+    })
+}
+
+#[test]
+fn a_braced_parameter_is_not_a_brace_group() {
+    let words =
+        ["${x}:a:${x}", "${x}{a,b}", "{a,b}${x}", "{a,${x}}", "${x}{1..2}${x}", "{${x},b}c", "a{b,c}${x}{d,e}", "${x}},a}", "{a,b${x}}"];
+    let bad: Vec<String> = words.iter().filter_map(|word| parameter_mismatch(word)).collect();
+    assert!(bad.is_empty(), "words with a parameter judged differently from bash:\n{}", bad.join("\n"));
+    let around = our_words("${x}:$(mktemp -d):${x}");
+    assert!(matches!(around.as_slice(), [w] if w.starts_with("${x}:") && w.ends_with(":${x}")), "{around:?}");
+}
+
+fn arb_parameter_word() -> impl Strategy<Value = String> {
+    let piece = prop_oneof![
+        3 => prop::string::string_regex("[ab.,{}0-2/:]{1,3}").expect("regex"),
+        2 => Just("${x}".to_string()),
+        1 => prop_oneof![Just("{".to_string()), Just("}".to_string()), Just(",".to_string())],
+    ];
+    prop::collection::vec(piece, 1..7)
+        .prop_map(|pieces| pieces.concat())
+        .prop_filter("a parameter and a brace", |w| w.contains("${x}") && w.replace("${x}", "").contains('{'))
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(128))]
+    /// Bash never brace-expands the text of a `${…}` parameter, so a word mixing parameters and
+    /// braces expands exactly as bash expands it.
+    #[test]
+    fn a_word_with_a_parameter_expands_as_bash_does(word in arb_parameter_word()) {
+        prop_assert_eq!(parameter_mismatch(&word), None);
+    }
+}

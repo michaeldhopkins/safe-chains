@@ -2,12 +2,11 @@ use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
 
 pub fn is_safe_env(tokens: &[Token]) -> Verdict {
-    if tokens.len() == 1 {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
+    let mut cleared = false;
     let mut i = 1;
     while i < tokens.len() && tokens[i].starts_with("-") {
         if tokens[i] == "-i" || tokens[i] == "--ignore-environment" {
+            cleared = true;
             i += 1;
         } else if tokens[i] == "-u" || tokens[i] == "--unset" {
             i += 2;
@@ -19,15 +18,22 @@ pub fn is_safe_env(tokens: &[Token]) -> Verdict {
     // another syntax, so they are classified identically — skipping them let `env
     // LD_PRELOAD=/tmp/evil.so ls` through while the prefix spelling denied.
     let mut assigned = Verdict::Allowed(SafetyLevel::Inert);
+    let mut config = None;
+    let mut expands = false;
     while i < tokens.len() && !tokens[i].starts_with("-") && tokens[i].contains("=") {
         if let Some((name, value)) = tokens[i].as_str().split_once('=') {
             assigned = assigned.combine(crate::envvars::assignment_verdict(name, value));
+            expands |= value.contains(['$', '`']) || value.contains(crate::cst::eval::TAGGED_PREFIX);
+            if name == crate::pathctx::RIPGREP_CONFIG_PATH {
+                config = Some(!value.is_empty());
+            }
         }
         i += 1;
     }
     if i >= tokens.len() {
-        return assigned;
+        return if cleared && !expands { assigned } else { Verdict::Denied };
     }
+    let _config = crate::pathctx::bind_ripgrep_config(config);
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
     assigned.combine(crate::command_verdict(&inner))
 }
@@ -289,13 +295,12 @@ mod tests {
         time_git_log: "time git log --oneline -5",
         // engine-authoritative: `time rm file` deletes a WORKTREE file → developer.
         time_worktree_rm: "time rm file",
-        env_bare: "env",
         env_safe_command: "env ls -la",
         env_with_var: "env FOO=bar ls -la",
         env_multiple_vars: "env FOO=bar BAZ=qux git status",
         env_ignore_flag: "env -i PATH=/usr/bin ls",
         env_unset_flag: "env -u FOO git log",
-        env_vars_only: "env FOO=bar",
+        env_cleared_vars_only: "env -i FOO=bar",
         nice_safe_command: "nice git log",
         nice_with_priority: "nice -n 10 cargo test",
         ionice_safe_command: "ionice git log",
@@ -316,6 +321,11 @@ mod tests {
         timeout_rm_denied: "timeout 60 rm -rf /",
         time_git_push_denied: "time git push",
         env_rm_denied: "env rm -rf /",
+        env_prints_the_environment: "env",
+        env_prints_with_an_added_var: "env FOO=bar",
+        env_prints_after_unset: "env -u FOO",
+        env_prints_through_a_pipe: "env | grep KEY",
+        env_absolute_prints: "/usr/bin/env",
         env_sh_denied: "env sh -c 'rm -rf /'",
         env_python_denied: "env python3 /tmp/evil.py",
         env_var_rm_denied: "env FOO=bar rm -rf /",
@@ -418,10 +428,14 @@ mod tests {
                 assert_eq!(crate::command_verdict(&denied_cmd), Verdict::Denied, "{denied_cmd}");
             }
         }
+        for script in ["./heavy-slot.sh", "scripts/heavy-slot.sh"] {
+            let cmd = format!("{script} run -- git status");
+            let verdict = crate::command_verdict(&cmd);
+            assert_eq!(verdict, crate::command_verdict(&format!("bash {cmd}")), "{cmd}");
+            assert_eq!(verdict, Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd}");
+        }
         for untrusted_path in [
-            "./heavy-slot.sh".to_string(),
             "../heavy-slot.sh".to_string(),
-            "scripts/heavy-slot.sh".to_string(),
             "/tmp/heavy-slot.sh".to_string(),
             "/var/tmp/heavy-slot.sh".to_string(),
             tilde("/heavy-slot.sh"),
@@ -542,7 +556,7 @@ mod tests {
                     0..5,
                 ),
         ) {
-            let mut tokens: Vec<Token> = vec![Token::from_test("env")];
+            let mut tokens: Vec<Token> = vec![Token::from_test("env"), Token::from_test("-i")];
             let mut expected = Verdict::Allowed(SafetyLevel::Inert);
             for (k, v) in &pairs {
                 tokens.push(Token::from_test(&format!("{k}={v}")));

@@ -972,31 +972,31 @@ debride -r	safe-read
 debride -v	safe-read
 debride -w x	safe-read
 debride x	safe-read
-declare	inert
+declare	denied
 declare --help	denied
 declare --version	denied
-declare -A	inert
-declare -A -F	inert
+declare -A	denied
+declare -A -F	denied
 declare -A x	inert
 declare -F	inert
-declare -a	inert
+declare -a	denied
 declare -f	inert
-declare -g	inert
-declare -i	inert
+declare -g	denied
+declare -i	denied
 declare -i count=5	inert
 declare -ix FOO=42	inert
-declare -l	inert
-declare -n	inert
-declare -p	inert
-declare -p PATH	inert
-declare -r	inert
-declare -t	inert
-declare -u	inert
-declare -x	inert
+declare -l	denied
+declare -n	denied
+declare -p	denied
+declare -p PATH	denied
+declare -r	denied
+declare -t	denied
+declare -u	denied
+declare -x	denied
 declare -x FOO=bar	inert
 declare -x LD_PRELOAD=/tmp/evil.so	denied
 declare -x PYTHONPATH=/tmp/inj	denied
-declare x	inert
+declare x	denied
 defaults	denied
 defaults --help	inert
 defaults --help --version	denied
@@ -2169,12 +2169,15 @@ direnv --help --version	denied
 direnv --help x	denied
 direnv --version	inert
 direnv -h	inert
+direnv dump	denied
 direnv export	denied
 direnv export --help	inert
 direnv export --help -h	inert
-direnv export --help x	inert
+direnv export --help x	denied
 direnv export -h	inert
-direnv export x	inert
+direnv export bash	denied
+direnv export json	denied
+direnv export x	denied
 direnv fetchurl	denied
 direnv fetchurl --help	inert
 direnv fetchurl --help -h	inert
@@ -2317,7 +2320,10 @@ ditto -h	safe-write
 ditto -j	safe-write
 ditto -k	safe-write
 ditto -v	safe-write
-ditto -x	safe-write
+ditto -x	denied
+ditto -x -k ./archive.zip ./out	denied
+ditto -x ./archive.cpio ./out	denied
+ditto -xk ./archive.zip ./out	denied
 ditto -z	safe-write
 ditto ./src ./dst	safe-write
 ditto src/ dest/	safe-write
@@ -2411,11 +2417,8 @@ djxl -h	safe-write
 djxl -q	safe-write
 djxl -v	safe-write
 djxl x	safe-write
-dltest	inert
-dltest --help	denied
-dltest --version	denied
-dltest /usr/lib/libc.dylib printf	inert
-dltest x	inert
+dltest ./x.dylib sym	denied
+dltest /usr/lib/libc.dylib printf	denied
 dlv	denied
 dlv --help	inert
 dlv --help --version	inert
@@ -3798,7 +3801,9 @@ dotenv -f .env.test cat README.md	safe-read
 dotenv -f /etc/shadow ls	denied
 dotenv -f /tmp/evil.env ls	denied
 dotenv -f x	denied
-dotenv -v x	denied
+dotenv -v GIT_PAGER=/tmp/evil -- git log	denied
+dotenv -v LD_PRELOAD=/tmp/x.so -- ls	denied
+dotenv -v PATH=/tmp/evil -- git log	denied
 dotenv bash -c 'ls && rm -rf /'	denied
 dotenv bundle exec rspec spec/foo_spec.rb	safe-read
 dotenv ls	inert

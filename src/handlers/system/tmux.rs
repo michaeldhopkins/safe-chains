@@ -3,8 +3,7 @@ use crate::verdict::{SafetyLevel, Verdict};
 
 static INERT_SUBS: &[&str] = &[
     "display", "display-message", "has", "has-session", "info", "list-buffers", "list-clients", "list-commands", "list-keys", "list-panes",
-    "list-sessions", "list-windows", "ls", "lsb", "lsc", "lscm", "lsk", "lsp", "lsw", "show", "show-environment", "show-options",
-    "showenv", "start", "start-server",
+    "list-sessions", "list-windows", "ls", "lsb", "lsc", "lscm", "lsk", "lsp", "lsw", "show", "show-options", "start", "start-server",
 ];
 
 static SAFE_WRITE_SUBS: &[&str] = &[
@@ -73,7 +72,7 @@ fn find_command_arg(tokens: &[Token], sub: &str) -> Option<usize> {
             let mut i = 1;
             while i < tokens.len() {
                 let t = tokens[i].as_str();
-                if t == "-I" || t == "-O" {
+                if t == "-O" {
                     i += 1;
                     continue;
                 }
@@ -123,6 +122,15 @@ static COMMAND_OPTIONS: &[&str] = &[
     "window-pane-changed", "window-renamed", "window-resized", "window-unlinked",
 ];
 
+/// tmux takes any unique prefix of an option name, so a name is refused when it begins one tmux
+/// runs, or begins `after-`, or is begun by `after-`.
+fn runs_a_command(option: &str) -> bool {
+    if option.starts_with('@') {
+        return false;
+    }
+    option.starts_with("after-") || "after-".starts_with(option) || COMMAND_OPTIONS.iter().any(|known| known.starts_with(option))
+}
+
 /// `set-option [-aFgopqsuUw] [-t target] option [value]`: refused when the option is one tmux runs
 /// or writes to, when `-F` expands the value as a format before storing it, and when `-a` appends
 /// a value starting with `(` (which completes a `#(` begun by the stored value).
@@ -158,10 +166,10 @@ fn option_verdict(sub: &str, rest: &[Token]) -> Verdict {
         return Verdict::Allowed(SafetyLevel::SafeWrite).combine(crate::envvars::assignment_verdict(name, value));
     }
     let option = name.split('[').next().unwrap_or(name);
-    if option.starts_with("after-") || COMMAND_OPTIONS.contains(&option) || flags.contains('F') {
+    if runs_a_command(option) || flags.contains('F') {
         return Verdict::Denied;
     }
-    if flags.contains('a') && positionals.get(1).is_some_and(|v| v.starts_with('(')) {
+    if flags.contains('a') && positionals.get(1).is_some_and(|v| v.starts_with(['(', '{'])) {
         return Verdict::Denied;
     }
     Verdict::Allowed(SafetyLevel::SafeWrite)
@@ -304,7 +312,10 @@ fn tmux_command(rest: &[Token]) -> Verdict {
 
     // `#(…)` in a format runs a shell command when tmux expands it, and formats are expanded in
     // display-message, names, -F templates, option values and run-shell's own command line.
-    if rest.iter().any(|t| t.as_str().contains("#(") || expands_twice(t.as_str())) {
+    if rest
+        .iter()
+        .any(|t| t.as_str().contains("#(") || expands_twice(t.as_str()) || !super::tmux_formats::reads_only_tmux_values(t.as_str()))
+    {
         return Verdict::Denied;
     }
 
@@ -365,7 +376,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         "tmux",
         "https://man7.org/linux/man-pages/man1/tmux.1.html",
         "Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, \
-             list-keys, list-commands, show-options, show-environment, display-message, info, \
+             list-keys, list-commands, show-options, display-message with formats naming tmux values, info, \
              has-session, start-server. \
              Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, \
              kill-server, attach-session, detach-client, switch-client, new-window, split-window, \
@@ -385,6 +396,19 @@ mod tests {
     use crate::is_safe_command;
     fn check(cmd: &str) -> bool {
         is_safe_command(cmd)
+    }
+
+    #[test]
+    fn every_prefix_of_an_option_tmux_runs_is_refused() {
+        for option in super::COMMAND_OPTIONS.iter().copied().chain(["after-new-window"]) {
+            for end in 1..=option.len() {
+                let cmd = format!("tmux set -g {} x", &option[..end]);
+                assert!(!check(&cmd), "{cmd} was approved");
+            }
+        }
+        for cmd in ["tmux set -g mouse on", "tmux set -g @my-option x", "tmux set -g status-left x", "tmux set -g history-limit 5000"] {
+            assert!(check(cmd), "{cmd} was refused");
+        }
     }
 
     #[test]
@@ -409,8 +433,6 @@ mod tests {
         tmux_lscm: "tmux list-commands",
         tmux_show: "tmux show-options",
         tmux_show_short: "tmux show",
-        tmux_showenv: "tmux show-environment",
-        tmux_showenv_short: "tmux showenv",
         tmux_display: "tmux display-message",
         tmux_display_short: "tmux display",
         tmux_info: "tmux info",
@@ -470,6 +492,29 @@ mod tests {
     }
 
     denied! {
+        tmux_showenv_denied: "tmux show-environment",
+        tmux_new_prompt_command_denied: "tmux new -d -e PROMPT_COMMAND='rm -rf ~'",
+        tmux_new_ps1_denied: "tmux new -d -e PS1='$(id)'",
+        tmux_new_glued_ps0_denied: "tmux new -d -ePS0=x",
+        tmux_new_ps2_denied: "tmux new-session -d -e PS2=x",
+        tmux_split_ps4_denied: "tmux split-window -e PS4=x",
+        tmux_inherited_prompt_command_denied: "PROMPT_COMMAND='curl x | sh' tmux new -d",
+        tmux_exported_ps1_denied: "export PS1='$(id)'; tmux new -d",
+        tmux_setenv_prompt_command_denied: "tmux setenv -g PROMPT_COMMAND 'rm -rf ~'",
+        tmux_set_environment_ps1_denied: "tmux set-environment PS1 x",
+        tmux_set_environment_global_ps0_denied: "tmux set-environment -g PS0 x",
+        tmux_setenv_hidden_ps4_denied: "tmux setenv -h PS4 x",
+        tmux_setenv_format_denied: "tmux setenv -F X '#(id)'",
+        tmux_setenv_global_format_denied: "tmux set-environment -gF X '#(rm -rf ~)'",
+        tmux_new_zsh_prompt_denied: "tmux new -d -e PROMPT=x",
+        tmux_new_zsh_rprompt_denied: "tmux new -d -e RPROMPT=x",
+        tmux_showenv_short_denied: "tmux showenv",
+        tmux_showenv_global_denied: "tmux showenv -g",
+        tmux_showenv_named_denied: "tmux show-environment -g OPENAI_API_KEY",
+        tmux_showenv_hidden_denied: "tmux show-environment -h",
+        tmux_display_environment_denied: "tmux display -p '#{OPENAI_API_KEY}'",
+        tmux_list_format_environment_denied: "tmux ls -F '#{session_name} #{GITHUB_TOKEN}'",
+        tmux_display_condition_environment_denied: "tmux display -p '#{?OPENAI_API_KEY,set,unset}'",
         tmux_bare_denied: "tmux",
         tmux_source_denied: "tmux source-file ~/.tmux.conf",
         tmux_run_unsafe_denied: "tmux run-shell 'rm -rf /'",
@@ -479,6 +524,8 @@ mod tests {
         tmux_run_no_cmd_denied: "tmux run-shell",
         tmux_if_shell_format_unsafe_denied: "tmux if-shell -F '#{cond}' 'rm -rf /'",
         tmux_pipe_pane_output_unsafe_denied: "tmux pipe-pane -o /tmp/log 'rm -rf /'",
+        tmux_pipe_pane_input_denied: "tmux pipe-pane -I -t work 'printf x'",
+        tmux_pipep_input_denied: "tmux pipep -I 'echo id'",
         tmux_unknown_denied: "tmux load-buffer foo",
         tmux_new_session_command_denied: "tmux new-session 'rm -rf /'",
         tmux_new_session_detached_command_denied: "tmux new-session -d -s work rm -rf /",
@@ -511,6 +558,8 @@ mod tests {
         tmux_set_format_flag_denied: "tmux set -gF status-right '#{l:#}(id)'",
         tmux_set_append_paren_denied: "tmux set -ga @x '(id)'",
         tmux_set_append_bundled_denied: "tmux set -a -g status-right '(id)'",
+        tmux_set_append_brace_denied: "tmux set -ga status-left '{HOME}'",
+        tmux_set_append_brace_modifier_denied: "tmux set -ga status-left '{E:@x}'",
         tmux_set_history_file_denied: "tmux set -g history-file ./x",
         tmux_set_command_error_hook_denied: "tmux set -g command-error 'run-shell id'",
         tmux_set_client_created_hook_denied: "tmux set -g client-created 'run-shell id'",

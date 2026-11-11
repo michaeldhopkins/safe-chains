@@ -349,7 +349,6 @@ safe! {
     pagestuff_all: "pagestuff binary -a",
     unwinddump_basic: "unwinddump binary",
     lorder_files: "lorder a.o b.o c.o",
-    dltest_lib: "dltest /usr/lib/libc.dylib printf",
     lldb_version: "lldb --version",
     lldb_help: "lldb --help",
 
@@ -430,17 +429,15 @@ safe! {
     wdutil_info: "wdutil info",
     assetutil_info: "assetutil -I Assets.car",
     logger_msg: "logger 'test message'",
-    xip_expand: "xip --expand archive.xip",
     screen_list: "screen -ls",
 
     aa_list: "aa list",
     aa_archive: "aa archive -d src -o out.aar",
     aea_id: "aea id",
-    xar_extract: "xar -x -f file.xar",
+    xar_list: "xar -t -f file.xar",
     bzcmp_compare: "bzcmp a.bz2 b.bz2",
     xzdec_basic: "xzdec",
     zless_view: "zless file.gz",
-    cpio_extract: "cpio -idv",
     ditto_copy: "ditto src/ dest/",
     zip_create: "zip archive.zip file.txt",
     zipgrep_search: "zipgrep pattern archive.zip",
@@ -900,12 +897,8 @@ safe! {
     exit_bare: "exit",
     exit_code: "exit 0",
     exit_code_1: "exit 1",
-    declare_bare: "declare",
-    declare_p: "declare -p",
-    declare_p_var: "declare -p PATH",
     declare_f: "declare -f",
     declare_ix: "declare -ix FOO=42",
-    typeset_bare: "typeset",
 
     comment_only: "# just a comment",
     comment_before_cmd: "# comment\necho hello",
@@ -1093,8 +1086,38 @@ denied! {
     vendor_bin_pest: "./vendor/bin/pest --no-progress",
     vendor_bin_phpstan: "./vendor/bin/phpstan analyse --no-progress",
     vendor_bin_phpunit: "./vendor/bin/phpunit --testsuite Unit",
+}
+
+denied! {
+    env_bare_prints_the_environment: "env",
+    cmpdylib_credential_after_double_dash: "cmpdylib -- ~/.ssh/id_ed25519 x",
+    cmpdylib_credential_operand: "cmpdylib ~/.ssh/id_ed25519 ./new.dylib",
+    cmpdylib_system_secret: "cmpdylib ./old.dylib /etc/shadow",
+    dltest_loads_a_library: "dltest /usr/lib/libc.dylib printf",
+    dltest_loads_a_folder_library: "dltest ./x.dylib sym",
+    printenv_bare_prints_the_environment: "printenv",
+    printenv_named_variable: "printenv OPENAI_API_KEY",
+    printenv_gnu_alias: "gprintenv",
+    printenv_absolute: "/usr/bin/printenv HOME",
+    printenv_help_beside_a_name: "printenv --help HOME",
+    printenv_null: "printenv -0",
+    batch_version_queues_a_job: "batch -V",
+    batch_help_beside_a_file: "batch --help -f x.sh",
+    mise_set_help_word_names_a_variable: "mise set help",
+    mise_set_help_after_a_name: "mise set FOO --help",
+    launchctl_print_help_beside_a_target: "launchctl print --help gui/501",
+    launchctl_dumpstate_help: "launchctl dumpstate --help",
+    codex_exec_help_word_is_a_prompt: "codex exec help",
+    codex_exec_help_with_a_prompt: "codex exec --help hi",
+    codex_sandbox_help_with_a_command: "codex sandbox --help macos ls",
+    codex_resume_last: "codex resume --last --help -c x=y",
+    codex_cloud_status_override: "codex cloud status -c x=y",
     workon_destroy_no_save_denied: "workon destroy --no-save",
     workon_unknown_sub_denied: "workon frobnicate",
+    declare_bare_denied: "declare",
+    declare_p_denied: "declare -p",
+    declare_p_var_denied: "declare -p PATH",
+    typeset_bare_denied: "typeset",
     for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",
     redirect_git_hook_denied: "echo x > .git/hooks/pre-commit",
     redirect_envrc_denied: "echo x > .envrc",
@@ -1559,7 +1582,6 @@ inert! {
     level_cargo_msrv_list: "cargo msrv list",
     level_cargo_msrv_show: "cargo msrv show",
     level_cargo_vet_dump_graph: "cargo vet dump-graph",
-    level_env_bare: "env",
     level_timeout_ls: "timeout 5 ls -la",
     level_bash_version: "bash --version",
     level_df_bare: "df",
@@ -1896,6 +1918,27 @@ denied! {
 }
 
 safe! {
+    printenv_help: "printenv --help",
+    printenv_short_help: "printenv -h",
+    printenv_version: "printenv --version",
+    printenv_short_version: "printenv -V",
+    gprintenv_help: "gprintenv --help",
+    gprintenv_version: "gprintenv --version",
+    batch_help: "batch --help",
+    batch_short_help: "batch -h",
+    mise_set_help: "mise set --help",
+    mise_set_short_help: "mise set -h",
+    launchctl_print_help: "launchctl print --help",
+    launchctl_print_short_help: "launchctl print -h",
+    codex_exec_help: "codex exec --help",
+    codex_exec_short_help: "codex exec -h",
+    codex_sandbox_help: "codex sandbox --help",
+    codex_resume_help: "codex resume --help",
+    codex_cloud_status_without_an_id: "codex cloud status",
+    codex_cloud_diff_without_an_id: "codex cloud diff",
+}
+
+safe! {
     // the aliases and csplit still work for legit workspace operations
     gcat_workspace: "gcat ./notes.txt",
     csplit_workspace_count: "csplit ./file.txt 10",
@@ -2193,5 +2236,65 @@ fn workspace_overreach_reports_an_absolute_path_as_written() {
     for path in ["/etc/./hosts", "/work/../etc/hosts"] {
         let reach = crate::workspace_overreach(&format!("cat {path}"));
         assert_eq!(reach.map(|(named, _)| named).as_deref(), Some(path), "{path} must be named as written");
+    }
+}
+
+proptest::proptest! {
+    /// `cargo install` writes into the cargo bin directory, outside the project, whatever it
+    /// builds from, so no source, root or build flag makes it pass; only `--list` and `--help` do.
+    #[test]
+    fn cargo_install_never_passes_unless_it_only_lists(
+        toolchain in proptest::sample::select(vec!["", "+nightly ", "+1.90.0 "]),
+        source in proptest::sample::select(vec!["--path .", "--path ./crates/tool", "ripgrep", "--git https://github.com/x/y", "--path=."]),
+        extra in proptest::sample::subsequence(vec!["--force", "--locked", "--root ./out", "--bin safe-chains", "-q", "--offline", "--debug"], 0..3),
+    ) {
+        let line = format!("cargo {toolchain}install {source} {}", extra.join(" "));
+        proptest::prop_assert!(!is_safe_command(&line), "{}", line);
+        let listing = format!("cargo {toolchain}install --list");
+        proptest::prop_assert!(is_safe_command(&listing), "{}", listing);
+    }
+}
+
+proptest::proptest! {
+    /// codex's `-c` / `--config`, `--enable` and `--disable` set config for the run, which can name
+    /// a program to start, so no subcommand that passes on its own passes behind one.
+    #[test]
+    fn a_codex_config_override_never_passes_in_front_of_a_subcommand(
+        flag in proptest::sample::select(vec!["-c x=y", "-cx=y", "--config x=y", "--config=x=y", "--enable x", "--disable x", "--enable=x"]),
+        sub in proptest::sample::select(vec!["features list", "mcp list --help", "debug app-server --help", "cloud list", "apply x", "completion --shell zsh"]),
+    ) {
+        let plain = format!("codex {sub}");
+        proptest::prop_assert!(is_safe_command(&plain), "{}", plain);
+        let line = format!("codex {flag} {sub}");
+        proptest::prop_assert!(!is_safe_command(&line), "{}", line);
+    }
+}
+
+/// Every codex subcommand takes `-c` / `--config`, `--enable` and `--disable` too, so the override
+/// is refused wherever it sits on the line, not only in front of the subcommand.
+#[test]
+fn a_codex_config_override_never_passes_anywhere_on_the_line() {
+    let flags = [
+        "-c x=y", "-cx=y", "-c=x=y", "--config x=y", "--config=x=y", "--enable x", "--enable=x", "--disable x", "--disable=x",
+        "-c chatgpt_base_url=http://x", "-c notify=[\"sh\",\"-c\",\"id\"]",
+    ];
+    let subs = [
+        "cloud list", "cloud list --json", "cloud list --limit 5", "cloud status x", "cloud diff x", "cloud diff x --attempt 2",
+        "cloud apply x", "apply x", "features list", "completion --shell zsh",
+    ];
+    for sub in subs {
+        assert!(is_safe_command(&format!("codex {sub}")), "codex {sub}");
+        let words: Vec<&str> = sub.split(' ').collect();
+        for flag in flags {
+            for at in 0..=words.len() {
+                let mut line = words.clone();
+                line.insert(at, flag);
+                let cmd = format!("codex {}", line.join(" "));
+                assert!(!is_safe_command(&cmd), "{cmd} must not be approved");
+            }
+        }
+    }
+    for cmd in ["codex cloud list --enable x", "codex cloud list --disable=x", "codex cloud list -cx=y", "codex cloud list --conf x=y"] {
+        assert!(!is_safe_command(cmd), "{cmd} must not be approved");
     }
 }

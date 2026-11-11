@@ -4,12 +4,14 @@ mod cwd_writes;
 pub mod folder_config;
 pub use custom::fuzz_load_config;
 pub(crate) use cwd_writes::cwd_writes;
+#[cfg(test)]
+pub(crate) use cwd_writes::declared_writers;
 mod dispatch;
 mod docs;
 mod flag_sets;
-pub(crate) use flag_sets::{fallback_flag_sets, handler_policy_flag_sets};
+pub(crate) use flag_sets::{command_flag_sets, command_valued_flags, fallback_flag_sets, handler_policy_flag_sets, sub_valued_flags};
 mod glob_flags;
-use glob_flags::glob_presents_unlisted_flag;
+mod operands;
 mod passthrough_gate;
 mod policy;
 pub(crate) mod types;
@@ -463,18 +465,18 @@ fn output_flag_value<'a>(tokens: &'a [Token], flag: &'a str) -> Option<&'a str> 
 /// misses the dangerous flag inside it (a classifier/allowlist disagreement; a live bypass for any
 /// clustering tool with a classifying short flag).
 fn flag_present(tokens: &[Token], flag: &str) -> bool {
-    // A `-X` short flag (exactly two chars, leading `-`) can appear in a cluster; `--long` cannot.
-    let short_char = (flag.len() == 2 && flag.as_bytes()[0] == b'-').then(|| flag.as_bytes()[1]);
+    // A single-dash flag can appear in a cluster, `-X` or a longest-match `-XY` (zip's `-qTTcmd`); `--long` cannot.
+    let letters = flag.strip_prefix('-').filter(|l| !l.is_empty() && !l.starts_with('-'));
     tokens.iter().any(|t| {
         let s = t.as_str();
         if s == flag || s.strip_prefix(flag).is_some_and(|rest| rest.starts_with('=')) {
             return true;
         }
         // Short cluster `-<letters>` (single dash, not `--`): scan only the boolean-letter run BEFORE
-        // any `=value`, so a glued value (`-o=decrypted`) can't spuriously match the flag char.
-        matches!(short_char, Some(c)
+        // any `=value`, so a glued value (`-o=decrypted`) can't spuriously match the flag letters.
+        matches!(letters, Some(l)
             if s.len() > 1 && s.as_bytes()[0] == b'-' && s.as_bytes()[1] != b'-'
-            && s[1..].split('=').next().is_some_and(|run| run.as_bytes().contains(&c)))
+            && s[1..].split('=').next().is_some_and(|run| run.contains(l)))
     })
 }
 
@@ -536,7 +538,7 @@ pub fn try_sub_dispatch(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> {
     };
     let arg = tokens.get(1)?.as_str();
     let sub = subs.iter().find(|s| s.name == arg)?;
-    Some(dispatch::dispatch_sub_kind(&tokens[1..], &sub.kind))
+    Some(dispatch::dispatch_sub(&tokens[1..], sub))
 }
 
 /// Apply `cmd_name`'s TOML-declared `[command.fallback]` grammar.
@@ -750,6 +752,10 @@ pub fn toml_command_docs() -> Vec<crate::docs::CommandDoc> {
 mod arity_tests;
 #[cfg(test)]
 mod gate_consistency;
+#[cfg(test)]
+mod glob_scope_tests;
+#[cfg(test)]
+mod guard_values;
 #[cfg(test)]
 mod overlap_tests;
 #[cfg(test)]

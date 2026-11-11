@@ -24,8 +24,14 @@
 ### `at`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/at.1p.html">https://man7.org/linux/man-pages/man1/at.1p.html</a></p>
 
-- Allowed standalone flags: --help, -V, -b, -c, -d, -l, -m, -r, -v
-- Allowed valued flags: -f, -q, -t
+- Requires -d, -l, -r.
+- Allowed standalone flags: --help, -d, -l, -r
+- Allowed valued flags: -q
+
+**Examples:**
+
+- `at -l`
+- `at -r 3`
 
 ### `atq`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/atq.1p.html">https://man7.org/linux/man-pages/man1/atq.1p.html</a></p>
@@ -34,17 +40,30 @@
 - Allowed valued flags: -q
 - Bare invocation allowed
 
+**Examples:**
+
+- `atq`
+- `atq -q b`
+
 ### `atrm`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/atrm.1p.html">https://man7.org/linux/man-pages/man1/atrm.1p.html</a></p>
 
 - Allowed standalone flags: --help, -V
 
-### `batch`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/batch.1p.html">https://man7.org/linux/man-pages/man1/batch.1p.html</a></p>
+**Examples:**
 
-- Allowed standalone flags: --help, -V, -m, -v
-- Allowed valued flags: -f, -q
-- Bare invocation allowed
+- `atrm 3`
+
+### `batch`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?query=batch">https://man.freebsd.org/cgi/man.cgi?query=batch</a></p>
+
+- Requires --help, -h.
+- Allowed standalone flags: --help, -h
+
+**Examples:**
+
+- `batch --help`
+- `batch -h`
 
 ### `bazel`
 <p class="cmd-url"><a href="https://bazel.build/reference/command-line-reference">https://bazel.build/reference/command-line-reference</a></p>
@@ -205,7 +224,8 @@
 ### `crontab`
 <p class="cmd-url"><a href="https://ss64.com/mac/crontab.html">https://ss64.com/mac/crontab.html</a></p>
 
-- Requires -l. - Allowed standalone flags: -l, --help, -h
+- Requires -l.
+- Allowed standalone flags: -l, --help, -h
 - Allowed valued flags: -u
 
 ### `csrutil`
@@ -487,7 +507,8 @@ Aliases: `fly`
 ### `kill`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/kill.1.html">https://man7.org/linux/man-pages/man1/kill.1.html</a></p>
 
-- Requires -0, -L, -l. - Allowed standalone flags: --help, -0, -L, -h, -l
+- Requires -0, -L, -l.
+- Allowed standalone flags: --help, -0, -L, -h, -l
 
 ### `klist_cdhashes`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/klist_cdhashes.8.html">https://keith.github.io/xcode-man-pages/klist_cdhashes.8.html</a></p>
@@ -696,7 +717,6 @@ Aliases: `fly`
 <p class="cmd-url"><a href="https://ss64.com/mac/launchctl.html">https://ss64.com/mac/launchctl.html</a></p>
 
 - **blame**: Flags: --help, -h
-- **dumpstate**: Flags: --help, -h
 - **error**: Flags: --help, -h
 - **examine**: Flags: --help, -h
 - **help**: Flags: --help, -h
@@ -813,7 +833,8 @@ Aliases: `fly`
 ### `make`
 <p class="cmd-url"><a href="https://www.gnu.org/software/make/manual/make.html">https://www.gnu.org/software/make/manual/make.html</a></p>
 
-- Requires -n, --dry-run, --just-print, --recon, -p, --print-data-base. - Allowed standalone flags: --dry-run, --help, --just-print, --print-data-base, --question, --recon, --version, -V, -h, -n, -p, -q
+- Requires -n, --dry-run, --just-print, --recon.
+- Allowed standalone flags: --dry-run, --help, --just-print, --print-data-base, --question, --recon, --version, -V, -h, -n, -p, -q
 - Allowed valued flags: --directory, --file, --jobs, --makefile, -C, -f, -j
 
 **Examples:**
@@ -821,8 +842,9 @@ Aliases: `fly`
 - `make -n`
 - `make -n -j 4`
 - `make -n -C .`
+- `make -n -C src`
 - `make -n -f Makefile`
-- `make -p`
+- `make -nq`
 
 ### `malloc_history`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/malloc_history.1.html">https://keith.github.io/xcode-man-pages/malloc_history.1.html</a></p>
@@ -859,7 +881,7 @@ Aliases: `fly`
 - **doctor**: Flags: --help, -h, -q, -v
 - **edit**: Flags: --help, -h
 - **en**: Flags: --help, -h
-- **env**: Flags: --help, --json, -J, -h. Valued: --shell, -s
+- **env**: Flags: --help, -h
 - **exec**: delegates to inner command
 - **fmt**: Flags: --check, --help, -h
 - **generate**: Flags: --help, -h
@@ -888,7 +910,8 @@ Aliases: `fly`
 - **rm**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **run**: Flags: --help, -h
 - **search**: Flags: --help, -h
-- **set**: Flags: --file, --global, --help, --remove, -f, -g, -h
+- **self-update**
+- **set**: Flags: --global, --help, --remove, -g, -h. Valued: --env, --file, -E, -f
 - **settings add**: Flags: --help, -h
 - **settings get**: Flags: --help, -h, -q, -v
 - **settings list**: Flags: --help, -h, -q, -v
@@ -915,18 +938,19 @@ Aliases: `fly`
 - **tool-alias ls**: Flags: --help, -h, -q, -v
 - **tool-alias set**: Flags: --help, -h
 - **tool-alias unset**: Flags: --help, -h
-- **trust**: Flags: --all, --help, --ignore, --quiet, --show, -a, -h, -q
-- **u**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
+- **trust** (requires --show): Flags: --all, --help, --quiet, --show, -a, -h, -q
+- **u**: Flags: --force, --fuzzy, --global, --help, --pin, --quiet, --remove, --verbose, -f, -g, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
 - **uninstall**: Flags: --all, --dry-run, --help, -a, -n, -h
-- **unset**: Flags: --file, --global, --help, -f, -g, -h
+- **unset**: Flags: --global, --help, -g, -h. Valued: --file, -f
 - **untrust**: Flags: --all, --help, -a, -h
 - **unuse**: Flags: --help, -h
 - **up**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
 - **upgrade**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
-- **use**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
+- **use**: Flags: --force, --fuzzy, --global, --help, --pin, --quiet, --remove, --verbose, -f, -g, -q, -v, -h. Valued: --cd, --env, --path, -E, -e, -p
 - **watch**: Flags: --help, -h
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
+- **x**: delegates to inner command
 - Allowed standalone flags: --help, --version, -V, -h
 
 **Examples:**
@@ -944,6 +968,21 @@ Aliases: `fly`
 - `eval "$(mise activate bash)"`
 - `eval "$(mise activate bash --shims)"`
 - `eval "$(mise activate /bin/zsh --quiet)"`
+- `mise set FOO=bar`
+- `mise set NODE_ENV=production`
+- `mise set --file ./mise.toml FOO=bar`
+- `mise set -E staging FOO=bar`
+- `mise use -E production node@20`
+- `mise use -e sandbox node@20`
+- `mise set --env=dev FOO=bar`
+- `mise unset FOO`
+- `mise use --path ./mise.toml ruby@4.0.3`
+- `mise u -p ./mise.toml ruby@4.0.3`
+- `mise use -g node@20`
+- `mise use --global node@20`
+- `mise u -g node@20`
+- `mise use -gf node@20`
+- `mise unset -g FOO`
 
 ### `neon`
 <p class="cmd-url"><a href="https://neon.com/docs/reference/neon-cli">https://neon.com/docs/reference/neon-cli</a></p>
@@ -1095,7 +1134,8 @@ Aliases: `neonctl`
 ### `ninja`
 <p class="cmd-url"><a href="https://ninja-build.org/manual.html">https://ninja-build.org/manual.html</a></p>
 
-- Requires -t, -n. - Allowed standalone flags: --help, --version, -n, -v, -V, -h
+- Requires -t, -n.
+- Allowed standalone flags: --help, --version, -n, -v, -V, -h
 - Allowed valued flags: -C, -f, -j, -k, -l, -t
 
 ### `northflank`
@@ -1143,7 +1183,8 @@ Aliases: `neonctl`
 ### `pg_dump`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgdump.html">https://www.postgresql.org/docs/current/app-pgdump.html</a></p>
 
-- Requires --schema-only, -s. - Allowed standalone flags: --help, --no-comments, --no-owner, --no-privileges, --no-tablespaces, --schema-only, --verbose, --version, -V, -h, -s, -v
+- Requires --schema-only, -s.
+- Allowed standalone flags: --help, --no-comments, --no-owner, --no-privileges, --no-tablespaces, --schema-only, --verbose, --version, -V, -h, -s, -v
 - Allowed valued flags: --dbname, --encoding, --file, --format, --host, --port, --schema, --table, --username, -E, -F, -U, -d, -f, -n, -p, -t
 
 ### `pg_isready`
@@ -1278,7 +1319,8 @@ Aliases: `upsun`
 ### `pmset`
 <p class="cmd-url"><a href="https://ss64.com/mac/pmset.html">https://ss64.com/mac/pmset.html</a></p>
 
-- Requires -g. - Allowed standalone flags: -g, --help, -h
+- Requires -g.
+- Allowed standalone flags: -g, --help, -h
 
 ### `porter`
 <p class="cmd-url"><a href="https://docs.porter.run/standard/cli">https://docs.porter.run/standard/cli</a></p>
@@ -1821,7 +1863,7 @@ Aliases: `upsun`
 ### `tmux`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tmux.1.html">https://man7.org/linux/man-pages/man1/tmux.1.html</a></p>
 
-- Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option for options that hold data, set-environment, send-keys for keys that type nothing (Left, Right, Home, End, paging, Escape, C-c) or for text submitted with Enter that is itself an allowed command. Delegation: run-shell, if-shell, pipe-pane, confirm-before, and the shell command given to new-session, new-window, split-window, respawn-pane and respawn-window (recursively validates inner commands, in the -c directory).
+- Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, display-message with formats naming tmux values, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option for options that hold data, set-environment, send-keys for keys that type nothing (Left, Right, Home, End, paging, Escape, C-c) or for text submitted with Enter that is itself an allowed command. Delegation: run-shell, if-shell, pipe-pane, confirm-before, and the shell command given to new-session, new-window, split-window, respawn-pane and respawn-window (recursively validates inner commands, in the -c directory).
 
 ### `tofu`
 <p class="cmd-url"><a href="https://opentofu.org/docs/cli/commands/">https://opentofu.org/docs/cli/commands/</a></p>

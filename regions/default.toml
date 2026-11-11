@@ -226,6 +226,24 @@ role = "credential-store"
 os = ["linux"]
 note = "A process's argv, which routinely carries tokens passed as flags (`--password`, `--token`)."
 researched = "2026-08-12"
+[[region]]
+path = "/proc/*/task/*/environ"
+role = "credential-store"
+os = ["linux"]
+note = "One thread's view of the process environment block, the same bytes as /proc/<pid>/environ."
+researched = "2026-10-23"
+[[region]]
+path = "/proc/*/task/*/mem"
+role = "credential-store"
+os = ["linux"]
+note = "One thread's view of the process address space, the same memory as /proc/<pid>/mem."
+researched = "2026-10-23"
+[[region]]
+path = "/proc/*/task/*/cmdline"
+role = "credential-store"
+os = ["linux"]
+note = "One thread's view of the process argv, the same as /proc/<pid>/cmdline."
+researched = "2026-10-23"
 # NOT shielded: safe-chains' own decision log at `~/.local/state/safe-chains/`.
 #
 # It was, for one release. The reasoning — it records command lines verbatim, so it accumulates
@@ -449,6 +467,114 @@ role = "credential-store"
 note = "Mercurial config; the `[auth]` section holds per-prefix usernames and passwords in cleartext."
 researched = "2026-08-15"
 
+# ── Coding agents' sign-ins. Each CLI keeps its OAuth or API token in a plain file under its own
+#    folder; the rest of that folder (settings, logs, transcripts) stays readable. ───────────────
+[[region]]
+path = "~/.claude/.credentials.json"
+role = "credential-store"
+note = "Claude Code's OAuth access and refresh tokens where no system keychain holds them (Linux, and macOS when the keychain is unavailable)."
+researched = "2026-10-19"
+[[region]]
+path = "~/.codex/auth.json"
+role = "credential-store"
+note = "Codex CLI's sign-in: the ChatGPT OAuth tokens or the OpenAI API key, unless cli_auth_credentials_store moves them to the keychain."
+researched = "2026-10-19"
+[[region]]
+path = "~/.gemini/oauth_creds.json"
+role = "credential-store"
+note = "Gemini CLI's Google OAuth access and refresh tokens from a Login with Google sign-in."
+researched = "2026-10-19"
+[[region]]
+path = "~/.qwen/oauth_creds.json"
+role = "credential-store"
+note = "Qwen Code's OAuth tokens; it is a fork of Gemini CLI and keeps them the same way."
+researched = "2026-10-19"
+[[region]]
+path = "~/.grok/auth.json"
+role = "credential-store"
+note = "Grok CLI's sign-in tokens."
+researched = "2026-10-19"
+[[region]]
+path = "~/.local/share/opencode/auth.json"
+role = "credential-store"
+note = "OpenCode's provider API keys and OAuth tokens, written by `opencode auth login`."
+researched = "2026-10-19"
+[[region]]
+path = "~/.config/github-copilot/"
+role = "credential-store"
+note = "GitHub Copilot's OAuth tokens (hosts.json, apps.json), shared by the editor plugins and the CLI."
+researched = "2026-10-19"
+[[region]]
+path = "~/.copilot/"
+role = "credential-store"
+note = "GitHub Copilot CLI's folder: config.json holds its GitHub token in plain text when no system keychain is available, and the session store and logs keep what each session saw. Shielded whole, since config.json is too common a name to refuse in every folder."
+researched = "2026-10-20"
+[[region]]
+path = "~/.gemini/.env"
+role = "credential-store"
+note = "Gemini CLI's user-level environment file, where GEMINI_API_KEY and GOOGLE_API_KEY are kept."
+researched = "2026-10-20"
+[[region]]
+path = "~/.gemini/mcp-oauth-tokens.json"
+role = "credential-store"
+note = "Gemini CLI's OAuth tokens for the MCP servers it signs in to."
+researched = "2026-10-20"
+[[region]]
+path = "~/.local/share/amp/secrets.json"
+role = "credential-store"
+note = "Amp's API key and sign-in token."
+researched = "2026-10-20"
+[[region]]
+path = "~/.claude.json"
+role = "credential-store"
+note = "Claude Code's user state: its MCP server entries carry the environment and headers given to `claude mcp add`, often API keys, and an API-key sign-in may be kept here."
+researched = "2026-10-20"
+[[region]]
+path = "~/.claude.json.backup"
+role = "credential-store"
+note = "Claude Code's copy of ~/.claude.json, kept beside it, with the same MCP server environment and headers."
+researched = "2026-10-23"
+[[region]]
+path = "~/.claude/backups/"
+role = "credential-store"
+note = "Claude Code's dated copies of ~/.claude.json, with the same MCP server environment and headers."
+researched = "2026-10-23"
+[[region]]
+path = "~/.codex/history.jsonl"
+role = "credential-store"
+note = "Codex CLI's prompt history: every message typed into it, keys and tokens pasted into a prompt among them."
+researched = "2026-10-20"
+[[region]]
+path = "~/.codex/sessions/"
+role = "credential-store"
+note = "Codex CLI's session rollouts: each session's prompts, commands and the output they printed, secrets a command printed among them."
+researched = "2026-10-20"
+[[region]]
+path = "~/.cursor/mcp.json"
+role = "credential-store"
+note = "Cursor's global MCP servers, with the environment and headers given to each, often API keys."
+researched = "2026-10-20"
+[[region]]
+path = "~/.codeium/windsurf/mcp_config.json"
+role = "credential-store"
+note = "Windsurf's MCP servers, with the environment and headers given to each, often API keys."
+researched = "2026-10-20"
+[[region]]
+path = "~/.continue/"
+role = "credential-store"
+note = "Continue's folder: config.yaml and the older config.json give each model its provider's apiKey, and .env and the session store sit beside them. Shielded whole, since config.json and config.yaml are too common to refuse in every folder."
+researched = "2026-10-20"
+[[region]]
+path = "~/.config/goose/"
+role = "credential-store"
+note = "Goose's folder: config.yaml holds its extensions' environment, often API keys, and secrets.yaml its provider keys when no system keyring holds them. Shielded whole, since config.yaml is too common to refuse in every folder."
+researched = "2026-10-20"
+[[region]]
+path = "~/.aider.conf.yml"
+role = "credential-store"
+note = "aider's user config, which may set openai-api-key, anthropic-api-key and other api-key entries."
+researched = "2026-10-20"
+
 # ── System credential stores + other-user homes: absolute paths a broad grant (`grant /` or
 #    `grant /etc/`) would otherwise expose. Kept as un-grantable shields (the dotfile rule only
 #    covers hidden entries; these are not dotfiles). ──────────────────────────────────────────
@@ -497,6 +623,11 @@ role = "credential-store"
 os = ["macos"]
 note = "macOS root home."
 researched = "2026-07-12"
+[[region]]
+path = "/.vol/"
+role = "credential-store"
+note = "macOS volfs. /.vol/device/inode names any file by its inode, including one a path shield would refuse. The same tree is mounted at /System/Volumes/Data/.vol."
+researched = "2026-10-21"
 # Well-known credential stores NESTED under ~/.config (non-hidden, so the dotfile rule can't
 # catch them under an explicit `grant ~/.config/`). Not exhaustive — an explicit grant of a
 # config dir can still expose an unlisted app's secrets; the docs advise granting narrowly.
@@ -505,6 +636,21 @@ path = "~/.config/gh/"
 role = "credential-store"
 note = "GitHub CLI OAuth token (hosts.yml)."
 researched = "2026-07-12"
+[[region]]
+path = "~/.config/hub"
+role = "credential-store"
+note = "hub's config: the GitHub oauth_token it signs in with."
+researched = "2026-10-20"
+[[region]]
+path = "~/.s3cfg"
+role = "credential-store"
+note = "s3cmd's config: access_key and secret_key in plain text."
+researched = "2026-10-20"
+[[region]]
+path = "~/.env"
+role = "credential-store"
+note = "A dotenv file in the home folder, which aider and other tools load for their API keys. A project's own .env is not covered here."
+researched = "2026-10-20"
 [[region]]
 path = "~/.config/gcloud/"
 role = "credential-store"
@@ -580,6 +726,12 @@ role = "credential-store"
 os = ["macos"]
 note = "Edge profile credential/cookie stores."
 researched = "2026-07-12"
+[[region]]
+path = "~/Library/Application Support/Claude/"
+role = "credential-store"
+os = ["macos"]
+note = "Claude desktop app's folder: claude_desktop_config.json gives each MCP server the environment it runs with, often API keys, and config.json, the extension settings and the local session store sit beside it. Shielded whole, since config.json is too common a name to refuse in every folder."
+researched = "2026-10-20"
 
 # ── safe-chains' own config: read-OK, write-DENIED, un-grantable (the trust root). An
 #    UNPROTECTED path (no harness blesses a third-party config location) — a stopgap until one

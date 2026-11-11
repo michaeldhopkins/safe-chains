@@ -90,32 +90,6 @@ bare = false
 max_positional = 1
 
 [[command]]
-name = "xar"
-description = "eXtensible ARchiver (used for .pkg and similar). One of -c (create), -t (list), -x (extract) is required; all three require -f to name the archive. Flags include --compression, --compression-args, --toc-cksum, --file-cksum, --exclude, --keep-existing, -C (chdir before extract). Apple has deprecated xar and recommends alternative formats."
-url = "https://mackyle.github.io/xar/"
-researched_version = "xar 1.8 (macOS bundled)"
-level = "SafeWrite"
-bare = false
-tolerate_unknown_short = true
-standalone = [
-    "--coalesce-heap", "--distribution",
-    "--dump-header", "--dump-toc-cksum",
-    "--keep-existing", "--keep-setuid",
-    "--link-same",
-    "-C", "-P", "-a", "-c", "-f",
-    "-j", "-k", "-l", "-p", "-s",
-    "-t", "-v", "-x", "-z",
-]
-valued = [
-    "--compression", "--compression-args",
-    "--dump-toc", "--exclude",
-    "--extract-subdoc", "--file-cksum",
-    "--list-subdocs", "--no-compress",
-    "--prop-exclude", "--prop-include",
-    "--rsize", "--toc-cksum",
-]
-
-[[command]]
 name = "stz"
 description = "Apple Streamable Archive tool. The documented subcommand is extract, which writes a streamable archive's contents to a new output directory. Optional --hash-type, --hash-size, --hashes-file verify integrity during extraction."
 url = "https://developer.apple.com/documentation"

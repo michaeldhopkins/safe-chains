@@ -1,0 +1,10 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 99b14ef2eea109f5664a0b65e4128d34d8058f81236e6a26d0d28c90797cf8bb # shrinks to before = [], foreign = "/tmp/evil", after = [], command = "ls"
+cc bca84935f007e51eb815ee9e6e2d04944699149da9f82bbdcb6f3eb43c53e91c # shrinks to elements = ["$PATH"], command = "ls"
+cc 89d3c0ac89703ead7f9c3f884047ebd4f46507c60311cf5b10dce167dab495e8 # shrinks to elements = ["/usr/bin"], command = "ls"
+cc a505b864933a331b22fa5cc5ba3c4a643a954493ed1b56bcf907964cfabfe029 # shrinks to before = ["${PATH}"], foreign = "$(mktemp -d)", after = ["${PATH}"], command = "ls"

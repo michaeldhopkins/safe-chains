@@ -9,7 +9,8 @@
 //! listed and the operand is judged as before. A command that follows links while it walks is also
 //! judged where each link out of the tree leads (`frozen_walk`).
 
-use super::frozen_walk::{Skip, Walk, is_frozen, reach_below};
+use super::frozen_walk::{Skip, Walk, reach_below};
+use super::regions::metadata::component_may_name;
 use crate::verdict::Verdict;
 
 /// What a walk below an operand turned up.
@@ -20,6 +21,22 @@ pub(crate) enum Reach {
     Found(String),
     /// A tree that could not be listed in full, stood for by a frozen name directly below it.
     Unlisted(String),
+}
+
+/// What a walk cut short reaches. A walk that follows links may have missed one leading anywhere,
+/// so no path stands for it; one that does not stands for a frozen name below its operand.
+pub(crate) fn cut_short(base: &str, walk: Walk) -> Vec<Reach> {
+    if walk.links == super::frozen_walk::WalkLinks::Follow {
+        vec![Reach::Unlisted(super::locus::UNKNOWABLE_ITEM.to_string())]
+    } else {
+        vec![super::frozen_walk::unlisted(base)]
+    }
+}
+
+/// Whether reading the folder a followed link leads to out of the tree reads a secret: the walk
+/// reports such a link as a frozen name below it, which says nothing about what lies in its target.
+pub(crate) fn reads_a_secret(target: &std::path::Path) -> bool {
+    target.to_str().is_none_or(|path| super::read_tree_verdict(path) == Verdict::Denied)
 }
 
 impl Reach {
@@ -203,6 +220,34 @@ pub(crate) fn frozen_below(base: &str, hidden: bool) -> Option<Reach> {
     let reached = reach_below(base, Walk::plain(hidden));
     let found = reached.iter().position(|r| matches!(r, Reach::Found(_))).unwrap_or(0);
     reached.into_iter().nth(found)
+}
+
+/// Whether `name` could open a write-frozen folder, spelled in any case or with a character outside
+/// ASCII that the file system may fold to one.
+pub(crate) fn is_frozen(name: &str) -> bool {
+    let fold = cfg!(target_os = "macos");
+    super::regions::metadata::frozen_names().iter().any(|n| component_may_name(name, n, fold))
+}
+
+/// Whether `name` could open the folder a package manager installs into (`node_modules`), spelled as
+/// `is_frozen` reads a frozen name.
+pub(crate) fn is_packaged(name: &str) -> bool {
+    component_may_name(name, "node_modules", cfg!(target_os = "macos"))
+}
+
+/// Whether running the file or folder `path` runs code from installed packages or a frozen folder,
+/// once the folder a `cd` moved to is joined on. No commit of the project's own shows that code. A
+/// frozen folder named last is the folder itself (`GIT_DIR=.git`), which its tool reads as its own.
+pub(crate) fn runs_unreviewed_code(path: &str) -> bool {
+    let placed = crate::pathctx::resolve(path);
+    let (dirs, last) = placed.rsplit_once('/').unwrap_or(("", &placed));
+    is_packaged(last) || dirs.split('/').any(|part| is_frozen(part) || is_packaged(part))
+}
+
+/// Whether a tool that runs the code of the folder `path` names would run files from installed
+/// packages or a frozen folder: the folder itself counts, since the tool reads the files inside it.
+pub(crate) fn is_unreviewed_folder(path: &str) -> bool {
+    crate::pathctx::resolve(path).split('/').any(|part| is_frozen(part) || is_packaged(part))
 }
 
 #[cfg(test)]

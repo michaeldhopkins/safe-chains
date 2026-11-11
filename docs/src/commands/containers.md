@@ -180,9 +180,9 @@
 ### `hadolint`
 <p class="cmd-url"><a href="https://github.com/hadolint/hadolint">https://github.com/hadolint/hadolint</a></p>
 
-- **Without a subcommand:**
 - Allowed standalone flags: --disable-ignore-pragma, --help, --no-color, --no-fail, --strict-labels, --verbose, --version, -V, -h, -v
 - Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t
+- Any `+RTS`, `-RTS` or `--RTS` argument is refused (GHC runtime options can write statistics to a named file).
 
 **Examples:**
 
@@ -297,7 +297,7 @@
 - **cluster-info**: Flags: --help, -h
 - **config current-context**: Flags: --help, -h
 - **config get-contexts**: Flags: --help, --no-headers, -h. Valued: --output, -o
-- **config view**: Flags: --flatten, --help, --minify, --raw, -h. Valued: --output, -o
+- **config view**: Flags: --flatten, --help, --minify, -h. Valued: --output, -o
 - **describe**: Flags: --all-namespaces, --help, --show-events, -A, -h. Valued: --namespace, --selector, -l, -n
 - **diff**: Flags: --field-manager, --force-conflicts, --help, --prune, --server-side, -h. Valued: -f, --filename, -k, --kustomize, -l, --selector, --prune-allowlist. Positional args accepted
 - **events**: Flags: --all-namespaces, --help, --watch, -A, -h, -w. Valued: --for, --namespace, --output, --types, -n, -o
@@ -308,6 +308,11 @@
 - **top pod**: Flags: --all-namespaces, --containers, --help, --no-headers, -A, -h. Valued: --namespace, --selector, --sort-by, -l, -n
 - **version**: Flags: --client, --help, --short, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `kubectl config view`
+- `kubectl config view --flatten --minify`
 
 ### `kubectx`
 <p class="cmd-url"><a href="https://github.com/ahmetb/kubectx">https://github.com/ahmetb/kubectx</a></p>
@@ -324,7 +329,7 @@
 ### `kustomize`
 <p class="cmd-url"><a href="https://kubectl.docs.kubernetes.io/references/kustomize/">https://kubectl.docs.kubernetes.io/references/kustomize/</a></p>
 
-- **build**: Flags: --enable-alpha-plugins, --enable-exec, --enable-helm, --help, --load-restrictor, -h. Valued: --env, --helm-command, --mount, --output, -o
+- **build**: Flags: --help, -h. Valued: --env, --helm-command, --load-restrictor, --mount, --output, -o
 - **version**: Flags: --help, --short, -h
 - Allowed standalone flags: --help, -h
 
@@ -334,6 +339,7 @@
 - `kustomize build`
 - `kustomize build ./overlays/dev`
 - `kustomize build -o ./rendered.yaml`
+- `kustomize build --load-restrictor LoadRestrictionsRootOnly`
 
 ### `linkerd`
 <p class="cmd-url"><a href="https://linkerd.io/2/reference/cli/">https://linkerd.io/2/reference/cli/</a></p>

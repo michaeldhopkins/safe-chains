@@ -1,5 +1,11 @@
 [[command]]
 name = "hlint"
+ghc_rts = true
+examples_denied = [
+    "hlint src +RTS -tpwned",
+    "hlint src '+RTS' -tpwned",
+    "hlint src -- +RTS -tpwned",
+]
 description = "Linter for Haskell. Reads source files and reports refactoring suggestions to stdout. --refactor invokes the `refactor` external program to apply suggestions in place — that's a write operation. The static analysis itself does not execute Haskell. Active project."
 url = "https://github.com/ndmitchell/hlint"
 researched_version = "hlint 3.x"

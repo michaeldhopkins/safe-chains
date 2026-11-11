@@ -82,6 +82,7 @@ pub(super) fn send_keys_verdict(rest: &[Token]) -> Verdict {
         match classify(arg.as_str()) {
             Key::Inert if line.is_empty() => moved = true,
             Key::Submit if !line.is_empty() => {
+                let _cwd = crate::pathctx::enter_cwd(Some(crate::pathctx::UNRESOLVED_CWD.to_string()));
                 verdict = verdict.combine(crate::command_verdict(&line));
                 line.clear();
             }

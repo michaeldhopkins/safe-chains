@@ -15,7 +15,9 @@ zcat x	inert
 zcmp	denied
 zcmp --help	denied
 zcmp --version	denied
+zcmp ./a.gz ./b.gz	inert
 zcmp x	inert
+zcmp ~/.ssh/id_ed25519 ./b.gz	denied
 zdiff	denied
 zdiff --help	denied
 zdiff --version	denied
@@ -296,7 +298,9 @@ zfgrep x	inert
 zforce	denied
 zforce --help	denied
 zforce --version	denied
+zforce ./a	safe-write
 zforce x	safe-write
+zforce ~/.ssh/id_ed25519	denied
 zgrep	denied
 zgrep -- -e ~/.ssh/id_rsa	denied
 zgrep --after-context x	inert
@@ -361,93 +365,199 @@ zig --help x	denied
 zig --version	inert
 zig x	denied
 zip	denied
+zip --DOS-names	safe-write
+zip --DOS-names --absolute-path	safe-write
+zip --DOS-names --before-date x	safe-write
+zip --DOS-names x	safe-write
 zip --absolute-path	safe-write
-zip --absolute-path --compression-method x	safe-write
-zip --absolute-path --delete	safe-write
-zip --absolute-path x	safe-write
+zip --adjust-sfx	safe-write
+zip --archive-comment	safe-write
+zip --before-date x	safe-write
+zip --compress-1	safe-write
+zip --compress-2	safe-write
+zip --compress-3	safe-write
+zip --compress-4	safe-write
+zip --compress-5	safe-write
+zip --compress-6	safe-write
+zip --compress-7	safe-write
+zip --compress-8	safe-write
+zip --compress-9	safe-write
 zip --compression-method x	safe-write
+zip --copy	safe-write
+zip --copy-entries	safe-write
 zip --delete	safe-write
+zip --dif	safe-write
+zip --difference-archive	safe-write
+zip --display-bytes	safe-write
+zip --display-counts	safe-write
+zip --display-dots	safe-write
+zip --display-globaldots	safe-write
+zip --display-usize	safe-write
+zip --display-volume	safe-write
+zip --dot-size x	safe-write
 zip --encrypt	safe-write
+zip --entry-comments	safe-write
 zip --exclude	safe-write
+zip --fifo	safe-write
 zip --filesync	safe-write
 zip --fix	safe-write
 zip --fixfix	safe-write
+zip --force-descriptors	safe-write
+zip --force-zip64	safe-write
 zip --freshen	safe-write
+zip --from-crlf	safe-write
+zip --from-date x	safe-write
+zip --grow	safe-write
 zip --help	safe-write
 zip --include	safe-write
 zip --junk-paths	safe-write
+zip --junk-sfx	safe-write
+zip --latest-time	safe-write
 zip --license	safe-write
+zip --log-append	safe-write
+zip --log-info	safe-write
+zip --logfile-path x	safe-write
+zip --more-help	safe-write
 zip --move	safe-write
+zip --must-match	safe-write
+zip --names-stdin	denied
+zip --no-dir-entries	safe-write
+zip --no-wild	safe-write
+zip --out x	safe-write
+zip --output-file x	safe-write
 zip --password x	safe-write
 zip --paths	safe-write
 zip --quiet	safe-write
 zip --recurse-paths	safe-write
+zip --recurse-patterns	safe-write
+zip --regex	safe-write
+zip --show-command	safe-write
+zip --show-debug	safe-write
+zip --show-files	safe-write
+zip --show-options	safe-write
+zip --split-bell	safe-write
+zip --split-pause	safe-write
+zip --split-size x	safe-write
+zip --split-verbose	safe-write
+zip --store	safe-write
+zip --strip-extra	safe-write
+zip --suffixes x	safe-write
 zip --symlinks	safe-write
 zip --temp-path x	safe-write
 zip --test	safe-write
+zip --to-crlf	safe-write
+zip --unzip-command	denied
 zip --update	safe-write
 zip --verbose	safe-write
-zip --version	denied
+zip --version	safe-write
+zip --wild-stop-dirs	safe-write
 zip -0	safe-write
 zip -1	safe-write
+zip -2	safe-write
+zip -3	safe-write
+zip -4	safe-write
+zip -5	safe-write
+zip -6	safe-write
+zip -7	safe-write
+zip -8	safe-write
 zip -9	safe-write
 zip -?	safe-write
-zip -@	safe-write
+zip -@	denied
 zip -A	safe-write
+zip -AC	safe-write
+zip -AS	safe-write
 zip -C	safe-write
 zip -D	safe-write
 zip -DF	safe-write
 zip -E	safe-write
 zip -F	safe-write
 zip -FF	safe-write
+zip -FI	safe-write
 zip -FS	safe-write
+zip -H	safe-write
 zip -J	safe-write
 zip -L	safe-write
 zip -M	safe-write
-zip -O	safe-write
+zip -MM	safe-write
 zip -O x	safe-write
-zip -P	safe-write
 zip -P x	safe-write
 zip -Q	safe-write
 zip -R	safe-write
+zip -RE	safe-write
 zip -S	safe-write
 zip -T	safe-write
+zip -T --unzip-command sh o.zip f	denied
+zip -T -TT sh o.zip f	denied
+zip -TT	denied
+zip -TTsh o.zip f	denied
 zip -U	safe-write
 zip -V	safe-write
 zip -X	safe-write
-zip -Z	safe-write
+zip -X-	safe-write
 zip -Z x	safe-write
 zip -a	safe-write
 zip -b x	safe-write
 zip -c	safe-write
 zip -d	safe-write
+zip -db	safe-write
+zip -dc	safe-write
+zip -dd	safe-write
+zip -dg	safe-write
+zip -ds x	safe-write
+zip -du	safe-write
+zip -dv	safe-write
 zip -e	safe-write
 zip -f	safe-write
+zip -fd	safe-write
+zip -fz	safe-write
+zip -fz-	safe-write
 zip -g	safe-write
 zip -h	safe-write
+zip -h2	safe-write
 zip -i	safe-write
+zip -ic	safe-write
 zip -j	safe-write
 zip -k	safe-write
 zip -l	safe-write
+zip -la	safe-write
+zip -lf x	safe-write
+zip -li	safe-write
+zip -ll	safe-write
 zip -m	safe-write
-zip -n	safe-write
 zip -n x	safe-write
+zip -nw	safe-write
 zip -o	safe-write
 zip -p	safe-write
 zip -q	safe-write
+zip -qTTsh o.zip f	denied
 zip -r	safe-write
+zip -r - .	safe-write
+zip -r -lf ./zip.log ./out.zip ./src	safe-write
 zip -r ./out.zip ./src	safe-write
-zip -s	safe-write
+zip -r o.zip . -TT 'sh x'	denied
+zip -r o.zip . -la -lf=/etc/x	denied
+zip -r o.zip . -lf ~/.zshrc	denied
+zip -rn.y - .	safe-write
 zip -s x	safe-write
-zip -t	safe-write
+zip -sU	safe-write
+zip -sb	safe-write
+zip -sc	safe-write
+zip -sd	safe-write
+zip -sf	safe-write
+zip -so	safe-write
+zip -sp	safe-write
+zip -su	safe-write
+zip -sv	safe-write
 zip -t x	safe-write
 zip -tt x	safe-write
 zip -u	safe-write
 zip -v	safe-write
 zip -w	safe-write
+zip -ws	safe-write
 zip -x	safe-write
 zip -y	safe-write
 zip -z	safe-write
+zip ./a.zip ./notes.txt	safe-write
 zip archive.zip file.txt	safe-write
 zip x	safe-write
 zipalign	denied
@@ -481,6 +591,7 @@ zipcloak --temp-path x	safe-write
 zipcloak --version	safe-write
 zipcloak -L	safe-write
 zipcloak -O x	safe-write
+zipcloak -O ~/.zshrc ./out.zip	denied
 zipcloak -b	safe-write
 zipcloak -d	safe-write
 zipcloak -h	safe-write
@@ -488,6 +599,7 @@ zipcloak -q	safe-write
 zipcloak -v	safe-write
 zipcloak ./out.zip	safe-write
 zipcloak x	safe-write
+zipcloak ~/.ssh/k.zip	denied
 zipcmp	denied
 zipcmp --help	denied
 zipcmp --version	denied
@@ -505,6 +617,7 @@ zipcmp -t	inert
 zipcmp -v	inert
 zipcmp ./a.zip ./b.zip	inert
 zipcmp x	inert
+zipcmp ~/.ssh/k.zip ./b.zip	denied
 zipdetails	denied
 zipdetails --help	denied
 zipdetails --scan	inert
@@ -515,10 +628,12 @@ zipdetails -h	inert
 zipdetails -v	inert
 zipdetails ./out.zip	inert
 zipdetails x	inert
+zipdetails ~/.ssh/k.zip	denied
 zipgrep	denied
 zipgrep --help	denied
 zipgrep --version	denied
 zipgrep TODO ./bundle.zip	inert
+zipgrep key ~/.ssh/k.zip	denied
 zipgrep pattern archive.zip	inert
 zipgrep x	inert
 zipgrep x ~/.ssh/id_rsa	denied
@@ -528,6 +643,7 @@ zipinfo --help --version	inert
 zipinfo --help x	inert
 zipinfo --version	inert
 zipinfo -1	inert
+zipinfo -1 ./archive.zip	inert
 zipinfo -2	inert
 zipinfo -C	inert
 zipinfo -M	inert
@@ -541,7 +657,9 @@ zipinfo -s	inert
 zipinfo -t	inert
 zipinfo -v	inert
 zipinfo -z	inert
+zipinfo ./archive.zip	inert
 zipinfo x	inert
+zipinfo ~/.ssh/keys.zip	denied
 zipmerge	denied
 zipmerge --help	denied
 zipmerge --version	denied
@@ -556,7 +674,9 @@ zipmerge -i	safe-write
 zipmerge -k	safe-write
 zipmerge -s	safe-write
 zipmerge ./all.zip ./a.zip ./b.zip	safe-write
+zipmerge ./all.zip ~/.ssh/k.zip	denied
 zipmerge x	safe-write
+zipmerge ~/.ssh/k.zip ./a.zip	denied
 zipnote	denied
 zipnote --help	safe-write
 zipnote --help --license	safe-write
@@ -568,8 +688,10 @@ zipnote -b	safe-write
 zipnote -h	safe-write
 zipnote -v	safe-write
 zipnote -w	safe-write
+zipnote -w /etc/x.zip	denied
 zipnote ./out.zip	safe-write
 zipnote x	safe-write
+zipnote ~/.ssh/k.zip	denied
 zipsplit	denied
 zipsplit --help	safe-write
 zipsplit --help --license	safe-write
@@ -579,6 +701,7 @@ zipsplit --license	safe-write
 zipsplit --version	safe-write
 zipsplit -L	safe-write
 zipsplit -b x	safe-write
+zipsplit -b ~/.ssh ./out.zip	denied
 zipsplit -h	safe-write
 zipsplit -i	safe-write
 zipsplit -n 100000 ./out.zip	safe-write
@@ -589,6 +712,7 @@ zipsplit -s	safe-write
 zipsplit -t	safe-write
 zipsplit -v	safe-write
 zipsplit x	safe-write
+zipsplit ~/.ssh/k.zip	denied
 ziptool	denied
 ziptool --help	denied
 ziptool --version	denied
@@ -605,13 +729,80 @@ ziptool -o x	safe-write
 ziptool -r	safe-write
 ziptool -s	safe-write
 ziptool -t	safe-write
+ziptool ./out.zip add_file a ./src/a.txt 0 0	safe-write
 ziptool ./out.zip stat 0	safe-write
+ziptool /etc/x.zip delete 0	denied
+ziptool o.zip add_file a ~/.ssh/id_ed25519 0 0	denied
+ziptool o.zip add_from_zip a ~/.ssh/k.zip 0 0 0	denied
 ziptool x	safe-write
+ziptool ~/.ssh/k.zip add a b	denied
 zless	inert
-zless --help	denied
-zless --version	denied
+zless '+!id' ./a.gz	denied
+zless --LINE-NUMBERS	inert
+zless --LINE-NUMBERS --LONG-PROMPT	inert
+zless --LINE-NUMBERS --pattern x	inert
+zless --LINE-NUMBERS x	inert
+zless --LONG-PROMPT	inert
+zless --QUIT-AT-EOF	inert
+zless --RAW-CONTROL-CHARS	inert
+zless --chop-long-lines	inert
+zless --help	inert
+zless --ignore-case	inert
+zless --no-init	inert
+zless --pattern x	inert
+zless --prompt x	inert
+zless --quiet	inert
+zless --quit-at-eof	inert
+zless --quit-if-one-screen	inert
+zless --raw-control-chars	inert
+zless --shift x	inert
+zless --silent	inert
+zless --squeeze-blank-lines	inert
+zless --tabs x	inert
+zless --tag x	inert
+zless --version	inert
+zless --window x	inert
+zless -E	inert
+zless -F	inert
+zless -G	inert
+zless -I	inert
+zless -J	inert
+zless -K	inert
+zless -L	inert
+zless -M	inert
+zless -N	inert
+zless -P x	inert
+zless -Q	inert
+zless -R	inert
+zless -S	inert
+zless -V	inert
+zless -W	inert
+zless -X	inert
+zless -a	inert
+zless -b x	inert
+zless -c	inert
+zless -e	inert
+zless -f	inert
+zless -g	inert
+zless -h x	inert
+zless -i	inert
+zless -j x	inert
+zless -m	inert
+zless -n	inert
+zless -o ./log ./a.gz	denied
+zless -p x	inert
+zless -q	inert
+zless -r	inert
+zless -s	inert
+zless -t x	inert
+zless -w	inert
+zless -x x	inert
+zless -y x	inert
+zless -z x	inert
+zless ./a.gz	inert
 zless file.gz	inert
 zless x	inert
+zless ~/.ssh/id_ed25519	denied
 zlib-flate	inert
 zlib-flate --help	denied
 zlib-flate --version	denied
@@ -623,9 +814,69 @@ zlib-flate -level x	inert
 zlib-flate -uncompress	inert
 zlib-flate x	inert
 zmore	inert
-zmore --help	denied
-zmore --version	denied
+zmore '+!id' ./a.gz	denied
+zmore --LINE-NUMBERS	inert
+zmore --LINE-NUMBERS --LONG-PROMPT	inert
+zmore --LINE-NUMBERS --prompt x	inert
+zmore --LINE-NUMBERS x	inert
+zmore --LONG-PROMPT	inert
+zmore --QUIT-AT-EOF	inert
+zmore --RAW-CONTROL-CHARS	inert
+zmore --chop-long-lines	inert
+zmore --help	inert
+zmore --ignore-case	inert
+zmore --no-init	inert
+zmore --prompt x	inert
+zmore --quiet	inert
+zmore --quit-at-eof	inert
+zmore --quit-if-one-screen	inert
+zmore --raw-control-chars	inert
+zmore --shift x	inert
+zmore --silent	inert
+zmore --squeeze-blank-lines	inert
+zmore --tabs x	inert
+zmore --tag x	inert
+zmore --version	inert
+zmore --window x	inert
+zmore -E	inert
+zmore -F	inert
+zmore -G	inert
+zmore -I	inert
+zmore -J	inert
+zmore -K	inert
+zmore -L	inert
+zmore -M	inert
+zmore -N	inert
+zmore -P x	inert
+zmore -Q	inert
+zmore -R	inert
+zmore -S	inert
+zmore -V	inert
+zmore -W	inert
+zmore -X	inert
+zmore -a	inert
+zmore -b x	inert
+zmore -c	inert
+zmore -e	inert
+zmore -f	inert
+zmore -g	inert
+zmore -h x	inert
+zmore -i	inert
+zmore -j x	inert
+zmore -m	inert
+zmore -n	inert
+zmore -p '!id' ./a.gz	denied
+zmore -q	inert
+zmore -r	inert
+zmore -s	inert
+zmore -t x	inert
+zmore -w	inert
+zmore -x x	inert
+zmore -y x	inert
+zmore -z x	inert
+zmore ./a.gz	inert
 zmore x	inert
+zmore ~/.ssh/id_ed25519	denied
 znew	denied
 znew --help	denied
 znew --version	denied
@@ -636,6 +887,8 @@ znew -K	safe-write
 znew -f	safe-write
 znew -t	safe-write
 znew -v	safe-write
+znew ./a.Z	safe-write
+znew /etc/x.Z	denied
 znew x	safe-write
 znew ~/.ssh/x.Z	denied
 zola	denied
@@ -937,8 +1190,66 @@ zstdgrep TODO ./log.zst	inert
 zstdgrep x	inert
 zstdgrep x ~/.ssh/id_rsa	denied
 zstdless	inert
-zstdless --help	denied
-zstdless --version	denied
+zstdless --LINE-NUMBERS	inert
+zstdless --LINE-NUMBERS --LONG-PROMPT	inert
+zstdless --LINE-NUMBERS --pattern x	inert
+zstdless --LINE-NUMBERS x	inert
+zstdless --LONG-PROMPT	inert
+zstdless --QUIT-AT-EOF	inert
+zstdless --RAW-CONTROL-CHARS	inert
+zstdless --chop-long-lines	inert
+zstdless --help	inert
+zstdless --ignore-case	inert
+zstdless --no-init	inert
+zstdless --pattern x	inert
+zstdless --prompt x	inert
+zstdless --quiet	inert
+zstdless --quit-at-eof	inert
+zstdless --quit-if-one-screen	inert
+zstdless --raw-control-chars	inert
+zstdless --shift x	inert
+zstdless --silent	inert
+zstdless --squeeze-blank-lines	inert
+zstdless --tabs x	inert
+zstdless --tag x	inert
+zstdless --version	inert
+zstdless --window x	inert
+zstdless -E	inert
+zstdless -F	inert
+zstdless -G	inert
+zstdless -I	inert
+zstdless -J	inert
+zstdless -K	inert
+zstdless -L	inert
+zstdless -M	inert
+zstdless -N	inert
+zstdless -P x	inert
+zstdless -Q	inert
+zstdless -R	inert
+zstdless -S	inert
+zstdless -V	inert
+zstdless -W	inert
+zstdless -X	inert
+zstdless -a	inert
+zstdless -b x	inert
+zstdless -c	inert
+zstdless -e	inert
+zstdless -f	inert
+zstdless -g	inert
+zstdless -h x	inert
+zstdless -i	inert
+zstdless -j x	inert
+zstdless -m	inert
+zstdless -n	inert
+zstdless -p x	inert
+zstdless -q	inert
+zstdless -r	inert
+zstdless -s	inert
+zstdless -t x	inert
+zstdless -w	inert
+zstdless -x x	inert
+zstdless -y x	inert
+zstdless -z x	inert
 zstdless ./a.zst	inert
 zstdless x	inert
 zstdmt	safe-write

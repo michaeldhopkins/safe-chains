@@ -1,0 +1,119 @@
+//! The other spellings of a path that a credential shield must also be asked about.
+
+use super::current_os;
+
+/// Every spelling a SHIELD must be asked about: the path itself, plus its macOS firmlink form
+/// when the `/private` prefix only matches under case folding.
+///
+/// `canonicalize` already folds `/private/etc/x` → `/etc/x`, but case-sensitively, because that
+/// fold also feeds admits and folding an admit would hand `/PRIVATE/tmp` the scratch rung. So the
+/// case variant of a firmlink never reached the shield: `/etc/SHADOW` was refused (nodes fold) and
+/// `/PRIVATE/etc/shadow` was not, though on the default macOS volume they are one file.
+///
+/// Extra spellings are offered to the shield ONLY. Everything else classifies the path as written,
+/// which is what keeps a case variant from reaching a permissive node.
+///
+/// The home folder is offered the same way. On the default macOS volume `/users/me/.s3cfg` and
+/// `/System/Volumes/Data/Users/me/.s3cfg` are `~/.s3cfg`, but `canonicalize` folds only the exact
+/// `$HOME` to `~`, so both read out as ordinary absolute files.
+pub(super) fn shield_spellings(path: &str) -> Vec<String> {
+    let mut out = vec![path.to_string()];
+    let mut offer = |p: String| {
+        if !out.contains(&p) {
+            out.push(p);
+        }
+    };
+    let on_data_volume = (current_os() == "macos").then(|| strip_prefix_could_be(path, "/System/Volumes/Data")).flatten();
+    for spelling in std::iter::once(path).chain(on_data_volume) {
+        offer(spelling.to_string());
+        if let Some(folded) = crate::engine::resolve::locus::firmlink_fold_case_insensitive(spelling) {
+            offer(folded);
+        }
+        if let Some(home) = home_fold_case_insensitive(spelling) {
+            offer(home);
+        }
+    }
+    out
+}
+
+/// `path` without `prefix`, matched component by component: in any ASCII case, and with each
+/// character outside ASCII standing for any run of characters, as APFS folds them.
+pub(super) fn strip_prefix_could_be<'a>(path: &'a str, prefix: &str) -> Option<&'a str> {
+    let mut rest = path;
+    for want in prefix.split('/').filter(|c| !c.is_empty()) {
+        let after = rest.strip_prefix('/')?;
+        let end = after.find('/')?;
+        let component = &after[..end];
+        let fits = match super::unicode_spelling::wildcard_component(component) {
+            Some(pattern) => super::metadata::glob_may_match(&pattern, want),
+            None => component.eq_ignore_ascii_case(want),
+        };
+        if !fits {
+            return None;
+        }
+        rest = &after[end..];
+    }
+    Some(rest)
+}
+
+/// The `~/…` form of an absolute path under `$HOME` in any case, on macOS only, where the default
+/// volume is case-insensitive.
+fn home_fold_case_insensitive(path: &str) -> Option<String> {
+    if current_os() != "macos" {
+        return None;
+    }
+    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1)?;
+    let rest = strip_prefix_could_be(path, home.trim_end_matches('/'))?;
+    Some(format!("~{rest}"))
+}
+
+/// `/Users/someone/…`, `/home/someone/…` — another user's home written out in full.
+///
+/// Only the `~name` spelling was recognised, and while every machine-rung path was refused that
+/// was enough. Opening local reads made the two spellings disagree: `~someone/notes` stayed
+/// private and `/Users/someone/notes` read out. Our OWN home never arrives here as an absolute —
+/// `canonicalize` has already folded it to `~/…`.
+pub(crate) fn absolute_other_home(path: &str) -> bool {
+    let home = std::env::var("HOME").unwrap_or_default();
+    let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
+    // Both conventional roots, not just this host's: the classifier reads strings, and a Linux
+    // path handed to a macOS run must not come back with a different answer. The parent matches in
+    // any case and below the data volume, as the default macOS volume does (`/users/someone` is
+    // `/Users/someone`); the user's own name stays exact, so a case variant of ours is not ours.
+    let path = strip_prefix_could_be(path, "/System/Volumes/Data").unwrap_or(path);
+    ["/Users", "/home"].iter().any(|parent| {
+        strip_prefix_could_be(path, parent)
+            .and_then(|r| r.strip_prefix('/'))
+            .and_then(|r| r.split('/').next())
+            .is_some_and(|user| !user.is_empty() && (ours.is_empty() || user != ours))
+    })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::strip_prefix_could_be;
+    use proptest::prelude::*;
+
+    proptest! {
+        /// A prefix is stripped in any case exactly when it ends at a component boundary, and what
+        /// is left is the rest of the path as written.
+        #[test]
+        fn a_prefix_strips_in_any_case_only_at_a_component_boundary(
+            prefix in "(/[a-z]{1,6}){1,3}",
+            rest in "(/[a-zA-Z.]{1,6}){1,3}",
+            glued in "[a-z]{1,4}",
+            flips in prop::collection::vec(any::<bool>(), 24),
+        ) {
+            let cased: String = prefix
+                .chars()
+                .zip(flips.iter().cycle())
+                .map(|(c, &up)| if up { c.to_ascii_uppercase() } else { c })
+                .collect();
+            let path = format!("{cased}{rest}");
+            prop_assert_eq!(strip_prefix_could_be(&path, &prefix), Some(rest.as_str()));
+            let longer = format!("{cased}{glued}{rest}");
+            prop_assert_eq!(strip_prefix_could_be(&longer, &prefix), None);
+            prop_assert_eq!(strip_prefix_could_be(&cased, &prefix), None);
+        }
+    }
+}

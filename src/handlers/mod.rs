@@ -22,15 +22,22 @@ macro_rules! handler_module {
 }
 
 pub mod android;
+mod cargo_runs_this;
 pub mod coreutils;
 pub mod df;
+pub(crate) mod direct_script;
+mod env_print;
 pub mod fd;
+mod followed_read;
 pub mod forges;
 pub mod fuzzy;
 pub mod hadolint;
 pub mod interpreter;
 pub mod jvm;
 pub mod magick;
+mod make_dirs;
+mod make_text;
+mod mise_global;
 pub mod network;
 pub mod node;
 pub mod pandoc;
@@ -39,9 +46,11 @@ pub mod perl;
 mod perl_load;
 mod perl_regex;
 pub mod php;
+pub mod printf;
 pub mod ruby;
 pub mod safe_chains;
 pub mod shell;
+pub(crate) mod shell_text;
 pub mod shellcheck;
 #[cfg(test)]
 mod signal_tests;
@@ -72,6 +81,9 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("df", df::check_df as HandlerFn),
         ("fd", fd::check_fd as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
+        ("open", system::open::check_open as HandlerFn),
+        ("screen", system::screen::check_screen as HandlerFn),
+        ("printf", printf::check_printf as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
         ("safe_chains", safe_chains::check_safe_chains as HandlerFn),
@@ -91,10 +103,16 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
     ])
 }
 
-pub fn dispatch(tokens: &[Token]) -> Verdict {
-    let cmd = crate::engine::resolve::dispatch_name(&tokens[0]);
-    let verdict = None
-        .or_else(|| crate::registry::custom_dispatch(tokens))
+pub(crate) fn judges_its_own_path(tokens: &[Token]) -> bool {
+    tokens.first().is_some_and(|first| first.command_name() == "heavy-slot.sh")
+}
+
+pub(crate) fn names_a_command(tokens: &[Token]) -> bool {
+    tokens.first().is_some_and(|first| named_verdict(first.command_name(), tokens).is_some())
+}
+
+fn named_verdict(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
+    None.or_else(|| crate::registry::custom_dispatch(tokens))
         .or_else(|| shell::dispatch(cmd, tokens))
         .or_else(|| wrappers::dispatch(cmd, tokens))
         .or_else(|| node::dispatch(cmd, tokens))
@@ -106,7 +124,11 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| fuzzy::dispatch(cmd, tokens))
         .or_else(|| vcs::dispatch(cmd, tokens))
         .or_else(|| crate::registry::toml_dispatch(tokens))
-        .unwrap_or(Verdict::Denied);
+}
+
+pub fn dispatch(tokens: &[Token]) -> Verdict {
+    let cmd = crate::engine::resolve::dispatch_name(&tokens[0]);
+    let verdict = named_verdict(cmd, tokens).unwrap_or(Verdict::Denied);
     // Cross-cutting path-operand gate (audit fix): a legacy content-reader/writer must not
     // read/write a sensitive path just because its own handler ignored the operand's locus.
     // Canonicalize through the alias map (`gtee` → `tee`) so a Homebrew g-alias hits the same
@@ -114,7 +136,52 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
     if verdict.is_allowed() && crate::pathgate::should_deny(crate::registry::canonical_name(cmd), tokens) {
         return Verdict::Denied;
     }
+    if verdict.is_allowed() && refuses_its_arguments(tokens) {
+        return Verdict::Denied;
+    }
     verdict
+}
+
+pub(crate) fn refuses_its_arguments(tokens: &[Token]) -> bool {
+    let Some(first) = tokens.first() else {
+        return false;
+    };
+    let specific = match crate::registry::canonical_name(first.command_name()) {
+        "cargo" => safe_chains::cargo_run_reaches_a_rule_change(tokens),
+        "chmod" => coreutils::chmod_mode::sets_an_id_bit(tokens),
+        "mkdir" => coreutils::chmod_mode::mkdir_mode_sets_an_id_bit(tokens),
+        "rsync" => {
+            coreutils::chmod_mode::rsync_chmod_sets_an_id_bit(tokens)
+                || coreutils::rsync_remote::refuses_its_remote_options(tokens)
+                || coreutils::rsync_shell::names_a_program_to_run(tokens)
+        }
+        "git" => vcs::git::runs_in_a_repository_outside_the_project(tokens),
+        name @ ("branchdiff" | "tig" | "hg" | "git-lfs" | "gitleaks" | "jj" | "jjpr") => {
+            vcs::git::opens_a_repository_outside_the_project(name, tokens)
+        }
+        "bundle" => ruby::gemfile::loads_a_gemfile_out_of_sight(tokens),
+        "make" => {
+            make_text::evaluates_text_from_the_line(tokens)
+                || make_dirs::moves_its_folder_out_of_sight(tokens)
+                || make_dirs::moves_into_an_unreviewed_folder(tokens)
+        }
+        "mise" => env_print::prints_the_environment(tokens) || mise_global::sets_an_audited_variable_globally(tokens),
+        "export" | "declare" | "ps" => env_print::prints_the_environment(tokens),
+        "pax" => coreutils::archive_extract::extracts(tokens) || coreutils::stdin_names::reads_names_it_cannot_check(tokens),
+        "cpio" => {
+            coreutils::archive_extract::extracts(tokens)
+                || coreutils::stdin_names::reads_names_it_cannot_check(tokens)
+                || coreutils::archive_extract::opens_a_remote_archive(tokens)
+        }
+        "zip" => coreutils::stdin_names::reads_names_it_cannot_check(tokens),
+        "ditto" | "xar" | "xip" | "ptar" | "ptargrep" | "7z" => coreutils::archive_extract::extracts(tokens),
+        "man" | "apropos" | "manpath" => shell_text::man_evaluates_a_word(tokens),
+        "zless" | "zmore" => shell_text::splits_a_flag(tokens) || shell_text::hands_flags_to_another_pager(tokens),
+        "zcmp" | "bzcmp" => shell_text::splits_a_flag(tokens),
+        "bash" | "sh" | "zsh" | "dash" | "ksh" => direct_script::runs_packaged_or_frozen(tokens),
+        _ => false,
+    };
+    specific || followed_read::follows_a_secret(tokens)
 }
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {

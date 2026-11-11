@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc d61411a4502d87000cc2c420245d265a27c3f7c3990fe1a5b1f9291ae83539ab # shrinks to names = {"-c"}
+cc dc87b11cb3ec91f3a22eb624d18e1d90e78481f37b063782c419082731dfc7c1 # shrinks to setting = "shopt -s dotglo''b"

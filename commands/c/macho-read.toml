@@ -1,13 +1,4 @@
 [[command]]
-name = "cmpdylib"
-description = "Compares two dynamic shared libraries to determine whether they are ABI-compatible: verifies architectures match, that every global symbol defined in the old library is still defined in the new one, and that compatibility version numbers monotonically increase. Read-only: takes two file arguments, prints any incompatibilities to stdout, sets a non-zero exit status when incompatible. No network. Surface frozen since 1997."
-url = "https://keith.github.io/xcode-man-pages/cmpdylib.1.html"
-researched_version = "macOS 14 / Xcode 15 (man page dated 1997-11-03)"
-level = "Inert"
-bare = false
-max_positional = 2
-
-[[command]]
 name = "dyld_info"
 description = "Inspects fixup, segment, symbol, and Objective-C information that dyld uses when loading Mach-O binaries and dylibs. Read-only: parses one or more files (or every dylib in the shared cache with -all_dyld_cache) and prints structured information. With no flags it prints platform, segments, and linked dylibs. Supports targeted views via -exports, -imports, -fixups, -fixup_chains, -function_starts, -load_commands, -section, -all_sections, plus validation modes. No network."
 url = "https://keith.github.io/xcode-man-pages/dyld_info.1.html"
@@ -127,12 +118,3 @@ url = "https://keith.github.io/xcode-man-pages/lorder.1.html"
 researched_version = "macOS 14 (man page dated 2024-02-27)"
 level = "Inert"
 bare = false
-
-[[command]]
-name = "dltest"
-description = "Tiny unixODBC utility that checks whether a given symbol can be resolved in a given shared object. Read-only: dlopens the library, dlsyms the symbol, prints whether the symbol was found, exits. Takes either no arguments (prints help) or exactly two: an absolute library path and a symbol name. No network."
-url = "https://www.unixodbc.org/doc/dltest.html"
-researched_version = "unixODBC 2.3.12"
-level = "Inert"
-bare = true
-max_positional = 2

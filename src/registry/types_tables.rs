@@ -131,13 +131,11 @@ pub(in crate::registry) struct MatrixAction {
     pub guard_short: Option<String>,
 }
 
-/// What `dispatch_spec` checks across the whole line, beside the command's own grammar.
+/// What `dispatch_spec` checks across the whole line, beside the command's own grammar. The
+/// command-wide switches that act around dispatch (`env_assignment_positionals`, `ghc_rts`) are
+/// `SpecHooks`.
 #[derive(Debug, Clone, Default)]
 pub(in crate::registry) struct LineChecks {
-    /// True when the command's `NAME=VALUE` positionals become environment variables (`export`,
-    /// `declare -x`). Each is classified through `envvars::assignment_verdict` and combined, so
-    /// `export LD_PRELOAD=/tmp/evil.so` denies as `LD_PRELOAD=/tmp/evil.so ls` does.
-    pub env_assignment_positionals: bool,
     /// `flag_value_shapes = { "--toolchain" = "toolchain-name" }`: each named long flag's VALUE,
     /// as `--flag value` or `--flag=value`, must match its shape wherever it appears on the line.
     /// The whole line is scanned, inner commands included: a false refusal there only asks, where
@@ -148,7 +146,6 @@ pub(in crate::registry) struct LineChecks {
 impl LineChecks {
     pub(in crate::registry) fn lower(
         command: &str,
-        env_assignment_positionals: Option<bool>,
         flag_value_shapes: &std::collections::BTreeMap<String, String>,
     ) -> Result<Self, String> {
         let mut shapes = Vec::new();
@@ -161,23 +158,14 @@ impl LineChecks {
             }
             shapes.push((flag.clone(), shape));
         }
-        Ok(Self { env_assignment_positionals: env_assignment_positionals.unwrap_or(false), flag_value_shapes: shapes })
+        Ok(Self { flag_value_shapes: shapes })
     }
 
     pub(in crate::registry) fn judge(&self, tokens: &[crate::parse::Token], grammar: impl FnOnce() -> Verdict) -> Verdict {
         if !self.flag_values_match(tokens) {
             return Verdict::Denied;
         }
-        let verdict = grammar();
-        if !self.env_assignment_positionals {
-            return verdict;
-        }
-        tokens[1..]
-            .iter()
-            .filter(|t| !t.starts_with('-'))
-            .filter_map(|t| t.as_str().split_once('='))
-            .map(|(name, value)| crate::envvars::assignment_verdict(name, value))
-            .fold(verdict, Verdict::combine)
+        grammar()
     }
 
     fn flag_values_match(&self, tokens: &[crate::parse::Token]) -> bool {

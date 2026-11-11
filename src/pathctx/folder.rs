@@ -137,22 +137,27 @@ pub(crate) fn judging(with_env: bool, classify: fn(&[Token]) -> Verdict) -> impl
 /// Judge one command leaf: run `classify`, and when its verdict is a write made in the unknown
 /// folder that nothing accounts for, refuse it.
 pub(crate) fn judge_leaf(tokens: &[Token], with_env: bool, classify: impl FnOnce() -> Verdict) -> Verdict {
-    let Some(level) = level().filter(|l| *l > FolderLevel::Reads) else {
-        return classify();
-    };
-    let here_unknown = super::cwd().is_some_and(|c| is_unknown(&c));
+    // A relative path is classified as `bash` of that path. Account for it as that command, so the
+    // shell's `writes_cwd = "code"` covers the project's own script. The classifier rewrites too.
+    let rewritten = crate::handlers::direct_script::as_interpreter(tokens);
+    let tokens = rewritten.as_ref();
     let declared = crate::registry::cwd_writes(tokens);
     let frame = FrameGuard::push(declared);
     let verdict = classify();
     let frame = frame.pop();
+    let verdict = if verdict.is_allowed() { verdict.combine(folder_code_verdict(declared)) } else { verdict };
     let writes = matches!(verdict, Verdict::Allowed(l) if l > SafetyLevel::SafeRead);
     if !writes {
         return verdict;
     }
-    if !here_unknown {
-        mark_parent_accounted();
+    let here_unknown = super::cwd().is_some_and(|c| is_unknown(&c));
+    let Some(level) = level().filter(|l| *l > FolderLevel::Reads && here_unknown) else {
+        let verdict = verdict.combine(cwd_write_verdict(declared, frame.named_write));
+        if verdict.is_allowed() {
+            mark_parent_accounted();
+        }
         return verdict;
-    }
+    };
     let names_its_writes = declared == Some(Anchor::NamesItsWrites) && frame.named_write;
     // An assignment in front can move a write the declaration describes (`GIT_INDEX_FILE=.zshrc git
     // add .`, `CARGO_TARGET_DIR=../.. cargo build`), so it voids an implicit declaration.
@@ -166,6 +171,53 @@ pub(crate) fn judge_leaf(tokens: &[Token], with_env: bool, classify: impl FnOnce
     } else {
         Verdict::Denied
     }
+}
+
+/// The verdict for the write a leaf makes in the folder it runs in without naming a path (`cargo
+/// fmt`, `git commit`, `mise set`): that folder judged as a write target, so a `cd` earlier on the
+/// line moves the write with it, exactly as it moves a relative operand. A leaf that declares a
+/// fixed target (`writes_cwd = "none"`), or that named what it wrote and declares no folder write,
+/// writes nothing here. The folder the harness reported is the session's own when it lies in the
+/// project root, and is not judged, nor is an unknown one (the unknown-folder mode's), nor a missing
+/// one, as for a relative path.
+fn cwd_write_verdict(declared: Option<Anchor>, named_write: bool) -> Verdict {
+    let in_folder = matches!(declared, Some(Anchor::ImplicitOutput | Anchor::ImplicitSource | Anchor::RunsFolderCode));
+    let judged = super::cwd().is_some_and(|cwd| !is_unknown(&cwd) && (super::moved_by_cd() || !within_root(&cwd)));
+    if declared == Some(Anchor::Free) || (named_write && !in_folder) || !judged {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    let frame = FrameGuard::push(None);
+    let verdict = crate::engine::resolve::write_target_verdict(".");
+    frame.pop();
+    verdict
+}
+
+/// The verdict for the code a leaf runs from the folder it runs in (`cargo run`, a `rake` task) or
+/// builds there (`cargo build` runs build scripts): once a `cd` has moved the line, that folder is
+/// judged as the place code is loaded from, so a temporary folder asks as `/tmp/x.py` would, though
+/// writing there would be approved.
+fn folder_code_verdict(declared: Option<Anchor>) -> Verdict {
+    let runs = matches!(declared, Some(Anchor::ImplicitOutput | Anchor::RunsFolderCode));
+    if !runs || super::cwd().is_none_or(|cwd| is_unknown(&cwd)) {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    if crate::engine::resolve::frozen_reach::is_unreviewed_folder(".") {
+        return Verdict::Denied;
+    }
+    if !super::moved_by_cd() {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    let frame = FrameGuard::push(None);
+    let trusted = crate::engine::resolve::execute_file_verdict(".").is_allowed();
+    frame.pop();
+    if trusted { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+}
+
+fn within_root(cwd: &str) -> bool {
+    super::root().is_some_and(|root| {
+        let root = root.trim_end_matches('/');
+        cwd.trim_end_matches('/') == root || cwd.starts_with(&format!("{root}/"))
+    })
 }
 
 fn mark_parent_accounted() {

@@ -26,6 +26,8 @@
 # wget's rows are checked against its option table: -c is --continue, -d --debug, -e --execute,
 # -h --help, -l --level, -p --page-requisites, -r --recursive, -w --wait; the table has no -s.
 #
+# zip's rows are checked against its option table: -l is --to-crlf, -o --latest-time, -t --from-date.
+#
 # FORMAT: <command>\t<short flag>\t<gated long flag>
 aria2c	-i	--input-file
 as	-M	--MD
@@ -58,6 +60,7 @@ jest	-o	--outputFile
 jest	-t	--testRunner
 kinit	-p	--password-file
 kustomize	-h	--helm-command
+mise	-c	--cd
 mkdocs	-c	--config-file
 mkdocs	-s	--site-dir
 mocha	-c	--config
@@ -75,9 +78,15 @@ re2c	-h	--header
 re2c	-i	--include
 redis-benchmark	-c	--cacert
 restic	-c	--cacert
+rg	-i	--ignore-file
 rollup	-f	--file
+rsync	-f	--files-from
+rsync	-l	--log-file
+rsync	-p	--partial-dir
 rsync	-p	--password-file
+rsync	-r	--read-batch
 rsync	-r	--rsh
+rsync	-t	--temp-dir
 say	-i	--input-file
 wget	-d	--directory-prefix
 wget	-p	--post-file
@@ -111,3 +120,7 @@ dotnet	-c	--configfile
 dotnet	-l	--lock-file-path
 dotnet	-r	--results-directory
 mocha	-s	--spec
+zip	-l	--logfile-path
+zip	-o	--out
+zip	-o	--output-file
+zip	-t	--temp-path

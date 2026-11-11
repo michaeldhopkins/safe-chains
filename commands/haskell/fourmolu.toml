@@ -1,5 +1,11 @@
 [[command]]
 name = "fourmolu"
+ghc_rts = true
+examples_denied = [
+    "fourmolu a.hs +RTS -tpwned",
+    "fourmolu a.hs '+RTS' -tpwned",
+    "fourmolu a.hs -- +RTS -tpwned",
+]
 description = "Configurable formatter for Haskell, fork of ormolu. Same surface as ormolu plus per-feature config flags. Without --inplace, prints to stdout; --inplace rewrites files. --mode check is read-only."
 url = "https://fourmolu.github.io/"
 researched_version = "fourmolu 0.x"

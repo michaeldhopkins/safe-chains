@@ -19,9 +19,6 @@ pub fn check_pandoc(tokens: &[Token]) -> Verdict {
     if matches!(tokens.get(1).map(Token::as_str), Some("lua" | "server")) {
         return Verdict::Denied;
     }
-    if tokens.iter().any(|t| is_runtime_option(t.as_str())) {
-        return Verdict::Denied;
-    }
     if !format_values_are_plain(tokens) {
         return Verdict::Denied;
     }

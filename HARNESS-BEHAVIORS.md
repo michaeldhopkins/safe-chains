@@ -98,7 +98,7 @@ target looks like.
 | Claude  | `Bash` (exact match)    | `{hookSpecificOutput: {...}}`          | `permissionDecision`| `allow` / `deny` / `ask` / `defer`. Omit is the normal flow, not `defer` | seconds (command default 600) |
 | Codex `PreToolUse` | `Bash` (unified exec is reported as `Bash`); config nests under top-level `hooks` | `{hookSpecificOutput: {...}}` | `permissionDecision`| **deny** (gated); *silent* (safe). Bare `allow` and `ask` fail open (CLI 0.164.0). `allow` + `updatedInput` rewrites | seconds (default 600) |
 | Codex `PermissionRequest` | `Bash`; same file, same command; routed on `hook_event_name` | `{hookSpecificOutput: {...}}` | `decision.behavior` | **allow** (safe); *silent* otherwise (Codex's own prompt). `deny` is honored; safe-chains does not emit it | seconds (default 600) |
-| Qwen    | code matcher `^Bash$` (regex only); exact `Bash` is the alias; tool id `run_shell_command` | `{hookSpecificOutput: {...}}` | `permissionDecision` | `allow` (does not skip the prompt), **deny**, **ask** | seconds; a command value ≥ 1000 is still read as ms |
+| Qwen    | code matcher `^run_shell_command$` (regex); exact `Bash` is an alias; tool id `run_shell_command` | `{hookSpecificOutput: {...}}` | `permissionDecision` | `allow` (does not skip the prompt), **deny**, **ask** | seconds; a command value ≥ 1000 is still read as ms |
 | Droid   | `Execute` (regex or exact; optional `commandRegex` on the shell string) | `{hookSpecificOutput: {...}}` | `permissionDecision` | **allow** (can bypass the prompt), **deny**, **ask** | seconds (default 60) |
 | Gemini  | `^run_shell_command$` (`BeforeTool`) | `{decision: ...}` | `decision` | **allow** / **deny** (alias `block`). No `ask` | ms (examples use `5000`) |
 | agy     | `run_command`           | `{decision, reason}`                   | `decision`          | `allow` (delegates), `auto_approve`, `deny`, `ask`, `force_ask`, `deny_unless_prior_grant` | seconds (default 30) |
@@ -456,8 +456,9 @@ The `droid` CLI is not installed. CLI v0.245.0 (2026-10-20) is the latest entry 
   in `hooks`. Legacy `.factory/hooks/hooks.json` still loads. Commands need absolute
   paths. `timeout` is seconds, default 60. `matcher` is an exact tool name or a
   case-sensitive regex; empty, omitted, or `*` matches every tool. `commandRegex`
-  is a second regex against the Execute command string. safe-chains writes the
-  wrapped form in `~/.factory/settings.json`, matcher `Execute`, timeout 60.
+  is a second regex against the Execute command string. safe-chains writes into
+  `~/.factory/hooks.json`, unwrapped, when that file exists, and otherwise the
+  wrapped form in `~/.factory/settings.json`; matcher `Execute`, timeout 60.
   Common tool matchers include `Execute`, `Read`, `Edit`, `Create`, `ApplyPatch`,
   `LS`, `Glob`, `Grep`, `Task`, `FetchUrl`, and `WebSearch`. The changelog's Script
   runs are a separate command surface; `Execute` does not name them.
@@ -562,8 +563,8 @@ the English source. Not driven live.
   is the tool id. The shell tool id is `run_shell_command`. An exact comparison
   runs first; otherwise the matcher is a regular expression, unanchored unless
   it starts with `^` or `(`. `timeout` for a command hook is seconds, default 60.
-  A command-hook value of 1000 or more is still read as milliseconds, so the
-  `60000` safe-chains writes is 60 seconds. `QWEN_PROJECT_DIR`,
+  A command-hook value of 1000 or more is still read as milliseconds, so an
+  older `60000` is 60 seconds. `QWEN_PROJECT_DIR`,
   `CLAUDE_PROJECT_DIR`, and `GEMINI_PROJECT_DIR` are set on the hook process.
 - **Decisions.** `hookSpecificOutput.permissionDecision`: `allow`, `deny`, or
   `ask`. `permissionDecisionReason` is required. `allow` lets the call continue
@@ -582,11 +583,12 @@ the English source. Not driven live.
   exit continues.
 - **What safe-chains emits.** A Claude-shaped `permissionDecision: "allow"` for
   a safe command, an empty body otherwise, and `additionalContext` with no
-  decision for the mixed-chain note. The installed matcher is `^Bash$`. A
-  matcher that starts with `^` is only a regular expression, and the `Bash`
-  alias is compared exactly, so `^Bash$` does not select `run_shell_command`.
-  A present `tool_name` must be `Bash`. The payload's `tool_name` is the
-  runtime id.
+  decision for the mixed-chain note. The installed matcher is
+  `^run_shell_command$`, with a `timeout` of `60`. Earlier releases installed
+  `^Bash$`, which never fired: a matcher that starts with `^` is only a regular
+  expression, and the `Bash` alias is compared exactly. Running setup again
+  rewrites that entry and its `60000` timeout in place. A present `tool_name`
+  must be `run_shell_command` or `Bash`.
 - **Other command surface.** In Code Mode, a call made from an `exec` script
   returns its result to the script. Its `PreToolUse` context is appended to the
   `exec` result.

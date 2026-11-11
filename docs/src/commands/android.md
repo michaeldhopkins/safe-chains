@@ -95,5 +95,6 @@
 ### `zipalign`
 <p class="cmd-url"><a href="https://developer.android.com/tools/zipalign">https://developer.android.com/tools/zipalign</a></p>
 
-- Requires -c. - Allowed standalone flags: -c, -p, -v, --help, -h, --version, -V
+- Requires -c.
+- Allowed standalone flags: -c, -p, -v, --help, -h, --version, -V
 

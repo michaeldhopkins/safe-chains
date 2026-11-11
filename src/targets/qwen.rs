@@ -22,6 +22,10 @@ impl Target for QwenTarget {
         Some(format!(r#"{{"tool_name":"{tool}","tool_input":{{"command":"{command}"}}}}"#))
     }
 
+    fn shell_tool_name(&self) -> &'static str {
+        QwenHookFormat::SHELL_TOOL
+    }
+
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
         vec![home.join(".qwen")]
     }
@@ -40,7 +44,12 @@ impl Target for QwenTarget {
             let mut settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
 
             if has_safe_chains_hook(&settings) {
-                return Ok(InstallOutcome::AlreadyConfigured { path });
+                if !migrate_legacy_entries(&mut settings) {
+                    return Ok(InstallOutcome::AlreadyConfigured { path });
+                }
+                let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
+                std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
+                return Ok(InstallOutcome::Installed { path });
             }
 
             add_hook(&mut settings, binary)?;
@@ -62,6 +71,12 @@ impl Target for QwenTarget {
 }
 
 struct QwenHookFormat;
+
+impl QwenHookFormat {
+    /// The runtime tool id Qwen puts in `tool_name`. `Bash` is accepted as a matcher alias only; the
+    /// payload carries this id (hooks docs, "Tool hooks receive the runtime tool id in `tool_name`").
+    const SHELL_TOOL: &'static str = "run_shell_command";
+}
 
 #[derive(Deserialize)]
 struct ToolInput {
@@ -85,6 +100,7 @@ impl HookFormat for QwenHookFormat {
         // Self-filter on the tool: the hook can be delivered for a non-shell call by a
         // hand-edited matcher, and deciding on one grants or vetoes a tool never analysed.
         if let Some(name) = &envelope.tool_name
+            && name != QwenHookFormat::SHELL_TOOL
             && name != "Bash"
         {
             return Err(ParseError { message: format!("not a shell tool: {name}") });
@@ -135,11 +151,11 @@ impl HookFormat for QwenHookFormat {
 
 fn hook_entry(binary: &str) -> Value {
     json!({
-        "matcher": "^Bash$",
+        "matcher": "^run_shell_command$",
         "hooks": [{
             "type": "command",
             "command": binary,
-            "timeout": 60_000,
+            "timeout": 60,
         }]
     })
 }
@@ -150,14 +166,44 @@ fn has_safe_chains_hook(settings: &Value) -> bool {
         .and_then(|h| h.get("PreToolUse"))
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
-            entries.iter().any(|entry| {
-                entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
-                    hooks
-                        .iter()
-                        .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
-                })
-            })
+            entries
+                .iter()
+                .any(|entry| entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| hooks.iter().any(is_our_hook)))
         })
+}
+
+const LEGACY_MATCHER: &str = "^Bash$";
+const LEGACY_TIMEOUT: u64 = 60_000;
+
+fn is_our_hook(hook: &Value) -> bool {
+    hook.get("command").and_then(Value::as_str).is_some_and(|cmd| cmd.contains("safe-chains"))
+}
+
+fn migrate_legacy_entries(settings: &mut Value) -> bool {
+    let Some(entries) = settings.pointer_mut("/hooks/PreToolUse").and_then(Value::as_array_mut) else {
+        return false;
+    };
+    let mut changed = false;
+    for entry in entries.iter_mut() {
+        let ours = entry.get("hooks").and_then(Value::as_array).is_some_and(|hooks| hooks.iter().any(is_our_hook));
+        if !ours {
+            continue;
+        }
+        if entry.get("matcher").and_then(Value::as_str) == Some(LEGACY_MATCHER) {
+            entry["matcher"] = json!("^run_shell_command$");
+            changed = true;
+        }
+        let Some(hooks) = entry.get_mut("hooks").and_then(Value::as_array_mut) else {
+            continue;
+        };
+        for hook in hooks.iter_mut().filter(|h| is_our_hook(h)) {
+            if hook.get("timeout").and_then(Value::as_u64) == Some(LEGACY_TIMEOUT) {
+                hook["timeout"] = json!(60);
+                changed = true;
+            }
+        }
+    }
+    changed
 }
 
 fn add_hook(settings: &mut Value, binary: &str) -> Result<(), String> {
@@ -181,7 +227,7 @@ mod tests {
         "hook_event_name": "PreToolUse",
         "timestamp": "2026-05-06T12:00:00Z",
         "permission_mode": "default",
-        "tool_name": "Bash",
+        "tool_name": "run_shell_command",
         "tool_input": {"command": "ls -la"},
         "tool_use_id": "tu_123"
     }"#;
@@ -205,12 +251,12 @@ mod tests {
     }
 
     #[test]
-    fn install_uses_bash_matcher() {
+    fn install_uses_runtime_id_matcher() {
         let dir = tempfile::tempdir().unwrap();
         std::fs::create_dir(dir.path().join(".qwen")).unwrap();
         target().install(dir.path()).unwrap();
         let contents = std::fs::read_to_string(dir.path().join(".qwen/settings.json")).unwrap();
-        assert!(contents.contains("^Bash$"));
+        assert!(contents.contains("^run_shell_command$"));
         assert!(contents.contains("safe-chains hook qwen"));
     }
 
@@ -224,10 +270,52 @@ mod tests {
     }
 
     #[test]
+    fn install_migrates_the_old_bash_matcher_without_duplicating() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(".qwen")).unwrap();
+        let old = r#"{"hooks":{"PreToolUse":[
+            {"matcher":"^Bash$","hooks":[{"type":"command","command":"safe-chains hook qwen","timeout":60000}]},
+            {"matcher":"^Bash$","hooks":[{"type":"command","command":"my-own-hook","timeout":60000}]}
+        ]}}"#;
+        let path = dir.path().join(".qwen/settings.json");
+        std::fs::write(&path, old).unwrap();
+
+        let outcome = target().install(dir.path()).unwrap();
+        assert!(matches!(outcome, InstallOutcome::Installed { .. }));
+        let settings: Value = serde_json::from_str(&std::fs::read_to_string(&path).unwrap()).unwrap();
+        let entries = settings.pointer("/hooks/PreToolUse").and_then(Value::as_array).unwrap();
+        assert_eq!(entries.len(), 2);
+        assert_eq!(entries[0], hook_entry("safe-chains hook qwen"));
+        assert_eq!(entries[1].get("matcher").and_then(Value::as_str), Some("^Bash$"));
+        assert_eq!(entries[1].pointer("/hooks/0/timeout").and_then(Value::as_u64), Some(60000));
+
+        let again = target().install(dir.path()).unwrap();
+        assert!(matches!(again, InstallOutcome::AlreadyConfigured { .. }));
+    }
+
+    #[test]
     fn parse_input_extracts_command() {
         let parsed = QwenHookFormat.parse_input(QWEN_DOCS_SAMPLE).unwrap();
         assert_eq!(parsed.command, "ls -la");
         assert_eq!(parsed.cwd.as_deref(), Some("/Users/me/project"));
+    }
+
+    /// Qwen sends the runtime tool id in `tool_name`; `Bash` is only a matcher alias. Refusing the real
+    /// name made the hook abstain on every command.
+    #[test]
+    fn parse_input_accepts_runtime_shell_id_and_the_alias() {
+        for name in ["run_shell_command", "Bash"] {
+            let json = format!(r#"{{"tool_name":"{name}","tool_input":{{"command":"ls"}}}}"#);
+            assert_eq!(QwenHookFormat.parse_input(&json).unwrap().command, "ls");
+        }
+        let other = r#"{"tool_name":"write_file","tool_input":{"command":"ls"}}"#;
+        assert!(QwenHookFormat.parse_input(other).is_err());
+    }
+
+    #[test]
+    fn install_timeout_is_in_seconds() {
+        let hook = hook_entry("safe-chains hook qwen");
+        assert_eq!(hook.pointer("/hooks/0/timeout").and_then(Value::as_u64), Some(60));
     }
 
     #[test]

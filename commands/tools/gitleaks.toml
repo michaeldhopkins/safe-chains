@@ -3,12 +3,19 @@ name = "gitleaks"
 description = "Scans git repositories and files for hardcoded secrets such as API keys, tokens, and credentials using pattern matching. Purely read-only analysis — it inspects history and staged content but never modifies the repository or transmits findings externally. The rule set grows steadily (150+ patterns as of v8.28), so new flags and options appear in minor releases roughly every few weeks."
 url = "https://github.com/gitleaks/gitleaks"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = ["gitleaks detect", "gitleaks detect --report-path report.json", "gitleaks protect --staged -r build/report.json"]
+examples_denied = ["gitleaks detect --report-path ~/.zshrc", "gitleaks detect -r.git/config", "gitleaks detect --log-opts=--output=x"]
+
+# `--report-path` writes the findings to any path it is given. `--log-opts` is handed to `git log`,
+# where `--output` writes a file of its own, so it is left out rather than parsed.
+[command.path_gate]
+flags = { "-r" = "write", "--report-path" = "write" }
 
 [[command.sub]]
 name = "detect"
 level = "SafeRead"
 standalone = ["--help", "--no-banner", "--no-color", "--redact", "--verbose", "-h", "-v"]
-valued = ["--baseline-path", "--config", "--exit-code", "--gitleaks-ignore-path", "--log-level", "--log-opts", "--max-target-megabytes", "--report-format", "--report-path", "--source", "-c", "-l", "-r", "-s"]
+valued = ["--baseline-path", "--config", "--exit-code", "--gitleaks-ignore-path", "--log-level", "--max-target-megabytes", "--report-format", "--report-path", "--source", "-c", "-l", "-r", "-s"]
 
 [[command.sub]]
 name = "protect"

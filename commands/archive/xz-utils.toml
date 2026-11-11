@@ -4,6 +4,7 @@ aliases = ["xzdiff", "lzcmp", "lzdiff"]
 description = "Wrappers that invoke cmp or diff on contents of files compressed with xz, gzip, bzip2, lzop, zstd, or lz4. Options other than --help/--version are passed to cmp(1) or diff(1). lzcmp / lzdiff are deprecated aliases retained for LZMA Utils compatibility."
 url = "https://tukaani.org/xz/"
 examples_safe = ["xzcmp ./a.xz ./b.xz"]
+examples_denied = ["xzcmp ~/.ssh/id_ed25519 ./b.xz"]
 researched_version = "XZ Utils 5.x"
 level = "Inert"
 bare = false
@@ -16,6 +17,7 @@ aliases = ["xzegrep", "xzfgrep", "lzgrep", "lzegrep", "lzfgrep"]
 description = "Run grep on files decompressed with xz, gzip, bzip2, lzop, zstd, or lz4. Most grep options are passed through; xzegrep / xzfgrep are aliases for `xzgrep -E` / `xzgrep -F`. lz* names are deprecated LZMA-Utils aliases retained for compatibility."
 url = "https://tukaani.org/xz/"
 examples_safe = ["xzgrep TODO ./log.xz"]
+examples_denied = ["xzgrep x ~/.ssh/id_ed25519"]
 researched_version = "XZ Utils 5.x"
 level = "Inert"
 bare = false
@@ -27,6 +29,7 @@ aliases = ["lzmadec"]
 description = "Small liblzma-based decompressor for .xz files (xzdec) or .lzma files (lzmadec). Always writes decompressed data to stdout; never creates or removes files. -d / -k / -c are ignored xz-compatibility no-ops."
 url = "https://tukaani.org/xz/"
 examples_safe = ["xzdec ./a.xz"]
+examples_denied = ["xzdec ~/.ssh/id_ed25519"]
 researched_version = "XZ Utils 5.x"
 level = "Inert"
 bare = true
@@ -42,6 +45,7 @@ name = "lzmainfo"
 description = "Read the first 13 bytes of an .lzma file, decode the header (dictionary size, uncompressed size for non-streamed archives), and print to stdout. Included in XZ Utils for backward compatibility with LZMA Utils."
 url = "https://tukaani.org/xz/"
 examples_safe = ["lzmainfo ./a.lzma"]
+examples_denied = ["lzmainfo ~/.ssh/id_ed25519"]
 researched_version = "XZ Utils 5.x"
 level = "Inert"
 bare = true
@@ -49,11 +53,52 @@ standalone = ["--help", "--version"]
 
 [[command]]
 name = "xzless"
-aliases = ["xzmore", "lzless", "lzmore"]
-description = "Paginate xz-, lzma-, gzip-, bzip2-, lzop-, zstd-, or lz4-compressed text using less(1) (xzless / lzless) or more(1) (xzmore / lzmore). lzless / lzmore are deprecated LZMA-Utils aliases."
+aliases = ["lzless"]
+description = "Paginate xz-, lzma-, gzip-, bzip2-, lzop-, zstd-, or lz4-compressed text using less(1). lzless is a deprecated LZMA-Utils alias. The pager also gets the operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and less's `-o FILE` copies the input to FILE."
 url = "https://tukaani.org/xz/"
 examples_safe = ["xzless ./a.xz"]
+examples_denied = ["xzless '+!id' ./a.xz", "xzless -o ./log ./a.xz"]
 researched_version = "XZ Utils 5.x"
 level = "Inert"
 bare = true
-tolerate_unknown_short = true
+reads_commands_from = ["plus"]
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-p", "-t", "-x", "-y", "-z",
+    "--pattern", "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]
+
+[[command]]
+name = "xzmore"
+aliases = ["lzmore"]
+description = "Paginate xz-, lzma-, gzip-, bzip2-, lzop-, zstd-, or lz4-compressed text using more(1), or whatever $PAGER names; lzmore is a deprecated LZMA-Utils alias. Offline: it reads the named files and reaches no network. The pager gets the flags and operands, so its startup commands apply: a `+` operand runs as a pager command (`+!id` runs `id` in a shell), and the more macOS ships is less in more mode, where `-p` and `--pattern` take a command to run at startup instead of a search pattern. XZ Utils releases a few times a year; the wrapper scripts are stable."
+url = "https://tukaani.org/xz/"
+examples_safe = ["xzmore ./a.xz"]
+examples_denied = ["xzmore '+!id' ./a.xz", "xzmore -p '!id' ./a.xz"]
+researched_version = "XZ Utils 5.8"
+level = "Inert"
+bare = true
+reads_commands_from = ["plus"]
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-t", "-x", "-y", "-z",
+    "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]

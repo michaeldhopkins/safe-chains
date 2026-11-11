@@ -1,5 +1,11 @@
 [[command]]
 name = "ormolu"
+ghc_rts = true
+examples_denied = [
+    "ormolu a.hs +RTS -tpwned",
+    "ormolu a.hs '+RTS' -tpwned",
+    "ormolu a.hs -- +RTS -tpwned",
+]
 description = "Strict, opinionated formatter for Haskell. Without --inplace, prints formatted source to stdout. --inplace / -i rewrites files (project-local SafeWrite via write_flags). --mode check exits non-zero on diff (read-only). Static — does not execute Haskell."
 url = "https://github.com/tweag/ormolu"
 researched_version = "ormolu 0.x"

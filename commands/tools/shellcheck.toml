@@ -3,6 +3,7 @@ name = "shellcheck"
 description = "Static analysis tool for shell scripts (bash, sh, dash, ksh). Parses scripts and reports common errors, portability issues, and style problems without executing them. Purely read-only with no file-modification capability. Infrequent but stable releases; v0.11.0 shipped August 2025."
 url = "https://www.shellcheck.net/wiki/"
 handler = "shellcheck"
+ghc_rts = true
 examples_safe = [
     "shellcheck script.sh",
     "shellcheck -x -s bash script.sh",

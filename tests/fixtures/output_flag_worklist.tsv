@@ -312,8 +312,6 @@ bazel aquery	--output
 bazel cquery	--output
 bazel query	--output
 bombardier	-o
-borg check	--repair
-borg config	--delete
 cargo udeps	--output
 cjpeg	-o
 clever activity	-o
@@ -391,10 +389,6 @@ kramdown	--output
 kramdown	-o
 kubectl api-resources	--output
 kubectl api-resources	-o
-kubectl events	--output
-kubectl events	-o
-kubectl get	--output
-kubectl get	-o
 kubectl version	--output
 kubectl version	-o
 linkerd check	--output
@@ -515,7 +509,6 @@ xattr	-d
 xattr	-w
 ytt	--output
 ytt	-o
-ziptool	-o
 jj backout	--destination
 jj duplicate	--destination
 jj duplicate	-o

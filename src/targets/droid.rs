@@ -54,11 +54,10 @@ impl DroidTarget {
             });
         }
 
-        let path = dir.join("settings.json");
-        // Droid docs require absolute paths for hook commands. The
-        // caller resolves the running binary's absolute path and we
-        // embed it in the config; falls back to bare "safe-chains
-        // hook droid" if discovery fails (and the install message warns).
+        let hooks_path = dir.join("hooks.json");
+        let settings_path = dir.join("settings.json");
+        let standalone = hooks_path.exists();
+        let path = if standalone { hooks_path } else { settings_path };
         let resolved = exe
             .map(|p| format!("{} hook droid", p.display()))
             .unwrap_or_else(|| "safe-chains hook droid".to_string());
@@ -68,17 +67,17 @@ impl DroidTarget {
             let contents = std::fs::read_to_string(&path).map_err(|e| format!("Could not read {}: {e}", path.display()))?;
             let mut settings: Value = serde_json::from_str(&contents).map_err(|e| format!("Could not parse {}: {e}", path.display()))?;
 
-            if has_safe_chains_hook(&settings) {
+            if has_safe_chains_hook(&settings, standalone) {
                 return Ok(InstallOutcome::AlreadyConfigured { path });
             }
 
-            add_hook(&mut settings, binary)?;
+            add_hook(&mut settings, binary, standalone)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
             std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
         } else {
             let mut settings = Value::Object(Map::new());
-            add_hook(&mut settings, binary)?;
+            add_hook(&mut settings, binary, false)?;
             let output = serde_json::to_string_pretty(&settings).expect("serializing valid JSON");
             std::fs::write(&path, format!("{output}\n")).map_err(|e| format!("Could not write {}: {e}", path.display()))?;
             Ok(InstallOutcome::Installed { path })
@@ -171,24 +170,32 @@ fn hook_entry(binary: &str) -> Value {
     })
 }
 
-fn has_safe_chains_hook(settings: &Value) -> bool {
-    settings
-        .get("hooks")
-        .and_then(|h| h.get("PreToolUse"))
-        .and_then(|arr| arr.as_array())
-        .is_some_and(|entries| {
-            entries.iter().any(|entry| {
-                entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
-                    hooks
-                        .iter()
-                        .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
-                })
+fn has_safe_chains_hook(settings: &Value, standalone: bool) -> bool {
+    let events = if standalone { Some(settings) } else { settings.get("hooks") };
+    events.and_then(|h| h.get("PreToolUse")).and_then(|arr| arr.as_array()).is_some_and(|entries| {
+        entries.iter().any(|entry| {
+            entry.get("hooks").and_then(|h| h.as_array()).is_some_and(|hooks| {
+                hooks
+                    .iter()
+                    .any(|hook| hook.get("command").and_then(|c| c.as_str()).is_some_and(|cmd| cmd.contains("safe-chains")))
             })
         })
+    })
 }
 
-fn add_hook(settings: &mut Value, binary: &str) -> Result<(), String> {
-    super::append_hook_entry(settings, "hooks", "PreToolUse", hook_entry(binary))
+fn add_hook(settings: &mut Value, binary: &str, standalone: bool) -> Result<(), String> {
+    if !standalone || !settings.is_object() {
+        return super::append_hook_entry(settings, "hooks", "PreToolUse", hook_entry(binary));
+    }
+    if let Some(slot) = settings.get("PreToolUse")
+        && !slot.is_array()
+    {
+        return Err(format!("`PreToolUse` is {}, expected an array. Leaving the file unchanged.", super::json_kind(slot)));
+    }
+    let mut wrapper = json!({ "hooks": std::mem::take(settings) });
+    super::append_hook_entry(&mut wrapper, "hooks", "PreToolUse", hook_entry(binary))?;
+    *settings = wrapper["hooks"].take();
+    Ok(())
 }
 
 #[cfg(test)]
@@ -233,7 +240,87 @@ mod tests {
         assert!(matches!(outcome, InstallOutcome::Installed { .. }));
         let contents = std::fs::read_to_string(dir.path().join(".factory/settings.json")).unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
-        assert!(has_safe_chains_hook(&settings));
+        assert!(has_safe_chains_hook(&settings, false));
+    }
+
+    #[test]
+    fn install_goes_into_hooks_json_when_that_file_exists() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(".factory")).unwrap();
+        std::fs::write(dir.path().join(".factory/hooks.json"), "{}\n").unwrap();
+        let outcome = target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        assert!(matches!(outcome, InstallOutcome::Installed { ref path } if path.ends_with("hooks.json")));
+        let contents = std::fs::read_to_string(dir.path().join(".factory/hooks.json")).unwrap();
+        let file: Value = serde_json::from_str(&contents).unwrap();
+        assert_eq!(file.pointer("/PreToolUse/0/matcher").and_then(|m| m.as_str()), Some("Execute"));
+        assert!(file.get("hooks").is_none());
+        assert!(!dir.path().join(".factory/settings.json").exists());
+    }
+
+    #[test]
+    fn install_is_idempotent_in_hooks_json() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(".factory")).unwrap();
+        std::fs::write(dir.path().join(".factory/hooks.json"), "{}\n").unwrap();
+        target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        let again = target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        assert!(matches!(again, InstallOutcome::AlreadyConfigured { .. }));
+    }
+
+    #[test]
+    fn install_keeps_other_events_in_hooks_json() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(".factory")).unwrap();
+        std::fs::write(dir.path().join(".factory/hooks.json"), r#"{"Stop":[{"hooks":[{"type":"command","command":"/bin/true"}]}]}"#)
+            .unwrap();
+        target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        let file: Value = serde_json::from_str(&std::fs::read_to_string(dir.path().join(".factory/hooks.json")).unwrap()).unwrap();
+        assert!(file.pointer("/Stop/0").is_some());
+        assert!(file.pointer("/PreToolUse/0").is_some());
+    }
+
+    #[test]
+    fn install_appends_after_existing_pre_tool_use_in_hooks_json() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(".factory")).unwrap();
+        std::fs::write(
+            dir.path().join(".factory/hooks.json"),
+            r#"{"PreToolUse":[{"matcher":"Edit","hooks":[{"type":"command","command":"/bin/true"}]}]}"#,
+        )
+        .unwrap();
+        target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        let file: Value = serde_json::from_str(&std::fs::read_to_string(dir.path().join(".factory/hooks.json")).unwrap()).unwrap();
+        assert_eq!(file.pointer("/PreToolUse/0/matcher").and_then(|m| m.as_str()), Some("Edit"));
+        assert_eq!(file.pointer("/PreToolUse/1/matcher").and_then(|m| m.as_str()), Some("Execute"));
+        assert!(file.pointer("/PreToolUse/2").is_none());
+    }
+
+    #[test]
+    fn install_into_hooks_json_leaves_settings_json_alone() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir(dir.path().join(".factory")).unwrap();
+        let settings = r#"{"model":"x","hooks":{"Stop":[]}}"#;
+        std::fs::write(dir.path().join(".factory/settings.json"), settings).unwrap();
+        std::fs::write(dir.path().join(".factory/hooks.json"), "{}").unwrap();
+        target().install_with(dir.path(), Some(Path::new(EXE))).unwrap();
+        assert_eq!(std::fs::read_to_string(dir.path().join(".factory/settings.json")).unwrap(), settings);
+        let file: Value = serde_json::from_str(&std::fs::read_to_string(dir.path().join(".factory/hooks.json")).unwrap()).unwrap();
+        assert!(file.pointer("/PreToolUse/0").is_some());
+    }
+
+    #[test]
+    fn install_refuses_unparseable_hooks_json_and_writes_nothing() {
+        for contents in ["", "{not json", "[1,2]", r#"{"PreToolUse":"x"}"#] {
+            let dir = tempfile::tempdir().unwrap();
+            std::fs::create_dir(dir.path().join(".factory")).unwrap();
+            std::fs::write(dir.path().join(".factory/hooks.json"), contents).unwrap();
+            let Err(err) = target().install_with(dir.path(), Some(Path::new(EXE))) else {
+                panic!("{contents:?} was accepted");
+            };
+            assert_eq!(std::fs::read_to_string(dir.path().join(".factory/hooks.json")).unwrap(), contents);
+            assert!(!dir.path().join(".factory/settings.json").exists(), "{contents:?}");
+            assert!(!err.contains("`hooks"), "{contents:?}: {err}");
+        }
     }
 
     #[test]

@@ -141,7 +141,7 @@ make --help	inert
 make --jobs x	denied
 make --just-print	inert
 make --makefile x	denied
-make --print-data-base	inert
+make --print-data-base	denied
 make --question	denied
 make --recon	inert
 make --version	denied
@@ -163,8 +163,12 @@ make -n --question	inert
 make -n --recon	inert
 make -n --version	inert
 make -n -C .	inert
+make -n -C /tmp/x	denied
+make -n -C src	inert
 make -n -C x	inert
 make -n -V	inert
+make -n -f -	denied
+make -n -f /tmp/x/Makefile	denied
 make -n -f Makefile	inert
 make -n -f x	inert
 make -n -h	inert
@@ -173,7 +177,9 @@ make -n -j x	inert
 make -n -n	inert
 make -n -p	inert
 make -n -q	inert
-make -p	inert
+make -n A=1	denied
+make -nq	inert
+make -p	denied
 make -q	denied
 make x	denied
 malloc_history	denied
@@ -234,10 +240,9 @@ mamba x	denied
 man	denied
 man --all	inert
 man --all --apropos	inert
-man --all --config-file x	inert
+man --all --encoding x	inert
 man --all x	inert
 man --apropos	inert
-man --config-file x	inert
 man --default	inert
 man --encoding x	inert
 man --extension x	inert
@@ -254,7 +259,6 @@ man --whatis	inert
 man --where	inert
 man --where-cat	inert
 man --wildcard	inert
-man -C x	inert
 man -E x	inert
 man -L x	inert
 man -M x	inert
@@ -1338,19 +1342,26 @@ mise en --help -h	inert
 mise en --help x	denied
 mise en -h	inert
 mise en x	denied
-mise env	inert
+mise env	denied
 mise env --help	inert
-mise env --help --json	inert
-mise env --help --shell x	inert
-mise env --help x	inert
-mise env --json	inert
-mise env --shell x	inert
-mise env -J	inert
+mise env --help -h	inert
+mise env --help x	denied
 mise env -h	inert
-mise env -s x	inert
-mise env x	inert
+mise env x	denied
 mise exec	denied
-mise exec -- bin/rails db:create	denied
+mise exec 'node[postinstall=touch pwned]' -- true	denied
+mise exec -- bin/rails db:create	safe-write
+mise exec --jobs x	denied
+mise exec --quiet	denied
+mise exec --quiet --jobs x	denied
+mise exec --quiet --raw	denied
+mise exec --quiet x	denied
+mise exec --raw	denied
+mise exec --verbose	denied
+mise exec -j x	denied
+mise exec -q	denied
+mise exec -v	denied
+mise exec node@path:/tmp/evil -- true	denied
 mise exec x	denied
 mise fmt	denied
 mise fmt --check	inert
@@ -1366,6 +1377,7 @@ mise generate --help x	denied
 mise generate -h	inert
 mise generate x	denied
 mise i	safe-write
+mise i 'node@20[postinstall=touch pwned]'	denied
 mise i --force	safe-write
 mise i --force --help	safe-write
 mise i --force --jobs x	safe-write
@@ -1379,6 +1391,7 @@ mise i -h	safe-write
 mise i -j x	safe-write
 mise i -q	safe-write
 mise i -v	safe-write
+mise i node@path:/tmp/evil	denied
 mise i ruby@4	safe-write
 mise i x	safe-write
 mise implode	denied
@@ -1388,6 +1401,7 @@ mise implode --help x	denied
 mise implode -h	inert
 mise implode x	denied
 mise install	safe-write
+mise install 'cargo:ripgrep[postinstall=touch pwned]'	denied
 mise install --force	safe-write
 mise install --force --help	safe-write
 mise install --force --jobs x	safe-write
@@ -1401,6 +1415,8 @@ mise install -h	safe-write
 mise install -j x	safe-write
 mise install -q	safe-write
 mise install -v	safe-write
+mise install cargo:rg{\\[,}x	denied
+mise install node@path:/tmp/evil	denied
 mise install ruby@4	safe-write
 mise install x	safe-write
 mise latest	inert
@@ -1588,18 +1604,60 @@ mise search --help x	inert
 mise search -h	inert
 mise search x	inert
 mise self-update	denied
+mise self-update --force	denied
+mise self-update --force --help	denied
+mise self-update --force --minimum-release-age x	denied
+mise self-update --force x	denied
+mise self-update --help	denied
+mise self-update --minimum-release-age x	denied
+mise self-update --no-plugins	denied
+mise self-update --yes	denied
+mise self-update -f	denied
+mise self-update -h	denied
+mise self-update -y	denied
 mise self-update x	denied
-mise set	safe-write
-mise set --file	safe-write
-mise set --file --global	safe-write
-mise set --file x	safe-write
-mise set --global	safe-write
+mise set	denied
+mise set "FOO=$(cat payload.txt)"	denied
+mise set "FOO=$X"	denied
+mise set -- _.source=./x.sh	denied
+mise set --env x	denied
+mise set --env=../x FOO=1	denied
+mise set --env=dev FOO=bar	safe-write
+mise set --file ./mise.toml FOO='{{ exec(command="touch pwned") }}'	denied
+mise set --file ./mise.toml FOO=bar	safe-write
+mise set --file x	denied
+mise set --file ~/.config/mise/conf.d/x.toml FOO=bar	denied
+mise set --file='./mise.toml' 'FOO={{ exec(command="id") }}'	denied
+mise set --file=/etc/mise/config.toml FOO=bar	denied
+mise set --global	denied
+mise set --global --env x	denied
+mise set --global --help	denied
+mise set --global x	denied
 mise set --help	safe-write
 mise set --remove	safe-write
-mise set -f	safe-write
-mise set -g	safe-write
+mise set -E /../../out/evil FOO=bar	denied
+mise set -E prod 'FOO={{ exec(command="id") }}'	denied
+mise set -E staging FOO=bar	safe-write
+mise set -E x	denied
+mise set -Ex/../../y FOO=1	denied
+mise set -f x	denied
+mise set -g	denied
 mise set -h	safe-write
-mise set x	safe-write
+mise set FOO --help	denied
+mise set FOO='x{{ env.HOME }}'	denied
+mise set FOO='{# comment #}'	denied
+mise set FOO='{% if true %}x{% endif %}'	denied
+mise set FOO='{{ exec(command="id") }}'	denied
+mise set FOO=`cat payload.txt`	denied
+mise set FOO=bar	safe-write
+mise set FOO={\\{x}}	denied
+mise set NODE_ENV=production	safe-write
+mise set _.path=/tmp/bin	denied
+mise set _.source=./x.sh	denied
+mise set _=x	denied
+mise set _{\\.,}source=./x.sh	denied
+mise set help	denied
+mise set x	denied
 mise settings	inert
 mise settings add	denied
 mise settings add --help	inert
@@ -1793,40 +1851,51 @@ mise tool-alias unset --help x	denied
 mise tool-alias unset -h	inert
 mise tool-alias unset x	denied
 mise tool-alias x	denied
-mise trust	safe-write
-mise trust --all	safe-write
-mise trust --all --help	safe-write
-mise trust --all x	safe-write
-mise trust --help	safe-write
-mise trust --ignore	safe-write
-mise trust --quiet	safe-write
-mise trust --show	safe-write
-mise trust -a	safe-write
-mise trust -h	safe-write
-mise trust -q	safe-write
-mise trust x	safe-write
+mise trust	denied
+mise trust --all	denied
+mise trust --all --help	denied
+mise trust --all x	denied
+mise trust --help	inert
+mise trust --ignore	denied
+mise trust --quiet	denied
+mise trust --show	safe-read
+mise trust -a	denied
+mise trust -a -q	denied
+mise trust -h	inert
+mise trust -q	denied
+mise trust .	denied
+mise trust x	denied
 mise u	denied
+mise u 'cargo:ripgrep[postinstall=id]'	denied
+mise u 'node@{% if true %}20{% endif %}'	denied
 mise u --cd x	safe-write
-mise u --env	safe-write
-mise u --env --cd x	safe-write
-mise u --env --force	safe-write
 mise u --env x	safe-write
 mise u --force	safe-write
+mise u --force --cd x	safe-write
+mise u --force --fuzzy	safe-write
+mise u --force x	safe-write
 mise u --fuzzy	safe-write
 mise u --global	safe-write
 mise u --help	safe-write
-mise u --path	safe-write
+mise u --path x	safe-write
 mise u --pin	safe-write
 mise u --quiet	safe-write
 mise u --remove	safe-write
 mise u --verbose	safe-write
-mise u -E	safe-write
+mise u -E x	safe-write
+mise u -e /../x node@20	denied
+mise u -e x	safe-write
 mise u -f	safe-write
 mise u -g	safe-write
+mise u -g node@20	safe-write
 mise u -h	safe-write
-mise u -p	safe-write
+mise u -p ./mise.toml ruby@4.0.3	safe-write
+mise u -p x	safe-write
+mise u -p ~/mise.toml node@20	denied
 mise u -q	safe-write
 mise u -v	safe-write
+mise u cargo:rg{\\[,}x	denied
+mise u git@path:/tmp/evil	denied
 mise u ruby@4.0.3	safe-write
 mise u x	safe-write
 mise uninstall	denied
@@ -1841,14 +1910,18 @@ mise uninstall -n	safe-write
 mise uninstall ruby@4	safe-write
 mise uninstall x	safe-write
 mise unset	safe-write
-mise unset --file	safe-write
-mise unset --file --global	safe-write
 mise unset --file x	safe-write
+mise unset --file ~/.config/mise/config.toml FOO	denied
 mise unset --global	safe-write
+mise unset --global --file x	safe-write
+mise unset --global --help	safe-write
+mise unset --global x	safe-write
 mise unset --help	safe-write
-mise unset -f	safe-write
+mise unset -f x	safe-write
 mise unset -g	safe-write
+mise unset -g FOO	safe-write
 mise unset -h	safe-write
+mise unset FOO	safe-write
 mise unset x	safe-write
 mise untrust	safe-write
 mise untrust --all	safe-write
@@ -1865,6 +1938,7 @@ mise unuse --help x	denied
 mise unuse -h	inert
 mise unuse x	denied
 mise up	safe-write
+mise up 'node[postinstall=touch pwned]'	denied
 mise up --dry-run	safe-write
 mise up --dry-run --help	safe-write
 mise up --dry-run --jobs x	safe-write
@@ -1878,6 +1952,7 @@ mise up -j x	safe-write
 mise up -n	safe-write
 mise up x	safe-write
 mise upgrade	safe-write
+mise upgrade 'cargo:ripgrep[postinstall=touch pwned]'	denied
 mise upgrade --dry-run	safe-write
 mise upgrade --dry-run --help	safe-write
 mise upgrade --dry-run --jobs x	safe-write
@@ -1889,29 +1964,45 @@ mise upgrade -h	safe-write
 mise upgrade -i	safe-write
 mise upgrade -j x	safe-write
 mise upgrade -n	safe-write
+mise upgrade node@path:/tmp/evil	denied
 mise upgrade x	safe-write
 mise use	denied
+mise use 'cargo:ripgrep[features=pcre2]'	denied
+mise use 'node@{# x #}'	denied
+mise use 'node@{{ exec(command="id") }}'	denied
 mise use --cd x	safe-write
-mise use --env	safe-write
-mise use --env --cd x	safe-write
-mise use --env --force	safe-write
+mise use --cd ~ node@20	denied
 mise use --env x	safe-write
+mise use --env=/../../x node@20	denied
 mise use --force	safe-write
+mise use --force --cd x	safe-write
+mise use --force --fuzzy	safe-write
+mise use --force x	safe-write
 mise use --fuzzy	safe-write
 mise use --global	safe-write
+mise use --global node@20	safe-write
 mise use --help	safe-write
-mise use --path	safe-write
+mise use --path ./mise.toml ruby@4.0.3	safe-write
+mise use --path x	safe-write
+mise use --path ~/.config/mise/config.toml node@20	denied
 mise use --pin	safe-write
 mise use --quiet	safe-write
 mise use --remove	safe-write
 mise use --verbose	safe-write
-mise use -E	safe-write
+mise use -E production node@20	safe-write
+mise use -E x	safe-write
+mise use -e sandbox node@20	safe-write
+mise use -e x	safe-write
 mise use -f	safe-write
 mise use -g	safe-write
+mise use -g node@20	safe-write
+mise use -gf node@20	safe-write
 mise use -h	safe-write
-mise use -p	safe-write
+mise use -p x	safe-write
 mise use -q	safe-write
 mise use -v	safe-write
+mise use node@path:/tmp/evil	denied
+mise use node@{\\{x}}	denied
 mise use ruby@4.0.3	safe-write
 mise use x	safe-write
 mise watch	denied
@@ -1937,6 +2028,17 @@ mise which -q	inert
 mise which -v	inert
 mise which x	inert
 mise x	denied
+mise x --jobs x	denied
+mise x --quiet	denied
+mise x --quiet --jobs x	denied
+mise x --quiet --raw	denied
+mise x --quiet x	denied
+mise x --raw	denied
+mise x --verbose	denied
+mise x -j x	denied
+mise x -q	denied
+mise x -v	denied
+mise x x	denied
 mix	denied
 mix --help	inert
 mix --help --version	inert
@@ -1994,19 +2096,36 @@ mkcert -uninstall	safe-write
 mkcert -version	safe-write
 mkcert x	safe-write
 mkdir	denied
-mkdir --context x	denied
+mkdir --context	denied
+mkdir --context --help	inert
+mkdir --context --mode x	denied
+mkdir --context /etc/evil ok	denied
+mkdir --context x	safe-write
 mkdir --help	inert
-mkdir --help --context x	inert
-mkdir --help --parents	inert
-mkdir --help x	safe-write
+mkdir --mode g+s d	denied
 mkdir --mode x	denied
+mkdir --mode=u+rwx d	safe-write
+mkdir --mode=u+s d	denied
 mkdir --parents	denied
 mkdir --verbose	denied
 mkdir --version	inert
 mkdir -Z	denied
+mkdir -m 2775 -p d	denied
+mkdir -m 4755 d	denied
+mkdir -m 755 d	safe-write
 mkdir -m x	denied
+mkdir -m4755 d	denied
 mkdir -p	denied
+mkdir -p ./a/../../x	denied
+mkdir -p .git/hooks	denied
+mkdir -p a/b	safe-write
+mkdir -p ~/newdir	denied
+mkdir -pm 0755 d	safe-write
+mkdir -pm 2775 d	denied
+mkdir -pm2775 d	denied
 mkdir -v	denied
+mkdir ../outside	denied
+mkdir /etc/evil	denied
 mkdir x	safe-write
 mkdocs	denied
 mkdocs --config-file x	denied
@@ -2984,6 +3103,8 @@ monolith -u x	inert
 monolith -v	inert
 monolith x	inert
 more	inert
+more '+!id' ./notes.md	denied
+more +42 ./notes.md	inert
 more --help	inert
 more --help --lines x	inert
 more --help --version	inert
@@ -2997,7 +3118,6 @@ more -f	inert
 more -h	inert
 more -l	inert
 more -n x	inert
-more -p	inert
 more -s	inert
 more -u	inert
 more x	inert
@@ -3755,31 +3875,72 @@ mvn / mvnw --version	denied
 mvn / mvnw x	denied
 mvn clean	denied
 mvn compile	safe-write
+mvn compile --log-file /etc/x.log	denied
+mvn compile --log-file=core/POM.xml	denied
+mvn compile --log-file=~/.bashrc	denied
+mvn compile -Dmaven.compiler.fork=true -Dmaven.compiler.executable=/tmp/javac	denied
+mvn compile -l ./sub/.mvn/extensions.xml	denied
+mvn compile -l .git/hooks/pre-commit	denied
+mvn compile -l .mvn/jvm.config	denied
+mvn compile -l build.log	safe-write
+mvn compile -l pom.xml	denied
+mvn compile -l ~/x.log	denied
+mvn compile test	safe-write
 mvn dependency:list	inert
 mvn dependency:tree	inert
 mvn dependency:tree --offline	inert
+mvn dependency:tree -DoutputFile=/tmp/tree.txt	denied
 mvn deploy	denied
 mvn help:describe -Dplugin=compiler	inert
 mvn install	denied
 mvn test	safe-read
 mvn test --batch-mode	safe-read
+mvn test --define exec.executable=/tmp/evil	denied
+mvn test --define=maven.repo.local=/tmp/repo	denied
+mvn test --define=test=FooTest	safe-read
+mvn test --file /tmp/x/pom.xml	denied
+mvn test --file=/tmp/x/pom.xml	denied
+mvn test --file=sub/pom.xml	safe-read
+mvn test --global-settings /tmp/settings.xml	denied
 mvn test --log-file /etc/cron.d/x	denied
-mvn test --log-file target/mvn.log	safe-read
+mvn test --log-file target/mvn.log	safe-write
+mvn test --settings /tmp/settings.xml	denied
+mvn test --toolchains /tmp/toolchains.xml	denied
+mvn test -D exec.executable=/tmp/evil	denied
+mvn test -D skipTests	safe-read
+mvn test -DargLine=-javaagent:/tmp/evil.jar	denied
+mvn test -Dexec.args=-c	denied
+mvn test -Dexec.executable=/tmp/evil	denied
 mvn test -Dfailsafe.jvm=/tmp/y/evil	denied
-mvn test -Dfoo=bar	safe-read
 mvn test -Djvm.home=/tmp/y/evil	denied
+mvn test -Djvm=/tmp/java	denied
+mvn test -Dmaven.ext.class.path=/tmp/evil.jar	denied
 mvn test -Dmaven.ext.class.path=/tmp/y/evil.jar	denied
+mvn test -Dmaven.repo.local=/tmp/repo	denied
 mvn test -Dmaven.test.skip=true	safe-read
 mvn test -DskipTests	safe-read
 mvn test -Dsurefire.jvm=/tmp/y/evil	denied
 mvn test -Dtest=MyTest	safe-read
+mvn test -f /tmp/x/pom.xml	denied
+mvn test -f sub/pom.xml	safe-read
+mvn test -f ~/other/pom.xml	denied
+mvn test -gs /tmp/settings.xml	denied
 mvn test -l /etc/cron.d/x	denied
-mvn test -l target/mvn.log	safe-read
+mvn test -l target/mvn.log	safe-write
+mvn test -q exec:java	denied
+mvn test -s .mvn/settings.xml	safe-read
+mvn test -s /tmp/settings.xml	denied
+mvn test -s/tmp/settings.xml	denied
+mvn test -t /tmp/toolchains.xml	denied
+mvn test dependency:tree	safe-read
+mvn test exec:exec	denied
 mvn test exec:exec -Dexec.executable=/tmp/y/evil	denied
+mvn test install	denied
 mvn test-compile	safe-write
 mvn validate	safe-read
 mvn validate deploy	denied
 mvn verify	safe-read
+mvn verify -P ci -T 4 --projects core	safe-read
 mvnw --version	inert
 mvnw test	safe-read
 mvnw test -l /etc/cron.d/x	denied

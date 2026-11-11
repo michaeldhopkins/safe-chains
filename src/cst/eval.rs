@@ -12,7 +12,7 @@ pub fn eval_word(word: &Word) -> String {
 /// `{a,b}{a,b}…` would otherwise blow up 2^n. The word becomes an unpinnable sentinel (→ machine
 /// → deny) rather than a DoS.
 pub(super) const BRACE_EXPANSION_CAP: usize = 256;
-pub(super) const UNPINNABLE: &str = "__SAFE_CHAINS_CMDSUB__";
+pub(crate) const UNPINNABLE: &str = "__SAFE_CHAINS_CMDSUB__";
 /// A brace sequence that was not expanded: it is longer than [`BRACE_EXPANSION_CAP`], or its size
 /// cannot be bounded. A destructive or recursive write of a word carrying this marker is refused.
 pub(crate) const UNRESOLVED_BRACE: &str = "__SAFE_CHAINS_UNRESOLVED_BRACE__";

@@ -1,9 +1,11 @@
 [[command]]
 name = "pandoc"
+ghc_rts = true
 description = "Universal document converter that parses markup and structured formats (Markdown, CommonMark, reStructuredText, HTML, LaTeX, Org, DocBook, Typst, DOCX, EPUB, ODT, Jupyter notebooks, CSV, TSV, JSON) into an AST and renders target formats to stdout by default. Writing to the filesystem requires explicit flags: `-o` / `--output` writes the converted document to a file, `--extract-media` writes embedded media assets into a directory, and `--log` writes JSON log messages to a file. Passing `-F` / `--filter` or `-L` / `--lua-filter` executes external filter programs or Lua scripts over the AST, `--pdf-engine` / `--latex-engine` invokes an external TeX or HTML-to-PDF engine binary, and `-d` / `--defaults` loads YAML option files that can enable filters, engines, or output files. When restricted to stdout conversion without output, media-extraction, log, defaults, engine, or filter flags, it operates as a local converter; local file operands, templates, headers, metadata files, and bibliographies are read from disk (while URL operands or `--request-header` can fetch remote HTTP resources). Actively maintained with frequent point releases and a well-documented option surface."
 url = "https://pandoc.org/MANUAL.html"
 researched_version = "pandoc 3.12.1"
 handler = "pandoc"
+doc_body = "Routing: `lua` and `server` as the first word are denied (a Lua interpreter and a listening server). The format flags (`-f`/`--from`, `-r`/`--read`, `-t`/`--to`, `-w`/`--write`, `-D`/`--print-default-template`) accept only built-in format names, so a path or a bare name that would load a Lua reader or writer is denied, and `pdf` is denied because it runs TeX. Every other flag is checked against the flag lists."
 examples_safe = [
     "pandoc README.md",
     "pandoc -f markdown -t html README.md",

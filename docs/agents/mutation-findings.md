@@ -68,3 +68,12 @@ What each rotating slice found and which tests killed it. Add an entry when you 
   clusters and prefix guards in `passthrough_tests`, and by dropping redundant index increments and
   unreachable or duplicate checks in `libxo_values_are_known`, `format_values_are_plain`,
   `has_unvalued_flag`, and `check_with_passthrough`.
+- **Pre-release run (2026-10-29):** 9 MISSED over `pager_set.rs` (`||` to `&&` where `cmd_sets` joins a
+  loop's or branch's condition and body), `ruby/gemfile.rs` (the `--gemfile` spellings and the
+  `exec` exemption), `handlers/mod.rs` (the `zip` arm of `refuses_its_arguments`),
+  `env_print.rs` (`ps` swallowing the word after any alphabetic one) and `followed_read.rs`
+  (`+` to `*` after `--` in `zip_roots`). Killed by tests in `tests/bundle_gemfile.rs`,
+  `tests/recursive_reach.rs`, `pager_set.rs` and `env_print.rs`. The `zip` arm is observable only
+  with `-y` (which turns off the link-following reader) and a pipe of unknown names. The four
+  `+=` mutants on `zip_roots`' index went from timeouts to an exclusion in `.cargo/mutants.toml`:
+  the loop pushes onto a `Vec` every pass, so it ate 44 GB before the timeout and hung the Mac.

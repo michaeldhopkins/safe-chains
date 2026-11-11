@@ -163,7 +163,8 @@ fn describe_custom(
     }
     // Reader-friendly order: named subs → bare-flag forms → sub × action grid → shared sets.
     if let Some(f) = fallback {
-        sections.push(describe_fallback(f));
+        let alone = sections.is_empty() && matrices.is_empty();
+        sections.push(describe_fallback(f, !alone));
     }
     if let Some(s) = describe_matrices(matrices, handler_policies) {
         sections.push(s);
@@ -174,8 +175,11 @@ fn describe_custom(
     sections.join("\n\n")
 }
 
-fn describe_fallback(f: &FallbackSpec) -> String {
-    let mut lines = vec!["**Without a subcommand:**".to_string()];
+fn describe_fallback(f: &FallbackSpec, with_header: bool) -> String {
+    let mut lines = Vec::new();
+    if with_header {
+        lines.push("**Without a subcommand:**".to_string());
+    }
     if f.policy.bare {
         lines.push("- Bare invocation allowed".to_string());
     }
@@ -195,6 +199,9 @@ fn describe_fallback(f: &FallbackSpec) -> String {
         Some(crate::policy::PositionalShape::ToolchainName) => {
             lines.push("- First positional must be a toolchain name (letters, digits, `.`, `_`, `-`)".to_string());
         }
+        Some(crate::policy::PositionalShape::LocalPath) => {
+            lines.push("- First positional must be a local folder, not a repository address".to_string());
+        }
         None => {}
     }
     lines.join("\n")
@@ -206,6 +213,7 @@ impl CommandSpec {
         // authoritative classification — rather than its legacy fallback fields (which drift:
         // e.g. cat's legacy `standalone` lists -V/-h/-l, which the behavior grammar denies).
         let description = if let Some(b) = &self.behavior { describe_behavior(b) } else { self.describe_kind() };
+        let description = self.hooks.describe(description);
         let mut doc = crate::docs::CommandDoc::handler(
             // These were `Box::leak`ed to satisfy a `&'static str`. `CommandDoc` owns both now,
             // so the clone is the whole cost — the leak bought nothing and paid per call.
@@ -226,7 +234,7 @@ impl CommandSpec {
             DispatchKind::RequireAny { require_any, policy, .. } => {
                 let req = require_any.join(", ");
                 let summary = policy.describe();
-                if summary.is_empty() { format!("Requires {req}.") } else { format!("Requires {req}. {summary}") }
+                if summary.is_empty() { format!("Requires {req}.") } else { format!("Requires {req}.\n{summary}") }
             }
             DispatchKind::Branching { bare_flags, subs, bare_ok, first_arg, .. } => {
                 let mut lines = Vec::new();
@@ -260,7 +268,7 @@ impl CommandSpec {
                 format!("- Read-only verb chain (`verb [args] {} verb …`). Allowed verbs: {}", spec.separator, verbs.join(", "),)
             }
             DispatchKind::Executor { policy, kind, .. } => describe_executor(policy, *kind),
-            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => String::new(),
+            DispatchKind::DelegateAfterSeparator(_) | DispatchKind::DelegateSkip { .. } => String::new(),
         }
     }
 }
@@ -361,7 +369,7 @@ impl SubSpec {
                     out.push(format!("- **{label}**: {summary}"));
                 }
             }
-            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => {
+            DispatchKind::DelegateAfterSeparator(_) | DispatchKind::DelegateSkip { .. } => {
                 out.push(format!("- **{label}**: delegates to inner command"));
             }
             DispatchKind::Custom { doc_body, .. } => {

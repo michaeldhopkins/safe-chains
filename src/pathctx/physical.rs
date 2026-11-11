@@ -50,6 +50,8 @@ pub(super) fn resolve(raw: &str, follow_last: bool) -> Option<String> {
     if !raw.starts_with('/') {
         return None;
     }
+    let stripped = crate::engine::resolve::locus::lookup_prefix::strip_lookup_prefixes(raw);
+    let raw = stripped.as_deref().unwrap_or(raw);
     let follow_last = follow_last || raw.ends_with('/') || raw.ends_with("/.");
     let mut budget = Budget { links: 0, entries: 0, matches: 0 };
     match walk(Vec::new(), parts(raw, true), follow_last, &mut budget) {

@@ -9,6 +9,7 @@ examples_safe = [
 ]
 
 [command.path_gate]
+positional = "read"
 flags = { "--outdir" = "write", "--outfile" = "write" }
 
 [[command.sub]]

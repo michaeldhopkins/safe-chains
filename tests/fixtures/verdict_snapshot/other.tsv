@@ -8,6 +8,7 @@ $(rm -rf /)	denied
 $cmd log	denied
 ${cmd} log	denied
 ((echo hello))	inert
+(chmod +s x)	denied
 (echo a; echo b) | head -1	inert
 (echo a; rm -rf /)	denied
 (echo hello)	inert
@@ -21,13 +22,18 @@ ${cmd} log	denied
 (ls | rm -rf /)	denied
 (ls)	inert
 (ls) && echo done	inert
+(open x.command)	denied
 (rm -rf /)	denied
 (x=1)	inert
 (x=1; ls)	inert
-./bin/rails db:migrate	denied
-./vendor/bin/pest --no-progress	denied
-./vendor/bin/phpstan analyse --no-progress	denied
-./vendor/bin/phpunit --testsuite Unit	denied
+./bin/rails db:migrate	safe-write
+./vendor/bin/pest --no-progress	safe-write
+./vendor/bin/phpstan analyse --no-progress	safe-write
+./vendor/bin/phpunit --testsuite Unit	safe-write
+/bin/chmod +s x	denied
+/usr/bin/env	denied
+/usr/bin/open x.command	denied
+/usr/bin/printenv HOME	denied
 :	inert
 : && echo hello	inert
 : --help	denied

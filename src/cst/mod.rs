@@ -16,6 +16,8 @@ pub(crate) mod eval;
 mod explain;
 mod functions;
 #[cfg(test)]
+mod funsub_tests;
+#[cfg(test)]
 mod glob_tests;
 pub(crate) mod heredocs;
 mod loops;
@@ -27,12 +29,15 @@ mod normalize_tests;
 pub(crate) mod opaque;
 #[cfg(test)]
 mod opaque_tests;
+mod pager_set;
 mod parse;
 mod printed;
 #[cfg(test)]
 mod proptests;
 mod reserved;
 mod scope_budget;
+mod search_quote;
+pub(crate) mod stdin_fed;
 mod sub_close;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -210,6 +215,7 @@ pub enum Redir {
 pub use check::{command_verdict, is_safe_command, is_safe_pipeline};
 pub(crate) use explain::denied_inner_words;
 pub use explain::{Explanation, SegmentReport, explain, explain_with_coverage};
+pub(crate) use pager_set::pager_may_be_set;
 pub use parse::parse;
 
 impl Word {

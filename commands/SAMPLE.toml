@@ -100,6 +100,19 @@
 #                                        #   (`exiftool -if EXPR` runs Perl and
 #                                        #   must not read as `-i -f`). Only
 #                                        #   on a flat command.
+# # reads_commands_from = ["plus", "stdin"]
+#                                        # optional; where a pager or editor
+#                                        #   takes commands besides its flags.
+#                                        #   "plus": a `+word` operand runs as a
+#                                        #   command (`less +!id`, `vim +!id`),
+#                                        #   so only `+N` and a bare `+` pass.
+#                                        #   "stdin": it reads keystrokes from a
+#                                        #   standard input that is not a
+#                                        #   terminal (`printf ':!id\n' | vim`),
+#                                        #   so anything feeding its input (a
+#                                        #   pipe, `<`, `<<<`, a heredoc, a
+#                                        #   redirected group) refuses it. Only
+#                                        #   on a flat command.
 # # env_assignment_positionals = true    # optional; this command PUTS its
 #                                        #   NAME=VALUE positionals into the
 #                                        #   ENVIRONMENT (`export`, `declare -x`,
@@ -114,6 +127,16 @@
 #                                        #   `LD_PRELOAD=/tmp/evil.so ls` denied.
 #                                        #   Set this on ANY command that exports
 #                                        #   a caller-named variable.
+# # ghc_rts = true                      # optional; this command is a program
+#                                        #   built with GHC. Its runtime reads
+#                                        #   `+RTS` options from the arguments
+#                                        #   and lets them write statistics to a
+#                                        #   named file, so any argument equal to
+#                                        #   `+RTS`, `-RTS` or `--RTS` denies the
+#                                        #   whole invocation. `GHCRTS` in the
+#                                        #   environment is refused by
+#                                        #   envvars.toml. Set it on every
+#                                        #   GHC-built tool.
 #                                        #   Only for commands with POSIX -number legacy syntax.
 # standalone = [                         # flags that take no value
 #     "--count", "--help", "--recursive", "--version",
@@ -400,10 +423,12 @@
 # glob family like `kubectl get pods` names its resource positionally); use
 # credential_first_arg for positionals that must deny.
 #
-# Empty = the family is not yet researched and stays permissive. That is a
-# migration affordance for the ~250 cloud-service groups, not a default to
-# reach for: `no_new_unresearched_first_arg_family` pins the remaining set, so
-# a new undeclared family fails the build.
+# Empty = the sub's own standalone/valued (plus the command's [command.wrapper]
+# flags) are the list after the argument too, so a flag is judged the same on
+# either side of it. A sub with no flags of its own is not yet researched and
+# stays permissive. That is a migration affordance for the ~250 cloud-service
+# groups, not a default to reach for: `no_new_unresearched_first_arg_family`
+# pins the remaining set, so a new undeclared family fails the build.
 
 # [[command.sub]]
 # name = "iam"
@@ -436,6 +461,33 @@
 # first_arg_loopback_valued = ["--endpoint-url"]   # DynamoDB Local
 # first_arg_standalone = ["--debug", "--no-cli-pager"]
 # first_arg_valued = ["--output", "--query", "--region", "--table-name"]
+
+# FLAG_VALUES — the values a valued flag may take, on any sub. A flag whose
+# value changes what the command reads (kubectl's `-o go-template-file=PATH`
+# prints any file through a template with no actions) lists the values it may
+# take; any other value, or none, refuses. Checked in every spelling: `-o v`,
+# `-o=v`, `--output=v`, glued `-ov` and inside a short cluster (`-Ao v`), before
+# or after the first positional. A trailing `*` matches a prefix. Each key must
+# also be in `valued` (or `first_arg_valued`); the build fails otherwise.
+
+# [[command.sub]]
+# name = "get"
+# first_arg = ["*"]
+# valued = ["--output", "-o"]
+# flag_values = { "--output" = ["json", "yaml", "jsonpath=*"], "-o" = ["json", "yaml", "jsonpath=*"] }
+
+# ASCII_LETTER_FLAGS — valued flags whose value must be one or more ASCII
+# letters (`A-Z`, `a-z`), on any sub. For a flag that names an environment or
+# profile from which the tool builds a file name (`mise use -E staging` writes
+# `mise.staging.toml`, while `-E /../../x` escapes the project): callers can use
+# their own names, and slashes, dots, digits, punctuation, or an empty value
+# refuse. Checked in the same spellings as `flag_values`, and each flag must
+# also be in `valued` (or `first_arg_valued`) and not in `flag_values`.
+
+# [[command.sub]]
+# name = "use"
+# valued = ["--env", "-E", "-e"]
+# ascii_letter_flags = ["--env", "-E", "-e"]
 
 # LOOPBACK_VALUED / LOOPBACK_LOCALIZES (on a profiled sub) — the same endpoint
 # gate, plus whether a local destination changes the CLASSIFICATION.
@@ -475,7 +527,8 @@
 # syntax as first_arg (exact or trailing-* prefix), but a MATCH DENIES the
 # invocation as a credential exposure instead of allowing it. Checked after
 # explicit sub-subs and BEFORE the first_arg allow-glob, and it is flag-aware
-# (skips leading flags to find the real first positional). Use it when a
+# (asks every positional and each comma-separated item in it, skipping flags
+# and the values of listed valued flags: `get pods,secrets` reads Secrets too). Use it when a
 # specific resource/key name turns an otherwise-safe read into secret
 # disclosure — while every OTHER value stays a normal read via first_arg.
 # It is the value-dependent complement to `profile = "credential-read"`
@@ -486,6 +539,33 @@
 # first_arg = ["*"]                                # any resource is a read…
 # credential_first_arg = ["secret", "secret/*"]    # …except the Secret resource
 # level = "SafeRead"
+
+# ─────────────────────────────────────────────────────────────────────
+# REFUSE OPERANDS — a sub that must not take certain argument text
+# ─────────────────────────────────────────────────────────────────────
+#
+# `refuse_operands` is a list of globs; `*` matches any run of characters,
+# including none, and every other character is literal. The sub is refused when
+# any glob matches an argument that is not a flag, either side of the `=` in
+# such an argument (`NAME=VALUE`: the name, and the value), or the value of a
+# `--flag=value`. The values of separate valued flags are plain arguments, so
+# they are tested too. An argument whose text the shell decides (a `$VAR`, a
+# `$(…)` or backtick substitution, arithmetic, or a brace group the classifier
+# cannot expand) is refused whatever the globs say, since it could hold any of
+# them. Use it on a sub that writes text a later command
+# executes: `mise set FOO='{{ exec(command="id") }}'` stores a template that
+# mise runs the next time it loads the file.
+#
+# It works on any sub, nested ones included, and is read before the sub's
+# flags are checked. On a `delegate_after` sub only the arguments before the
+# separator are read, so the inner command keeps its own grammar. It is not
+# read on a `profile` sub, and the build rejects the combination.
+
+# [[command.sub]]
+# name = "set"
+# level = "SafeWrite"
+# valued = ["--file"]
+# refuse_operands = ["*{{*", "*{%*", "*{#*", "_", "_.*"]
 
 # ─────────────────────────────────────────────────────────────────────
 # REQUIRE ANY — subcommand needs at least one of several flags
@@ -590,7 +670,8 @@
 #
 # delegate_after: Find a separator token (usually "--"), then validate
 #   everything after it as a complete command. Used for
-#   "mise exec -- git status" where the separator is "--".
+#   "mise exec -- git status" where the separator is "--". A flag before
+#   the separator must be one the sub lists in standalone or valued.
 
 # [[command.sub]]
 # name = "run"
@@ -608,6 +689,8 @@
 # [[command.sub]]
 # name = "exec"
 # delegate_after = "--"                  # validate everything after "--"
+# standalone = ["--raw"]                 # flags allowed before "--"
+# valued = ["--jobs"]
 
 # ─────────────────────────────────────────────────────────────────────
 # STRUCTURED + WRAPPER — global flags stripped before sub dispatch
@@ -750,11 +833,16 @@
 # level = "Inert"                       # SafetyLevel for matching invocations
 # bare = true                           # is bare invocation allowed
 # max_positional = 1                    # cap on non-flag arguments
-# positional_shape = "path"             # predicate over the first positional;
-#                                       # only "path" is supported today —
-#                                       # accepts tokens shaped like a file
+# positional_shape = "path"             # predicate over the first positional:
+#                                       # "path" accepts tokens shaped like a file
 #                                       # path (contain `/`, contain `.`, or
-#                                       # are `-` for stdin) and rejects flags
+#                                       # are `-` for stdin) and rejects flags;
+#                                       # "go-package" a local go package;
+#                                       # "local-path" a folder no tool could read
+#                                       # as a repository address (no scheme, `:`,
+#                                       # `@`, `?`, `//`, `.git`, or host-like first
+#                                       # component). A [[command.sub]] takes it too,
+#                                       # on a plain flag policy or an executor.
 # executor = "file"                     # the command runs code — gate the EXECUTOR
 #                                       # through the execution-origin engine instead
 #                                       # of the flat `level`: a WORKSPACE-local

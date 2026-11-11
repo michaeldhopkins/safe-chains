@@ -27,6 +27,9 @@ examples_denied = [
   "sentry-cli login",
 ]
 
+[command.path_gate]
+positional = "write"
+
 [[command.sub]]
 name = "info"
 level = "SafeRead"

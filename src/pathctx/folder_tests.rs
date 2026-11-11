@@ -64,15 +64,15 @@ fn an_unlabelled_writer_fails_closed_and_is_recorded() {
     let _folder = enter(FolderLevel::Workspace);
     let known = {
         let _known = crate::pathctx::enter_cwd(Some(ROOT.to_string()));
-        crate::cst::command_verdict("mise trust")
+        crate::cst::command_verdict("mise untrust")
     };
-    assert!(writes(known), "precondition: `mise trust` writes in a known folder");
+    assert!(writes(known), "precondition: `mise untrust` writes in a known folder");
     let _fresh = enter(FolderLevel::Workspace);
-    assert!(!crate::cst::command_verdict("mise trust").is_allowed());
+    assert!(!crate::cst::command_verdict("mise untrust").is_allowed());
     assert!(
         notes()
             .iter()
-            .any(|n| matches!(n, Note::Leaf { command, admitted: false, .. } if command.starts_with("mise trust"))),
+            .any(|n| matches!(n, Note::Leaf { command, admitted: false, .. } if command.starts_with("mise untrust"))),
         "{:?}",
         notes()
     );
@@ -106,4 +106,101 @@ fn a_frame_is_popped_even_when_classification_unwinds() {
     let caught = std::panic::catch_unwind(|| judge_leaf(&tokens, false, || panic!("boom")));
     assert!(caught.is_err());
     assert!(FRAMES.with(|f| f.borrow().is_empty()));
+}
+
+fn verdict_in(cwd: &str, command: &str) -> Verdict {
+    let _ctx = crate::pathctx::enter(PathCtx { cwd: Some(cwd.to_string()), root: Some(ROOT.to_string()), session_id: None });
+    crate::cst::command_verdict(command)
+}
+
+fn outside_the_workspace() -> Vec<String> {
+    let home = std::env::var("HOME").expect("HOME");
+    vec![home.clone(), "/".to_string(), format!("{home}/.config/mise"), "/work/projects/other".to_string()]
+}
+
+/// Every sub the registry declares as writing, or running code from, the folder it runs in: approved
+/// in the workspace, it must ask once a `cd` has taken it out, or when the harness says it already
+/// runs out there, and keep its verdict after a `cd` that stays inside.
+#[test]
+fn a_declared_folder_write_follows_the_working_directory() {
+    let mut checked = 0;
+    let mut wrong = Vec::new();
+    for (command, anchor) in crate::registry::declared_writers() {
+        if !matches!(anchor, Anchor::ImplicitSource | Anchor::ImplicitOutput | Anchor::RunsFolderCode) {
+            continue;
+        }
+        let at_root = verdict_in(ROOT, &command);
+        if !writes(at_root) {
+            continue;
+        }
+        checked += 1;
+        for dir in outside_the_workspace() {
+            for (cwd, line) in [(ROOT.to_string(), format!("cd {dir} && {command}")), (dir.clone(), command.clone())] {
+                if verdict_in(&cwd, &line).is_allowed() {
+                    wrong.push(format!("`{line}` in {cwd}"));
+                }
+            }
+        }
+        for line in [format!("cd src && {command}"), format!("(cd /; true) && {command}")] {
+            if verdict_in(ROOT, &line) != at_root {
+                wrong.push(format!("`{line}` changed its verdict inside the workspace"));
+            }
+        }
+    }
+    assert!(checked > 100, "only {checked} declared folder writers are approved at the root");
+    assert!(wrong.is_empty(), "{} wrong, first:\n{}", wrong.len(), wrong.iter().take(25).cloned().collect::<Vec<_>>().join("\n"));
+}
+
+/// A `cd` whose target the classifier cannot name leaves the folder unknown, so a folder write after
+/// it asks.
+#[test]
+fn a_folder_write_after_an_unfollowable_cd_asks() {
+    for cd in ["cd -", "cd", "cd \"$UNSET_DIR\"", "{ cd ~; }", "if true; then cd /; fi", "popd", "pushd ~"] {
+        for command in ["cargo fmt", "git commit -m x", "mise set X=1", "cargo build"] {
+            assert!(writes(verdict_in(ROOT, command)), "precondition: `{command}`");
+            let line = format!("{cd}; {command}");
+            assert!(!verdict_in(ROOT, &line).is_allowed(), "`{line}` was approved");
+        }
+    }
+}
+
+#[test]
+fn a_named_write_and_a_fixed_target_do_not_take_the_folder() {
+    let home = std::env::var("HOME").expect("HOME");
+    for command in ["touch /tmp/x", "echo x > /tmp/y", "ls", "git --version"] {
+        let line = format!("cd {home} && {command}");
+        assert_eq!(verdict_in(ROOT, &line), verdict_in(&home, command), "{line}");
+        assert!(verdict_in(ROOT, &line).is_allowed(), "{line}");
+    }
+}
+
+/// Every sub the registry declares as running the folder's code, or building into it (which runs
+/// build scripts): approved in the workspace, it must ask once a `cd` has taken it to a folder whose
+/// code is not the project's, a temporary one included, where a plain write would be approved.
+#[test]
+fn a_declared_folder_code_runner_follows_the_working_directory_to_a_temporary_folder() {
+    let mut checked = 0;
+    let mut wrong = Vec::new();
+    for (command, anchor) in crate::registry::declared_writers() {
+        if !matches!(anchor, Anchor::ImplicitOutput | Anchor::RunsFolderCode) {
+            continue;
+        }
+        let at_root = verdict_in(ROOT, &command);
+        if !at_root.is_allowed() {
+            continue;
+        }
+        checked += 1;
+        for dir in ["/tmp/x", "/private/tmp/x", "/var/folders/ab/T/x"] {
+            let line = format!("cd {dir} && {command}");
+            if verdict_in(ROOT, &line).is_allowed() {
+                wrong.push(format!("`{line}`"));
+            }
+        }
+        let line = format!("cd src && {command}");
+        if verdict_in(ROOT, &line) != at_root {
+            wrong.push(format!("`{line}` changed its verdict inside the workspace"));
+        }
+    }
+    assert!(checked > 50, "only {checked} declared folder code runners are approved at the root");
+    assert!(wrong.is_empty(), "{} wrong, first:\n{}", wrong.len(), wrong.iter().take(25).cloned().collect::<Vec<_>>().join("\n"));
 }

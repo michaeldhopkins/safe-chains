@@ -59,7 +59,10 @@ nano -w	inert
 nano -x	inert
 nano -y	inert
 nano -z	inert
+nano ./notes.md	inert
+nano < ./keys	denied
 nano x	inert
+nano ~/.ssh/id_ed25519	denied
 nasm	denied
 nasm --help	safe-write
 nasm --help --version	safe-write
@@ -5398,13 +5401,15 @@ numfmt -z	inert
 numfmt -z --to=iec	inert
 numfmt x	inert
 nvim	inert
+nvim '+!id' ./notes.md	denied
+nvim +42 ./notes.md	inert
 nvim --clean	inert
 nvim --clean --help	inert
-nvim --clean --startuptime x	inert
+nvim --clean -T x	inert
 nvim --clean x	inert
 nvim --help	inert
 nvim --noplugin	inert
-nvim --startuptime x	inert
+nvim --startuptime ./log	denied
 nvim --version	inert
 nvim -?	inert
 nvim -A	inert

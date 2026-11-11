@@ -45,21 +45,26 @@ pub struct PathCtx {
 
 thread_local! {
     static CURRENT: RefCell<PathCtx> = RefCell::new(PathCtx::default());
+    static REPORTED: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
 /// Install `ctx` as the ambient context for the duration of the returned guard; the previous
 /// context is restored on drop (panic-safe, so a failing test can't leak into the next).
 #[must_use]
 pub fn enter(ctx: PathCtx) -> Guard {
-    Guard(CURRENT.with(|c| c.replace(ctx)))
+    let reported = REPORTED.with(|r| r.replace(ctx.cwd.clone()));
+    Guard(CURRENT.with(|c| c.replace(ctx)), Some(reported))
 }
 
 /// Restores the previous [`PathCtx`] when dropped.
-pub struct Guard(PathCtx);
+pub struct Guard(PathCtx, Option<Option<String>>);
 
 impl Drop for Guard {
     fn drop(&mut self) {
         CURRENT.with(|c| *c.borrow_mut() = std::mem::take(&mut self.0));
+        if let Some(reported) = self.1.take() {
+            REPORTED.with(|r| *r.borrow_mut() = reported);
+        }
     }
 }
 
@@ -67,12 +72,21 @@ impl Drop for Guard {
 /// `cd` tracking as it walks a chain's statements. Restored on drop.
 #[must_use]
 pub fn enter_cwd(cwd: Option<String>) -> Guard {
-    Guard(CURRENT.with(|c| {
-        let mut b = c.borrow_mut();
-        // `session_id` is carried through unchanged: a `cd` mid-chain must not drop scratchpad
-        // recognition (the session is the same session whatever directory it walks into).
-        PathCtx { cwd: std::mem::replace(&mut b.cwd, cwd), root: b.root.clone(), session_id: b.session_id.clone() }
-    }))
+    Guard(
+        CURRENT.with(|c| {
+            let mut b = c.borrow_mut();
+            // `session_id` is carried through unchanged: a `cd` mid-chain must not drop scratchpad
+            // recognition (the session is the same session whatever directory it walks into).
+            PathCtx { cwd: std::mem::replace(&mut b.cwd, cwd), root: b.root.clone(), session_id: b.session_id.clone() }
+        }),
+        None,
+    )
+}
+
+/// Whether a `cd` earlier on the line moved the working directory away from the one the harness
+/// reported.
+pub(crate) fn moved_by_cd() -> bool {
+    REPORTED.with(|r| *r.borrow() != cwd())
 }
 
 /// The ambient working directory, if known.
@@ -87,6 +101,14 @@ pub fn root() -> Option<String> {
         let b = c.borrow();
         b.root.clone().or_else(|| b.cwd.clone())
     })
+}
+
+/// Whether the absolute, already placed `abs` lies at or below the project root as the kernel sees
+/// it, including a root that is itself a protected place.
+pub(crate) fn placed_in_root(abs: &str) -> bool {
+    root()
+        .filter(|root| root.starts_with('/'))
+        .is_some_and(|root| crate::engine::resolve::regions::lies_in_root(abs, &physical::root(&root)))
 }
 
 /// Whether `path` lies inside THIS session's scratchpad — the harness's own per-session working
@@ -222,6 +244,59 @@ impl Drop for StdinReprGuard {
     }
 }
 
+thread_local! {
+    static RIPGREP_CONFIG: RefCell<Vec<bool>> = const { RefCell::new(Vec::new()) };
+}
+
+pub(crate) const RIPGREP_CONFIG_PATH: &str = "RIPGREP_CONFIG_PATH";
+
+#[must_use]
+pub(crate) fn bind_ripgrep_config(follows: Option<bool>) -> RipgrepConfigGuard {
+    if let Some(follows) = follows {
+        RIPGREP_CONFIG.with(|v| v.borrow_mut().push(follows));
+    }
+    RipgrepConfigGuard { pushed: follows.is_some() }
+}
+
+/// Whether rg's config file makes it follow links: the one its own prefix names, or else the one
+/// named in the environment it inherits from us.
+pub(crate) fn ripgrep_config_follows() -> bool {
+    RIPGREP_CONFIG
+        .with(|v| v.borrow().last().copied())
+        .unwrap_or_else(|| config_file_follows(std::env::var_os(RIPGREP_CONFIG_PATH), cwd().as_deref()))
+}
+
+/// A config file that cannot be read may say anything, so it counts as following.
+fn config_file_follows(path: Option<std::ffi::OsString>, cwd: Option<&str>) -> bool {
+    let Some(path) = path.filter(|path| !path.is_empty()).map(std::path::PathBuf::from) else {
+        return false;
+    };
+    let path = match cwd {
+        _ if path.is_absolute() => path,
+        Some(cwd) => std::path::Path::new(cwd).join(path),
+        None => return true,
+    };
+    std::fs::read_to_string(path).map_or(true, |text| {
+        text.lines()
+            .map(str::trim)
+            .any(|line| line.starts_with("--follow") || (line.starts_with('-') && !line.starts_with("--") && line.contains('L')))
+    })
+}
+
+pub(crate) struct RipgrepConfigGuard {
+    pushed: bool,
+}
+
+impl Drop for RipgrepConfigGuard {
+    fn drop(&mut self) {
+        if self.pushed {
+            RIPGREP_CONFIG.with(|v| {
+                v.borrow_mut().pop();
+            });
+        }
+    }
+}
+
 /// Resolve a path argument for classification against the ambient `cwd`/`root`. Returns a
 /// path the *existing* classifiers (`classify_locus`, `is_safe_write_target`) can score
 /// unchanged. When `cwd` and `root` are both known and absolute, a **relative** path is lexically
@@ -325,6 +400,30 @@ fn declared_substitution_directory(cur: Option<&str>, expanded: &str) -> Option<
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn an_inherited_ripgrep_config_follows_when_it_says_so_or_cannot_be_read() {
+        let dir = tempfile::tempdir().expect("scratch");
+        let cwd = dir.path().to_str().expect("utf-8");
+        for (name, text) in [
+            ("long", "--follow\n"),
+            ("short", "  -iL\n"),
+            ("plain", "--smart-case\n--max-columns=10\n"),
+            ("glob", "--glob=*L*\n--type-add=L:*.l\n"),
+        ] {
+            std::fs::write(dir.path().join(name), text).expect("config");
+        }
+        let follows = |path: Option<&str>, cwd: Option<&str>| config_file_follows(path.map(Into::into), cwd);
+        assert!(follows(Some("long"), Some(cwd)));
+        assert!(follows(Some("short"), Some(cwd)));
+        assert!(follows(Some("missing"), Some(cwd)));
+        assert!(follows(Some("plain"), None));
+        assert!(!follows(Some("plain"), Some(cwd)));
+        assert!(!follows(Some("glob"), Some(cwd)));
+        assert!(!follows(Some(dir.path().join("plain").to_str().expect("utf-8")), None));
+        assert!(!follows(Some(""), Some(cwd)));
+        assert!(!follows(None, Some(cwd)));
+    }
 
     const SID: &str = "7676dbc5-a265-43b3-a0f8-49666792bd9b";
 

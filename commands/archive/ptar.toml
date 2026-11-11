@@ -1,6 +1,6 @@
 [[command]]
 name = "ptar"
-description = "tar-like utility written in Perl on top of Archive::Tar. One of -c (create), -x (extract), or -t (list) is required. -f names the archive (default ./default.tar; - for stdin/stdout), -z toggles zlib compression, -v prints filenames, -C runs in CPAN mode (drops 022 from permissions), -T reads filenames-to-create from a list."
+description = "tar-like utility written in Perl on top of Archive::Tar. One of -c (create), -x (extract), or -t (list) is required. -f names the archive (default ./default.tar; - for stdin/stdout), -z toggles zlib compression, -v prints filenames, -C runs in CPAN mode (drops 022 from permissions), -T reads filenames-to-create from a list. Extracting (-x) is refused, as tar extraction is: the archive decides the paths written and their modes."
 url = "https://metacpan.org/dist/Archive-Tar/view/bin/ptar"
 researched_version = "Perl Archive::Tar (perl 5.34+)"
 level = "SafeWrite"
@@ -10,10 +10,13 @@ standalone = [
     "-v", "-x", "-z",
 ]
 valued = ["-T", "-f"]
+examples_safe = ["ptar -c -f ./out.tar ./src", "ptar -t -f ./a.tar"]
 
-# -f names the archive ptar creates in -c mode.
+# -f names the archive ptar creates in -c mode. The operands of -c are hierarchies ptar walks and
+# stores, and -T names a file listing more of them.
 [command.path_gate]
-flags = { "-f" = "write" }
+positional = "read_tree"
+flags = { "-f" = "write", "-T" = "read" }
 
 [[command]]
 name = "ptardiff"
@@ -24,10 +27,15 @@ level = "Inert"
 bare = false
 max_positional = 1
 standalone = ["-h"]
+examples_safe = ["ptardiff ./a.tar"]
+
+# ptardiff reads the archive it names.
+[command.path_gate]
+positional = "read"
 
 [[command]]
 name = "ptargrep"
-description = "Apply a Perl regex to the contents of files inside one or more tar archives. By default matching files are extracted to disk; --list-only / -l prints matching pathnames instead. --basename / -b ignores directory paths on extraction, --ignore-case / -i is case-insensitive, --verbose / -v logs to stderr."
+description = "Apply a Perl regex to the contents of files inside one or more tar archives. By default matching files are extracted to disk; --list-only / -l prints matching pathnames instead. --basename / -b ignores directory paths on extraction, --ignore-case / -i is case-insensitive, --verbose / -v logs to stderr. Extracting is refused, as tar extraction is, so only a line with -l or --list-only before its first operand is approved."
 url = "https://metacpan.org/dist/Archive-Tar/view/bin/ptargrep"
 researched_version = "Perl Archive::Tar (perl 5.34+)"
 level = "SafeWrite"
@@ -37,3 +45,8 @@ standalone = [
     "--list-only", "--verbose",
     "-?", "-b", "-i", "-l", "-v",
 ]
+examples_safe = ["ptargrep -l pattern ./a.tar"]
+
+# The operands after the pattern are archives ptargrep reads; the pattern is gated as a read too.
+[command.path_gate]
+positional = "read"

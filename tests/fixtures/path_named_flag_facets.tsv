@@ -102,8 +102,6 @@ ansible-lint	--profile	untriaged	-	-	-
 ansible-lint	--project-dir	untriaged	-	-	-	
 ansible-lint	--rulesdir	untriaged	-	-	-	
 ansible-lint	--show-relpath	untriaged	-	-	-	
-ansible-vault encrypt	--vault-password-file	untriaged	-	-	-	
-ansible-vault encrypt_string	--vault-password-file	untriaged	-	-	-	
 apkanalyzer dex packages	--files	untriaged	-	-	-	
 apkanalyzer dex packages	--proguard-folder	untriaged	-	-	-	
 arduino-cli compile	--build-cache-path	untriaged	-	-	-	
@@ -162,7 +160,6 @@ buf generate	--exclude-path	untriaged	-	-	-
 buf generate	--path	untriaged	-	-	-	
 buf lint	--exclude-path	untriaged	-	-	-	
 buf lint	--path	untriaged	-	-	-	
-bun build	--public-path	untriaged	-	-	-	
 bundler-audit check	--gemfile-lock	untriaged	-	-	-	
 bundletool dump config	--xpath	untriaged	-	-	-	
 bundletool dump manifest	--xpath	untriaged	-	-	-	
@@ -182,9 +179,12 @@ cargo criterion	--criterion-manifest-path	untriaged	-	-	-
 cargo cyclonedx	--override-filename	untriaged	-	-	-	
 cargo doc	--profile	untriaged	-	-	-	
 cargo fetch	--lockfile-path	untriaged	-	-	-	
-cargo install	--profile	untriaged	-	-	-	
 cargo llvm-cov	--ignore-filename-regex	untriaged	-	-	-	
 cargo llvm-cov	--profile	untriaged	-	-	-	
+cargo msrv find	--path	untriaged	-	-	-	
+cargo msrv list	--path	untriaged	-	-	-	
+cargo msrv show	--path	untriaged	-	-	-	
+cargo msrv verify	--path	untriaged	-	-	-	
 cargo mutants	--file	untriaged	-	-	-	
 cargo mutants	--profile	untriaged	-	-	-	
 cargo nextest archive	--archive-file	untriaged	-	-	-	
@@ -226,11 +226,14 @@ coverage combine	--data-file	untriaged	-	-	-
 coverage html	--data-file	untriaged	-	-	-	
 coverage json	--data-file	untriaged	-	-	-	
 coverage report	--data-file	untriaged	-	-	-	
+coverage run	--data-file	untriaged	-	-	-	
+coverage run	--rcfile	untriaged	-	-	-	
 cppcheck	--cppcheck-build-dir	untriaged	-	-	-	
 cppcheck	--includes-file	untriaged	-	-	-	
 cppcheck	--rule-file	untriaged	-	-	-	
 credo	--config-file	untriaged	-	-	-	
 cucumber	--profile	untriaged	-	-	-	
+cucumber-js	--paths	untriaged	-	-	-	
 dart analyze	--directory	untriaged	-	-	-	
 dawn scan	--config-file	untriaged	-	-	-	
 dbmate status	--config-file	untriaged	-	-	-	
@@ -277,8 +280,18 @@ docfx build	--logFile	untriaged	-	-	-
 docfx build	--templateFolder	untriaged	-	-	-	
 docfx metadata	--logFile	untriaged	-	-	-	
 docker-compose config	--profile	untriaged	-	-	-	
+dotnet build	--artifacts-path	untriaged	-	-	-	
+dotnet clean	--artifacts-path	untriaged	-	-	-	
 dotnet nuget verify	--configfile	untriaged	-	-	-	
+dotnet pack	--artifacts-path	untriaged	-	-	-	
+dotnet publish	--artifacts-path	untriaged	-	-	-	
+dotnet restore	--artifacts-path	untriaged	-	-	-	
+dotnet restore	--configfile	untriaged	-	-	-	
+dotnet restore	--lock-file-path	untriaged	-	-	-	
 dotnet sln add	--solution-folder	untriaged	-	-	-	
+dotnet test	--artifacts-path	untriaged	-	-	-	
+dotnet test	--results-directory	untriaged	-	-	-	
+dotnet test	--test-adapter-path	untriaged	-	-	-	
 dotnet tool list	--tool-path	untriaged	-	-	-	
 dotnet-ef migrations list	--msbuildprojectextensionspath	untriaged	-	-	-	
 dotnet-symbol	--authenticated-server-path	untriaged	-	-	-	
@@ -298,6 +311,7 @@ eb status	--profile	untriaged	-	-	-
 eleventy	--pathprefix	untriaged	-	-	-	
 erb_lint	--custom-rule-files	untriaged	-	-	-	
 eslint	--ignore-path	untriaged	-	-	-	
+eslint	--rulesdir	untriaged	-	-	-	
 espeak-ng	--path	untriaged	-	-	-	
 eza	--group-directories-first-dirs	untriaged	-	-	-	
 file	--files-from	untriaged	-	-	-	
@@ -332,20 +346,7 @@ git status	--untracked-files	untriaged	-	-	-
 git-lfs locks	--path	untriaged	-	-	-	
 gitleaks detect	--baseline-path	untriaged	-	-	-	
 gitleaks detect	--gitleaks-ignore-path	untriaged	-	-	-	
-gitleaks detect	--report-path	untriaged	-	-	-	
-gitleaks protect	--gitleaks-ignore-path	untriaged	-	-	-	
-gitleaks protect	--report-path	untriaged	-	-	-	
-go build	-modfile	untriaged	-	-	-	
-go build	-pkgdir	untriaged	-	-	-	
-go list	-modfile	untriaged	-	-	-	
-go list	-pkgdir	untriaged	-	-	-	
-go run	-modfile	untriaged	-	-	-	
-go run	-pkgdir	untriaged	-	-	-	
-go test	-blockprofilerate	untriaged	-	-	-	
-go test	-memprofilerate	untriaged	-	-	-	
-go test	-mutexprofilefraction	untriaged	-	-	-	
-go vet	-modfile	untriaged	-	-	-	
-go vet	-pkgdir	untriaged	-	-	-	
+gitleaks protect	--gitleaks-ignore-path	untriaged	-	-	-
 golangci-lint run	--path-prefix	untriaged	-	-	-	
 golangci-lint run	--skip-dirs	untriaged	-	-	-	
 golangci-lint run	--skip-files	untriaged	-	-	-	
@@ -418,7 +419,6 @@ knex seed:make	--timestamp-filename-date	untriaged	-	-	-
 kotlinc	-classpath	untriaged	-	-	-	
 kotlinc	-Xfriend-paths	untriaged	-	-	-	
 kramdown	--config-file	untriaged	-	-	-	
-kubectl diff	--filename	untriaged	-	-	-	
 latexmk	--output-directory	untriaged	-	-	-	
 latexmk	-aux-directory	untriaged	-	-	-	
 latexmk	-output-directory	untriaged	-	-	-	
@@ -429,7 +429,6 @@ llvm-otool	-object-tool-path	untriaged	-	-	-
 localedef	--inputfile	untriaged	-	-	-	
 madge	--basedir	untriaged	-	-	-	
 madge	--rankdir	untriaged	-	-	-	
-man	--config-file	untriaged	-	-	-	
 man	--manpath	untriaged	-	-	-	
 markdownlint	--ignore-path	untriaged	-	-	-	
 markdownlint-cli2	--directories	untriaged	-	-	-	
@@ -496,6 +495,7 @@ msbuild	/profileEvaluation	untriaged	-	-	-
 msgcat	--files-from	untriaged	-	-	-	
 msgfmt	--directory	untriaged	-	-	-	
 mypy	--cache-dir	untriaged	-	-	-	
+mypy	--config-file	untriaged	-	-	-	
 mysqladmin	--character-sets-dir	untriaged	-	-	-	
 mysqladmin	--login-path	untriaged	-	-	-	
 mysqladmin	--ssl-capath	untriaged	-	-	-	
@@ -530,10 +530,6 @@ nix profile history	--profile	untriaged	-	-	-
 nix profile list	--profile	untriaged	-	-	-	
 nix-collect-garbage	--profile	untriaged	-	-	-	
 nixos-rebuild list-generations	--profile-name	untriaged	-	-	-	
-nomad alloc-status	-token-file	untriaged	-	-	-	
-nomad monitor	-token-file	untriaged	-	-	-	
-nomad node-status	-token-file	untriaged	-	-	-	
-nomad status	-token-file	untriaged	-	-	-	
 nox	--envdir	untriaged	-	-	-	
 nuget config	-ConfigFile	untriaged	-	-	-	
 nuget list	-ConfigFile	untriaged	-	-	-	
@@ -585,7 +581,12 @@ pg_verifybackup	--wal-directory	untriaged	-	-	-
 pg_waldump	--path	untriaged	-	-	-	
 pgbench	--file	untriaged	-	-	-	
 pgrep	--pidfile	untriaged	-	-	-	
+phpstan analyse	--autoload-file	untriaged	-	-	-	
 phpstan analyse	--tmp-file	untriaged	-	-	-	
+phpstan clear-result-cache	--autoload-file	untriaged	-	-	-	
+phpstan diagnose	--autoload-file	untriaged	-	-	-	
+phpunit	--cache-directory	untriaged	-	-	-	
+phpunit	--include-path	untriaged	-	-	-	
 pijul ls	--repo-path	untriaged	-	-	-	
 pio check	--project-dir	untriaged	-	-	-	
 pio pkg list	--storage-dir	untriaged	-	-	-	
@@ -612,8 +613,11 @@ pulumi preview	--config-file	untriaged	-	-	-
 pycodestyle	--filename	untriaged	-	-	-	
 pydocstyle	--match-dir	untriaged	-	-	-	
 pylint	--ignore-paths	untriaged	-	-	-	
+pylint	--rcfile	untriaged	-	-	-	
 pyright	--pythonpath	untriaged	-	-	-	
 pyright	--typeshedpath	untriaged	-	-	-	
+pytest	--confcutdir	untriaged	-	-	-	
+pytest	--rootdir	untriaged	-	-	-	
 railway logs	--path	untriaged	-	-	-	
 railway metrics	--path	untriaged	-	-	-	
 rbs prototype	--base-dir	untriaged	-	-	-	
@@ -637,13 +641,13 @@ restic snapshots	--path	untriaged	-	-	-
 restic stats	--path	untriaged	-	-	-	
 revive	--max_open_files	untriaged	-	-	-	
 revive	-max_open_files	untriaged	-	-	-	
-rg	--ignore-file	untriaged	-	-	-	
 rg	--max-filesize	untriaged	-	-	-	
 rg	--path-separator	untriaged	-	-	-	
 rollup	--amd.basePath	untriaged	-	-	-	
 rollup	--assetFileNames	untriaged	-	-	-	
 rollup	--chunkFileNames	untriaged	-	-	-	
 rollup	--entryFileNames	untriaged	-	-	-	
+rspec	--default-path	untriaged	-	-	-	
 rspec	--profile	untriaged	-	-	-	
 rufo	--filename	untriaged	-	-	-	
 rvm install	--with-openssl-dir	untriaged	-	-	-	
@@ -677,8 +681,8 @@ sequelize init	--config-path	untriaged	-	-	-
 sequelize init	--migrations-path	untriaged	-	-	-	
 sequelize init	--models-path	untriaged	-	-	-	
 sequelize init	--seeders-path	untriaged	-	-	-	
-shfmt	--filename	untriaged	-	-	-	
-shfmt	-filename	untriaged	-	-	-	
+shfmt	--filename	not-a-path	-	-	-	Names the standard input for dialect detection (shfmt man page: "provide a name for the standard input file"); the file is never opened.
+shfmt	-filename	not-a-path	-	-	-	Names the standard input for dialect detection (shfmt man page: "provide a name for the standard input file"); the file is never opened.
 skaffold diagnose	--filename	untriaged	-	-	-	
 skaffold find-configs	--directory	untriaged	-	-	-	
 skaffold inspect	--filename	untriaged	-	-	-	
@@ -726,7 +730,7 @@ steep paths	--steepfile	untriaged	-	-	-
 steep project	--steepfile	untriaged	-	-	-	
 steep stats	--steepfile	untriaged	-	-	-	
 steep validate	--steepfile	untriaged	-	-	-	
-streamzip	-zipfile	untriaged	-	-	-	
+stylelint	--config-basedir	untriaged	-	-	-	
 stylelint	--ignore-path	untriaged	-	-	-	
 stz extract	--hashes-file	untriaged	-	-	-	
 supabase branches get	--workdir	untriaged	-	-	-	
@@ -775,13 +779,16 @@ swc	--filename	untriaged	-	-	-
 swc	--out-file	untriaged	-	-	-	
 swc	--source-file-name	untriaged	-	-	-	
 swift build	--build-path	untriaged	-	-	-	
+swift build	--package-path	untriaged	-	-	-	
+swift package describe	--package-path	untriaged	-	-	-	
+swift package dump-package	--package-path	untriaged	-	-	-	
+swift package show-dependencies	--package-path	untriaged	-	-	-	
 swift test	--build-path	untriaged	-	-	-	
+swift test	--package-path	untriaged	-	-	-	
 swiftlint analyze	--compiler-log-path	untriaged	-	-	-	
 swiftlint analyze	--path	untriaged	-	-	-	
 swiftlint lint	--path	untriaged	-	-	-	
 syft	--file	untriaged	-	-	-	
-task	--dir	untriaged	-	-	-	
-task	--taskfile	untriaged	-	-	-	
 terraform-docs	--lockfile	untriaged	-	-	-	
 terraform-docs	--recursive-path	untriaged	-	-	-	
 tflint	--var-file	untriaged	-	-	-	
@@ -823,20 +830,28 @@ tofu validate	--var-file	untriaged	-	-	-
 tofu validate	-var-file	untriaged	-	-	-	
 tree	--filelimit	untriaged	-	-	-	
 tree	--filesfrom	untriaged	-	-	-	
-trivy config	--ignorefile	untriaged	-	-	-	
-trivy config	--skip-dirs	untriaged	-	-	-	
-trivy config	--skip-files	untriaged	-	-	-	
-trivy fs	--cache-dir	untriaged	-	-	-	
-trivy fs	--ignorefile	untriaged	-	-	-	
-trivy fs	--skip-dirs	untriaged	-	-	-	
-trivy fs	--skip-files	untriaged	-	-	-	
-trivy image	--cache-dir	untriaged	-	-	-	
-trivy image	--ignorefile	untriaged	-	-	-	
-trivy image	--skip-dirs	untriaged	-	-	-	
-trivy image	--skip-files	untriaged	-	-	-	
-trivy sbom	--cache-dir	untriaged	-	-	-	
 tuist build	--derived-data-path	untriaged	-	-	-	
+tuist build	--path	untriaged	-	-	-	
+tuist clean	--path	untriaged	-	-	-	
+tuist dump	--path	untriaged	-	-	-	
+tuist edit	--path	untriaged	-	-	-	
+tuist fetch	--path	untriaged	-	-	-	
+tuist generate	--path	untriaged	-	-	-	
+tuist graph	--path	untriaged	-	-	-	
+tuist hash cache	--path	untriaged	-	-	-	
+tuist hash selective-testing	--path	untriaged	-	-	-	
+tuist inspect build	--path	untriaged	-	-	-	
+tuist inspect bundle	--path	untriaged	-	-	-	
+tuist inspect dependencies	--path	untriaged	-	-	-	
+tuist inspect implicit-imports	--path	untriaged	-	-	-	
+tuist inspect redundant-imports	--path	untriaged	-	-	-	
+tuist inspect test	--path	untriaged	-	-	-	
+tuist install	--path	untriaged	-	-	-	
+tuist migration check-empty-settings	--path	untriaged	-	-	-	
+tuist migration list-targets	--path	untriaged	-	-	-	
+tuist scaffold list	--path	untriaged	-	-	-	
 tuist test	--derived-data-path	untriaged	-	-	-	
+tuist test	--path	untriaged	-	-	-	
 tuist test	--result-bundle-path	untriaged	-	-	-	
 turbo run	--profile	untriaged	-	-	-	
 typedoc	--basePath	untriaged	-	-	-	
@@ -844,9 +859,8 @@ units	--file	untriaged	-	-	-
 velero logs	--caCertFile	untriaged	-	-	-	
 vite build	--assetsDir	untriaged	-	-	-	
 vitepress build	--cache-dir	untriaged	-	-	-	
+vitest	--dir	untriaged	-	-	-	
 vyper	--root-folder	untriaged	-	-	-	
-wasmtime compile	--profile	untriaged	-	-	-	
-wasmtime wast	--profile	untriaged	-	-	-	
 webpack	--output-filename	untriaged	-	-	-	
 webpack	--output-public-path	untriaged	-	-	-	
 wget	--cut-dirs	untriaged	-	-	-	
@@ -855,11 +869,16 @@ wget	--include-directories	untriaged	-	-	-
 wget	--max-redirect	untriaged	-	-	-	
 wget	--restrict-file-names	untriaged	-	-	-	
 wrjpgcom	-cfile	untriaged	-	-	-	
-xar	--file-cksum	untriaged	-	-	-	
 xccov diff	--path-equivalence	untriaged	-	-	-	
 xccov view	--file	untriaged	-	-	-	
 xccov view	--files-for-target	untriaged	-	-	-	
 xccov view	--functions-for-file	untriaged	-	-	-	
+xcodebuild	-importPath	untriaged	-	-	-	
+xcodebuild	-localizationPath	untriaged	-	-	-	
+xcodebuild	-packageCachePath	untriaged	-	-	-	
+xcodebuild	-resultStreamPath	untriaged	-	-	-	
+xcodebuild	-test-enumeration-output-path	untriaged	-	-	-	
+xcodebuild	-testProductsPath	untriaged	-	-	-	
 xcodegen generate	--cache-path	untriaged	-	-	-	
 xcresulttool compare	--baseline-path	untriaged	-	-	-	
 xcresulttool export	--path	untriaged	-	-	-	
@@ -884,4 +903,3 @@ ytt	--data-value-file	untriaged	-	-	-
 ytt	--data-values-file	untriaged	-	-	-	
 ytt	--file-mark	untriaged	-	-	-	
 ytt	--ignored-paths	untriaged	-	-	-	
-zipcloak	--temp-path	untriaged	-	-	-	

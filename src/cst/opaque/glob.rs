@@ -9,9 +9,11 @@
 //! created in between is not seen. That window is an accepted risk, recorded in
 //! `docs/design/hard-problems.md` (HP-5). So are shell options that change what a glob matches (`dotglob`,
 //! `nocaseglob`, `GLOBIGNORE`, `nullglob`) when the session set them before this command: bash's
-//! defaults are assumed.
+//! defaults are assumed. A line that turns on dot names itself is judged with them on (`enter_dot_names`).
 
+mod dot_names;
 use crate::cst::{Word, WordPart};
+pub(crate) use dot_names::{dot_names_matched, enter_dot_names};
 
 /// More entries than this across the walk, or more matches in all, and the word stays unknown.
 const MAX_ENTRIES: usize = 4096;
@@ -65,7 +67,9 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
                 names.extend([".".to_string(), "..".to_string()]);
             }
             for name in names {
-                if (!name.starts_with('.') || component.starts_with('.')) && matches(component.as_bytes(), name.as_bytes())? {
+                if (!name.starts_with('.') || component.starts_with('.') || dot_names_matched())
+                    && matches(component.as_bytes(), name.as_bytes())?
+                {
                     next.push(join(prefix, &name, absolute));
                 }
             }
@@ -266,7 +270,8 @@ fn listed(dir: &str, component: &str, seen: &mut usize) -> Option<Vec<String>> {
     }
     let mut matched = Vec::new();
     for name in names {
-        if (!name.starts_with('.') || component.starts_with('.')) && matches(component.as_bytes(), name.as_bytes())? {
+        if (!name.starts_with('.') || component.starts_with('.') || dot_names_matched()) && matches(component.as_bytes(), name.as_bytes())?
+        {
             matched.push(name);
             if matched.len() > MAX_MATCHES {
                 return None;

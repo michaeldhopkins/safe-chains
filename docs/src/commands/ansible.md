@@ -31,18 +31,27 @@
 - **--list**: Flags: --help, --yaml, --toml, --export, -h, -y. Valued: --inventory, --limit, -i, -l
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `ansible-inventory --list -i ./inventory/hosts.yml`
+
 ### `ansible-playbook`
 <p class="cmd-url"><a href="https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html">https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html</a></p>
 
-- Requires --list-hosts, --list-tasks, --list-tags, --syntax-check. - Allowed standalone flags: --help, --list-hosts, --list-tags, --list-tasks, --syntax-check, --version, -h
+- Requires --list-hosts, --list-tasks, --list-tags, --syntax-check.
+- Allowed standalone flags: --help, --list-hosts, --list-tags, --list-tasks, --syntax-check, --version, -h
 - Allowed valued flags: --connection, --extra-vars, --inventory, --limit, --tags, --skip-tags, -C, -c, -e, -i, -l, -t
+
+**Examples:**
+
+- `ansible-playbook --syntax-check site.yml -i ./inventory/hosts.yml`
 
 ### `ansible-vault`
 <p class="cmd-url"><a href="https://docs.ansible.com/ansible/latest/cli/ansible-vault.html">https://docs.ansible.com/ansible/latest/cli/ansible-vault.html</a></p>
 
 - **decrypt**
-- **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --encrypt-vault-id, --help, -h. Valued: --encrypt-vault-id, --output, --vault-id, --vault-password-file. Positional args accepted
-- **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name, --vault-id, --vault-password-file
+- **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --help, -h. Valued: --encrypt-vault-id, --output. Positional args accepted
+- **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name
 - **help**: Positional args accepted
 - **view**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
@@ -50,6 +59,8 @@
 **Examples:**
 
 - `ansible-vault encrypt --output ./group_vars/all.enc ./group_vars/all.yml`
+- `ansible-vault encrypt --encrypt-vault-id dev ./a.yml`
+- `ansible-vault encrypt_string --stdin-name db_pass`
 
 ### `molecule`
 <p class="cmd-url"><a href="https://ansible.readthedocs.io/projects/molecule/usage/">https://ansible.readthedocs.io/projects/molecule/usage/</a></p>

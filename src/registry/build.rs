@@ -33,10 +33,16 @@ macro_rules! ensure {
 
 #[path = "build_archetype_flags.rs"]
 mod archetype_flags;
+#[path = "build_eval_safe.rs"]
+mod eval_safe;
 #[path = "build_lower.rs"]
 mod lower;
+#[path = "build_sub.rs"]
+mod sub;
 pub(crate) use archetype_flags::ArchetypeFlags;
+use eval_safe::*;
 use lower::{lower_behavior, lower_output};
+use sub::build_subs;
 
 /// `optional_valued` compiles down to membership in BOTH other lists, and that is the whole
 /// mechanism — the walk needs no third state.
@@ -82,7 +88,7 @@ pub(super) fn build_policy(
         bare: bare.unwrap_or(true),
         max_positional,
         min_positional: None,
-        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), single_dash_words: false },
+        tolerance: FlagTolerance { unknown, numeric_dash: numeric_dash.unwrap_or(false), ..FlagTolerance::strict() },
         passthrough: None,
     }
 }
@@ -233,454 +239,6 @@ fn assert_no_candidate_shadowed_by_glob(parent: &str, subs: &[TomlSub], first_ar
     Ok(())
 }
 
-/// Builds one SubSpec per alias (canonical name first, then each alias).
-/// All entries share the same kind via Clone — the dispatcher doesn't care
-/// which name the user invoked. `handler_policies` is consulted only by
-/// subs that set `policy = "key"`.
-pub(super) fn build_subs(
-    parent: &str,
-    toml: TomlSub,
-    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> Result<Vec<SubSpec>, String> {
-    let aliases = toml.aliases.clone();
-    let canonical = build_sub(parent, toml, handler_policies)?;
-    let mut out = Vec::with_capacity(1 + aliases.len());
-    for alias in aliases {
-        out.push(SubSpec {
-            name: alias,
-            kind: canonical.kind.clone(),
-            name_match: canonical.name_match,
-            policy_ref: canonical.policy_ref.clone(),
-            profile: canonical.profile.clone(),
-            flags: canonical.flags.clone(),
-            // An alias must inherit the allowlist: an empty list reads as "not yet enumerated" and
-            // would let the alias spelling accept flags its canonical name rejects.
-            allowed_standalone: canonical.allowed_standalone.clone(),
-            allowed_valued: canonical.allowed_valued.clone(),
-            allowed_unknown: canonical.allowed_unknown,
-            eval_safe: canonical.eval_safe,
-            eval_safe_flags: canonical.eval_safe_flags.clone(),
-            eval_safe_flag_values: canonical.eval_safe_flag_values.clone(),
-            eval_safe_required_flags: canonical.eval_safe_required_flags.clone(),
-            // As with the flag allowlist: an alias spelling must carry the canonical sub's stdout
-            // claim, or `$(git diff --name-only)` would be bounded while an aliased spelling of the
-            // same sub fell back to unpinnable — the mirror of the sub-alias gate hole.
-            output: canonical.output.clone(),
-            network_destination: canonical.network_destination,
-            destination_flag: canonical.destination_flag.clone(),
-            loopback_valued: canonical.loopback_valued.clone(),
-            loopback_effect: canonical.loopback_effect,
-            output_path_flags: canonical.output_path_flags.clone(),
-            writes_cwd: canonical.writes_cwd,
-        });
-    }
-    out.push(canonical);
-    Ok(out)
-}
-
-/// Enforce the research standard at build time (reading the TOML fields, so provenance is a
-/// production-validated part of the tree, not dead metadata). A sub with a `profile` must name a
-/// real archetype and cite a `fact` + `source`; each escalating `[[command.sub.flag]]` must name a
-/// real archetype (or the `unclassified` fail-closed escape) and cite its own `fact` + `source`. A
-/// mis-authored classification fails CLOSED — the registry panics at load rather than silently
-/// under-recording why a subcommand sits above the auto-approve line.
-fn assert_sub_provenance(parent: &str, toml: &TomlSub) -> Result<(), String> {
-    let cited = |o: &Option<String>| o.as_deref().is_some_and(|s| !s.trim().is_empty());
-    // A `judgment` is optional (the discretionary layer), but if given it must say something.
-    let judged = |o: &Option<String>| o.as_deref().is_none_or(|s| !s.trim().is_empty());
-    if let Some(p) = &toml.profile {
-        ensure!(
-            crate::engine::archetype::archetype(p).is_some(),
-            "{parent} sub `{}`: profile `{p}` is not a known archetype (archetypes.toml)",
-            toml.name,
-        );
-        ensure!(cited(&toml.fact), "{parent} sub `{}`: `profile` requires a `fact`", toml.name);
-        ensure!(cited(&toml.source), "{parent} sub `{}`: `profile` requires a `source`", toml.name);
-        ensure!(judged(&toml.judgment), "{parent} sub `{}`: `judgment`, if given, must not be blank", toml.name);
-        // A profiled sub must say what flags it accepts. The engine classifies it from its archetype
-        // without running the legacy flag walk, so an EMPTY list is not "nothing permitted" — before
-        // this was enforced it meant "everything permitted", and `git rebase --exec 'rm -rf /'`
-        // classified as an ordinary rebase. Declaring `tolerate_unknown_*` is the explicit way to say
-        // a surface is genuinely unbounded; saying nothing at all is not an option.
-        ensure!(
-            !toml.standalone.is_empty()
-                || !toml.valued.is_empty()
-                || toml.tolerate_unknown_short == Some(true)
-                || toml.tolerate_unknown_long == Some(true)
-                || !toml.flag.is_empty(),
-            "{parent} sub `{}`: a profiled sub must declare its flag surface — list `standalone`/\
-             `valued`, or set `tolerate_unknown_long = true` if it is genuinely unbounded",
-            toml.name,
-        );
-        // A profiled sub is a leaf: the engine classifies it by archetype, and its legacy kind is
-        // forced to deny-all (below) — a nested Branching would sidestep that.
-        ensure!(toml.sub.is_empty(), "{parent} sub `{}`: a profiled sub must be a leaf (no nested subs)", toml.name);
-    }
-    // `network_destination` classifies the destination onto the archetype's `locus.provenance`, so
-    // it only has meaning on a profiled sub.
-    ensure!(
-        toml.network_destination != Some(true) || toml.profile.is_some(),
-        "{parent} sub `{}`: `network_destination` requires a `profile`",
-        toml.name,
-    );
-    ensure!(
-        toml.destination_flag.is_none() || toml.network_destination == Some(true),
-        "{parent} sub `{}`: `destination_flag` requires `network_destination`",
-        toml.name,
-    );
-    // An output-file path is only meaningful on a profiled (`data-export`) sub — the engine gates
-    // that file's write onto the sub's derived profile.
-    ensure!(
-        toml.output_path_flags.is_empty() || toml.profile.is_some(),
-        "{parent} sub `{}`: `output_path_flags` requires a `profile`",
-        toml.name,
-    );
-    for f in &toml.flag {
-        ensure!(
-            f.classifies == "unclassified" || crate::engine::archetype::archetype(&f.classifies).is_some(),
-            "{parent} sub `{}` flag `{}`: classifies `{}` is not a known archetype",
-            toml.name,
-            f.name,
-            f.classifies,
-        );
-        ensure!(cited(&f.fact), "{parent} sub `{}` flag `{}`: requires a `fact`", toml.name, f.name);
-        ensure!(cited(&f.source), "{parent} sub `{}` flag `{}`: requires a `source`", toml.name, f.name);
-        ensure!(judged(&f.judgment), "{parent} sub `{}` flag `{}`: `judgment`, if given, must not be blank", toml.name, f.name);
-        ensure!(
-            !(f.when_absent == Some(true) && f.value_prefix.is_some()),
-            "{parent} sub `{}` flag `{}`: `when_absent` and `value_prefix` are mutually exclusive",
-            toml.name,
-            f.name,
-        );
-    }
-    Ok(())
-}
-
-/// `loopback_localizes` says "pointed at this machine, clear the facets the destination decides".
-/// Two things must hold or the claim is incoherent:
-///
-/// - it needs a `loopback_valued` flag, since nothing else can establish that the destination IS
-///   this machine;
-/// - a DESTROY archetype may not set it. The emulator claim is unverifiable — `ssh -L
-///   8000:dynamodb.<region>.amazonaws.com:443` makes `localhost:8000` production — and a wrong
-///   guess costs a stray write for a mutate and the data for a delete. Refusing it here rather than
-///   relying on the resolver's runtime skip means no future sub opts out by accident.
-fn assert_loopback_localizes_is_coherent(parent: &str, name: &str, toml: &TomlSub) -> Result<(), String> {
-    // Both the admission gate (`presents_unlisted_flag`) and the delta (`sub_loopback_localizes`)
-    // are reached only through the PROFILED sub walk, so on an unprofiled sub the declaration is
-    // inert — the flag would simply be missing from the legacy lists and deny, with nothing saying
-    // why. Fails closed, but silently, which is its own kind of bug.
-    ensure!(
-        toml.loopback_valued.is_empty() || toml.profile.is_some(),
-        "{parent} sub `{name}`: `loopback_valued` needs `profile` — the gate is only consulted on \
-         a profiled sub, so here it would do nothing at all",
-    );
-    if !toml.loopback_localizes.unwrap_or(false) {
-        return Ok(());
-    }
-    ensure!(
-        !toml.loopback_valued.is_empty(),
-        "{parent} sub `{name}`: `loopback_localizes` requires a `loopback_valued` flag — without \
-         one nothing can establish that the destination is this machine",
-    );
-    // Asked of the archetype's OPERATION facet, not of its name. A name test passes today only
-    // because every destroy archetype happens to be called `*destroy*`; a later `remote-wipe` or
-    // `bucket-purge` carrying `operation = "destroy"` would sail through it and localize. Deciding
-    // by name rather than behavior is the exact mistake this classifier exists to avoid.
-    let profile = toml.profile.as_deref().unwrap_or_default();
-    let operation = crate::engine::archetype::archetype(profile).map(|c| c.operation);
-    ensure!(
-        operation != Some(crate::engine::facet::Operation::Destroy),
-        "{parent} sub `{name}`: `profile = \"{profile}\"` carries `operation = destroy` and may \
-         not set `loopback_localizes` — a loopback endpoint cannot be verified (an SSH tunnel makes \
-         localhost mean production), and that is only unrecoverable for destroy",
-    );
-    Ok(())
-}
-
-pub(super) fn build_sub(
-    parent: &str,
-    mut toml: TomlSub,
-    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
-) -> Result<SubSpec, String> {
-    check_no_legacy_positional_style(&toml.name, toml.positional_style)?;
-    let name = toml.name.clone();
-    let policy_ref = toml.policy.clone();
-    let profile = toml.profile.clone();
-    assert_sub_provenance(parent, &toml)?;
-    assert_no_candidate_shadowed_by_glob(&format!("{parent} {}", toml.name), &toml.sub, &toml.first_arg)?;
-    let flags = std::mem::take(&mut toml.flag)
-        .into_iter()
-        .map(|f| crate::registry::types::FlagProvenance {
-            name: f.name,
-            classifies: f.classifies,
-            value_prefix: f.value_prefix,
-            when_absent: f.when_absent.unwrap_or(false),
-        })
-        .collect();
-    // A profiled sub is engine-classified and above the auto-approve line. Its LEGACY dispatch is
-    // reached only when the engine ABSTAINS — e.g. a global flag (`git -c …`, `git -C …`) intervenes
-    // before the subcommand, so `sub_archetypes`'s walk stops early. In that case the legacy kind
-    // MUST deny outright (fail-closed), never fall through to a permissive default: force bare off,
-    // no flags, no positionals.
-    // Preserve the DECLARED lists before the legacy kind is zeroed: the engine classifies a profiled
-    // sub from its archetype without ever running the legacy flag walk, so these are the only copy
-    // that survives, and `sub_archetypes` validates against them.
-    let (allowed_standalone, allowed_valued) = (toml.standalone.clone(), toml.valued.clone());
-    let allowed_unknown = match (toml.tolerate_unknown_short.unwrap_or(false), toml.tolerate_unknown_long.unwrap_or(false)) {
-        (false, false) => UnknownTolerance::Strict,
-        (true, false) => UnknownTolerance::Short,
-        (false, true) => UnknownTolerance::Long,
-        (true, true) => UnknownTolerance::Both,
-    };
-    if profile.is_some() {
-        toml.bare = Some(false);
-        toml.standalone = Vec::new();
-        toml.valued = Vec::new();
-        toml.max_positional = Some(0);
-    }
-    let eval_safe = toml.eval_safe.unwrap_or(false);
-    let eval_safe_flags = std::mem::take(&mut toml.eval_safe_flags);
-    let eval_safe_flag_values = std::mem::take(&mut toml.eval_safe_flag_values);
-    let eval_safe_required_flags = std::mem::take(&mut toml.eval_safe_required_flags);
-    let network_destination = toml.network_destination.unwrap_or(false);
-    let destination_flag = toml.destination_flag.clone();
-    let output_path_flags = toml.output_path_flags.clone();
-    let loopback_valued = toml.loopback_valued.clone();
-    let loopback_effect = if toml.loopback_localizes.unwrap_or(false) { LoopbackEffect::Localizes } else { LoopbackEffect::AdmitOnly };
-    assert_loopback_localizes_is_coherent(parent, &name, &toml)?;
-    let valued_for_check = toml.valued.clone();
-    assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags)?;
-    assert_eval_safe_flag_values_consistent(parent, &name, &eval_safe_flags, &eval_safe_flag_values)?;
-    assert_eval_safe_valued_flags_declared(parent, &name, &eval_safe_flags, &valued_for_check, &eval_safe_flag_values)?;
-    assert_eval_safe_required_flags_consistent(parent, &name, &eval_safe_flags, &eval_safe_required_flags)?;
-    assert_sub_eval_safe_only_on_leaf(parent, &toml)?;
-    let writes_cwd = super::cwd_writes::lower(parent, &name, toml.writes_cwd.as_deref(), &toml.output_dirs, toml.executor.as_deref())?;
-    let output = lower_output(&format!("{parent} {name}"), toml.output.as_ref())?;
-    Ok(SubSpec {
-        name,
-        output,
-        writes_cwd,
-        name_match: if toml.per_database { NameMatch::WithDatabaseSuffix } else { NameMatch::Exact },
-        kind: super::passthrough_gate::build_sub_kind(parent, toml, handler_policies)?,
-        policy_ref,
-        profile,
-        flags,
-        allowed_standalone,
-        allowed_valued,
-        allowed_unknown,
-        eval_safe,
-        eval_safe_flags,
-        eval_safe_flag_values,
-        eval_safe_required_flags,
-        network_destination,
-        destination_flag,
-        loopback_valued,
-        loopback_effect,
-        output_path_flags,
-    })
-}
-
-fn assert_eval_safe_flag_values_consistent(
-    parent: &str,
-    name: &str,
-    eval_safe_flags: &[String],
-    eval_safe_flag_values: &std::collections::HashMap<String, Vec<String>>,
-) -> Result<(), String> {
-    for (flag, values) in eval_safe_flag_values {
-        if !eval_safe_flags.iter().any(|f| f == flag) {
-            fail!(
-                "command '{parent}' sub `{name}` lists `{flag}` in \
-                 `eval_safe_flag_values` but not in `eval_safe_flags`. \
-                 A value allowlist only takes effect when the flag itself \
-                 is allowed. Add `{flag}` to `eval_safe_flags` or remove \
-                 the value entry."
-            );
-        }
-        for value in values {
-            if value.is_empty() || !value.chars().all(is_bare_literal_char) {
-                fail!(
-                    "command '{parent}' sub `{name}` has eval_safe_flag_values \
-                     for `{flag}` containing value `{value:?}` with characters \
-                     outside `[a-zA-Z0-9_./=-]`. The allowed-value set must \
-                     itself be bare-literal so it can never embed a shell-\
-                     expansion trigger into the substituted invocation."
-                );
-            }
-        }
-    }
-    Ok(())
-}
-
-fn is_bare_literal_char(c: char) -> bool {
-    c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | '/' | '=')
-}
-
-fn assert_eval_safe_required_flags_consistent(
-    parent: &str,
-    name: &str,
-    eval_safe_flags: &[String],
-    eval_safe_required_flags: &[String],
-) -> Result<(), String> {
-    for flag in eval_safe_required_flags {
-        if !eval_safe_flags.iter().any(|f| f == flag) {
-            fail!(
-                "command '{parent}' sub `{name}` lists `{flag}` in \
-                 `eval_safe_required_flags` but not in `eval_safe_flags`. \
-                 A required-flag constraint must be a subset of the \
-                 allowed-flag set — otherwise the flag is required AND \
-                 immediately denied. Add `{flag}` to `eval_safe_flags` or \
-                 remove it from `eval_safe_required_flags`."
-            );
-        }
-    }
-    Ok(())
-}
-
-/// Every valued flag in `eval_safe_flags` must declare its value
-/// posture in `eval_safe_flag_values`: either a concrete value
-/// allowlist (`["env", "fish"]`) OR the explicit-unrestricted form
-/// (`[]`). Without this, a contributor adding a short alias like
-/// `-f` for an already-tagged `--format` would silently widen the
-/// eval-safe surface to any value of `-f` — the v0.196.0 aws
-/// near-miss in disguise.
-fn assert_eval_safe_valued_flags_declared(
-    parent: &str,
-    name: &str,
-    eval_safe_flags: &[String],
-    valued: &[String],
-    eval_safe_flag_values: &std::collections::HashMap<String, Vec<String>>,
-) -> Result<(), String> {
-    for flag in eval_safe_flags {
-        if !valued.iter().any(|v| v == flag) {
-            continue;
-        }
-        if !eval_safe_flag_values.contains_key(flag) {
-            fail!(
-                "command '{parent}' sub `{name}` lists `{flag}` in \
-                 `eval_safe_flags` AND in `valued`, but `{flag}` has no \
-                 entry in `eval_safe_flag_values`. Every valued flag \
-                 tagged eval-safe must declare its value posture: \
-                 either a concrete allowlist of safe values \
-                 (`{flag} = [\"value-a\", \"value-b\"]`) or the \
-                 explicit-unrestricted form (`{flag} = []`) signaling \
-                 the contributor vetted that any value preserves shell-\
-                 init output. Omitting an entry means the walker can't \
-                 tell whether the value-following-flag is supposed to \
-                 be checked, and a future short alias of `{flag}` \
-                 could silently widen the eval-safe surface."
-            );
-        }
-    }
-    Ok(())
-}
-
-fn assert_eval_safe_flags_require_tag(parent: &str, name: &str, eval_safe: bool, flags: &[String]) -> Result<(), String> {
-    if !flags.is_empty() && !eval_safe {
-        fail!(
-            "command '{parent}' sub `{name}` declares `eval_safe_flags` without \
-             `eval_safe = true`. The flag allowlist only takes effect when the \
-             sub is tagged eval-safe. Add `eval_safe = true` or drop \
-             `eval_safe_flags`."
-        );
-    }
-    Ok(())
-}
-
-fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) -> Result<(), String> {
-    if toml.eval_safe != Some(true) {
-        return Ok(());
-    }
-    if !toml.sub.is_empty() {
-        fail!(
-            "command '{parent}' sub `{}` sets `eval_safe = true` AND has \
-             nested [[command.sub.sub]] blocks. eval_safe must be tagged on \
-             a leaf node — move the tag onto the specific sub-sub that emits \
-             shell-init code. Otherwise the walker accepts any unmatched \
-             sub-sub name as a positional, which is counter-intuitive.",
-            toml.name,
-        );
-    }
-    if toml.handler.is_some() {
-        fail!(
-            "command '{parent}' sub `{}` sets `eval_safe = true` AND \
-             `handler = \"...\"`. Handler-based subs run Rust dispatch logic \
-             whose shape the eval walker cannot introspect — eval-safety \
-             requires a declarative leaf the registry can reason about.",
-            toml.name,
-        );
-    }
-    if toml.delegate_after.is_some() || toml.delegate_skip.is_some() {
-        fail!(
-            "command '{parent}' sub `{}` sets `eval_safe = true` AND \
-             delegates to an inner command (delegate_after / delegate_skip). \
-             The inner command's output is unrelated to this sub's vetting \
-             — drop `eval_safe`.",
-            toml.name,
-        );
-    }
-    Ok(())
-}
-
-fn assert_eval_safe_tagged_command_has_researched_version(toml: &TomlCommand) -> Result<(), String> {
-    let command_tagged = toml.eval_safe == Some(true);
-    let any_sub_tagged = toml_has_any_eval_safe_sub(&toml.sub);
-    if !command_tagged && !any_sub_tagged {
-        return Ok(());
-    }
-    if toml.researched_version.is_none() {
-        fail!(
-            "command '{}' has `eval_safe = true` (on the command or a sub) \
-             but no `researched_version`. eval-safe tags pin a per-tag trust \
-             claim against a specific upstream snapshot — add the version \
-             you researched (e.g. `researched_version = \"v2026.5.3\"`) so \
-             the next contributor knows what to diff against.",
-            toml.name,
-        );
-    }
-    Ok(())
-}
-
-fn toml_has_any_eval_safe_sub(subs: &[TomlSub]) -> bool {
-    subs.iter().any(|s| s.eval_safe == Some(true) || toml_has_any_eval_safe_sub(&s.sub))
-}
-
-fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) -> Result<(), String> {
-    if toml.eval_safe != Some(true) {
-        return Ok(());
-    }
-    if !toml.sub.is_empty() {
-        fail!(
-            "command '{}' sets `eval_safe = true` at the command level AND \
-             has [[command.sub]] blocks. Move the tag onto the specific \
-             sub that emits shell-init code (e.g. `mise activate`) — \
-             command-level tagging on a structured command is counter-\
-             intuitive.",
-            toml.name,
-        );
-    }
-    // Command-level eval_safe IS allowed alongside `handler = "..."`: the walker reads
-    // `spec.eval_safe` at the leaf, and the contributor vouches that every invocation the handler
-    // accepts AND that passes the eval_safe_* flag checks prints shell-init stdout (typically
-    // narrowed via `eval_safe_required_flags`; see fzf's TOML).
-    if toml.wrapper.is_some() {
-        fail!(
-            "command '{}' sets `eval_safe = true` AND `[command.wrapper]`. \
-             Wrappers forward to an inner command — tagging the wrapper \
-             would tag every wrapped invocation. Drop `eval_safe`.",
-            toml.name,
-        );
-    }
-    if toml.deny.unwrap_or(false) {
-        fail!(
-            "command '{}' sets both `deny = true` and `eval_safe = true`. \
-             These are contradictory — deny silently dominates. Drop one.",
-            toml.name,
-        );
-    }
-    Ok(())
-}
-
 pub(super) fn build_sub_kind_unchecked(
     parent: &str,
     toml: TomlSub,
@@ -699,10 +257,14 @@ pub(super) fn build_sub_kind_unchecked(
         });
     }
     if toml.allow_all.unwrap_or(false) {
-        return Ok(DispatchKind::Policy { policy: OwnedPolicy::allow_all(), level: toml.level.unwrap_or(TomlLevel::Inert).into() });
+        return Ok(DispatchKind::Policy {
+            policy: OwnedPolicy::allow_all(),
+            level: toml.level.unwrap_or(TomlLevel::Inert).into(),
+            shape: None,
+        });
     }
     if let Some(sep) = toml.delegate_after {
-        return Ok(DispatchKind::DelegateAfterSeparator { separator: sep });
+        return Ok(DispatchKind::DelegateAfterSeparator(DelegateAfter::new(sep, toml.standalone, toml.valued)));
     }
     if let Some(skip) = toml.delegate_skip {
         let shape = crate::policy::PositionalShape::from_toml(
@@ -754,6 +316,7 @@ fn build_policy_sub_kind(
     toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
 ) -> Result<DispatchKind, String> {
+    let shape = sub_shape(parent, &toml)?;
     let mut policy = if let Some(key) = &toml.policy {
         if !toml.standalone.is_empty() || !toml.valued.is_empty() {
             fail!(
@@ -787,10 +350,6 @@ fn build_policy_sub_kind(
         let Some(kind) = ExecutorKind::from_name(name) else {
             fail!("command '{parent}' sub `{}`: unknown executor `{name}` (known: file, project)", toml.name)
         };
-        let shape = crate::policy::PositionalShape::from_toml(
-            toml.positional_shape.as_deref(),
-            &format!("command '{parent}' sub `{}`", toml.name),
-        )?;
         return Ok(DispatchKind::Executor {
             policy,
             level,
@@ -822,7 +381,7 @@ fn build_policy_sub_kind(
     if !toml.require_any.is_empty() {
         return Ok(DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false });
     }
-    Ok(DispatchKind::Policy { policy, level })
+    Ok(DispatchKind::Policy { policy, level, shape })
 }
 
 /// Diagnostic for a configuration class that silently breaks flag dispatch:
@@ -836,28 +395,17 @@ fn assert_flat_or_structured(toml: &TomlCommand) -> Result<(), String> {
     if toml.sub.is_empty() {
         return Ok(());
     }
-    let mut conflicts = Vec::new();
-    if !toml.standalone.is_empty() {
-        conflicts.push("standalone");
-    }
-    if !toml.valued.is_empty() {
-        conflicts.push("valued");
-    }
-    if toml.max_positional.is_some() {
-        conflicts.push("max_positional");
-    }
-    if toml.tolerate_unknown_short.is_some() {
-        conflicts.push("tolerate_unknown_short");
-    }
-    if toml.tolerate_unknown_long.is_some() {
-        conflicts.push("tolerate_unknown_long");
-    }
-    if toml.numeric_dash.is_some() {
-        conflicts.push("numeric_dash");
-    }
-    if toml.single_dash_words.is_some() {
-        conflicts.push("single_dash_words");
-    }
+    let set = [
+        ("standalone", !toml.standalone.is_empty()),
+        ("valued", !toml.valued.is_empty()),
+        ("max_positional", toml.max_positional.is_some()),
+        ("tolerate_unknown_short", toml.tolerate_unknown_short.is_some()),
+        ("tolerate_unknown_long", toml.tolerate_unknown_long.is_some()),
+        ("numeric_dash", toml.numeric_dash.is_some()),
+        ("single_dash_words", toml.single_dash_words.is_some()),
+        ("reads_commands_from", !toml.reads_commands_from.is_empty()),
+    ];
+    let conflicts: Vec<&str> = set.iter().filter(|(_, present)| *present).map(|(name, _)| *name).collect();
     if !conflicts.is_empty() {
         fail!(
             "command '{}' mixes flat-style top-level fields ({}) with [[command.sub]] blocks. \
@@ -969,7 +517,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref())?;
     let output = lower_output(&toml.name, toml.output.as_ref())?;
     let writes_cwd = super::cwd_writes::lower(&toml.name, "<command>", toml.writes_cwd.as_deref(), &toml.output_dirs, None)?;
-    let line_checks = LineChecks::lower(&toml.name, toml.env_assignment_positionals, &toml.flag_value_shapes)?;
+    let line_checks = LineChecks::lower(&toml.name, &toml.flag_value_shapes)?;
+    let hooks = SpecHooks::lower(toml.env_assignment_positionals, toml.ghc_rts);
     let archetype_flags = archetype_flags::lower(&toml.name, toml.flag, &toml.flag_valued, &toml.valued, toml.wrapper.as_ref())?;
     if toml.deny.unwrap_or(false) {
         return Ok(CommandSpec {
@@ -991,7 +540,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
-            kind: DispatchKind::Policy { policy: OwnedPolicy::deny_all(), level: SafetyLevel::Inert },
+            hooks,
+            kind: DispatchKind::Policy { policy: OwnedPolicy::deny_all(), level: SafetyLevel::Inert, shape: None },
         });
     }
     if let Some(vc) = toml.verb_chain {
@@ -1014,6 +564,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
+            hooks,
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
         });
     }
@@ -1051,6 +602,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
+            hooks,
             kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body, subs, fallback, handler_policies, matrices },
         });
     }
@@ -1078,9 +630,10 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
                 output,
                 writes_cwd,
                 line_checks: line_checks.clone(),
+                hooks,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
-                    subs: filter_candidates(toml.sub)?
+                    subs: filter_candidates(super::glob_flags::with_wrapper_flags(toml.sub, &w.standalone, &w.valued))?
                         .map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
                         .collect::<Result<Vec<_>, _>>()?
                         .into_iter()
@@ -1118,6 +671,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
+            hooks,
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -1150,6 +704,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
+            hooks,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: filter_candidates(toml.sub)?
@@ -1178,6 +733,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
         toml.tolerate_unknown_long, toml.numeric_dash,
     );
     policy.tolerance.single_dash_words = toml.single_dash_words.unwrap_or(false);
+    super::policy::reads_commands_from(&mut policy.tolerance, &toml.name, &toml.reads_commands_from)?;
 
     let level = toml.level.unwrap_or(TomlLevel::Inert).into();
 
@@ -1201,6 +757,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
+            hooks,
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -1231,6 +788,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
+            hooks,
             kind: DispatchKind::WriteFlagged { policy, base_level: level, write_flags: toml.write_flags },
         });
     }
@@ -1255,12 +813,14 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
             output,
             writes_cwd,
             line_checks: line_checks.clone(),
+            hooks,
             kind: DispatchKind::RequireAny { require_any: toml.require_any, policy, level, accept_bare_help: false },
         });
     }
 
     Ok(CommandSpec {
         line_checks: line_checks.clone(),
+        hooks,
         name: toml.name,
         description: desc,
         aliases: toml.aliases,
@@ -1278,7 +838,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> Result<Command
         behavior,
         output,
         writes_cwd,
-        kind: DispatchKind::Policy { policy, level },
+        kind: DispatchKind::Policy { policy, level, shape: None },
     })
 }
 
@@ -1325,6 +885,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
                 // would let the alias put a variable into the environment unclassified while the
                 // canonical spelling denied.
                 line_checks: spec.line_checks.clone(),
+                hooks: spec.hooks,
                 name: spec.name.clone(),
                 description: spec.description.clone(),
                 aliases: vec![],
@@ -1365,6 +926,15 @@ mod tests {
             "[[command]]\nname = \"tc\"\nsingle_dash_words = true\n[[command.sub]]\nname = \"ls\"\n",
             "single_dash_words",
         );
+    }
+
+    #[test]
+    fn reads_commands_from_is_flat_only_and_names_known_sources() {
+        crate::registry::tests::assert_rejected(
+            "[[command]]\nname = \"tc\"\nreads_commands_from = [\"plus\"]\n[[command.sub]]\nname = \"ls\"\n",
+            "reads_commands_from",
+        );
+        crate::registry::tests::assert_rejected("[[command]]\nname = \"tc\"\nreads_commands_from = [\"argv\"]\n", "argv");
     }
 
     /// Strategies for built-policy inputs. `flag_name` keeps test strings small and distinct

@@ -26,9 +26,6 @@
 7z	-stx
 ameba	--fail-level
 ansible-lint	--profile
-ansible-vault encrypt	--encrypt-vault-id
-ansible-vault encrypt_string	--stdin-name
-ansible-vault view	--vault-password-file
 ar	--plugin
 ar	--target
 arduino-cli compile	--show-properties
@@ -147,19 +144,6 @@ biber	--output-indent
 biber	--output-resolve
 biber	--output-safecharsset
 biber	--recodedata
-borg [wrapper]	--bypass-lock
-borg [wrapper]	--lock-wait
-borg check	--archives-only
-borg check	--first
-borg check	--last
-borg check	--sort-by
-borg info	--first
-borg info	--last
-borg info	--sort-by
-borg list	--first
-borg list	--format
-borg list	--last
-borg list	--sort-by
 brotli	--quality
 brotli	--suffix
 brotli	--window
@@ -1201,8 +1185,6 @@ svn proplist	-r
 svn status	--changelist
 svn status	--config-dir
 svn status	--depth
-task	-d
-task	-t
 tcpdump	-B
 tcpdump	-c
 tcpdump	-C
@@ -1377,12 +1359,6 @@ xz	-C
 xz	-F
 xz	-T
 ytt	--symlink-allow
-zip	-n
-zip	-O
-zip	-P
-zip	-s
-zip	-t
-zip	-Z
 zstd	--adapt
 zstd	--filelist
 zstd	--format

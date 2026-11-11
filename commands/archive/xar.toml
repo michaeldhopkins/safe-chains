@@ -1,0 +1,33 @@
+[[command]]
+name = "xar"
+description = "eXtensible ARchiver (used for .pkg and similar). One of -c (create), -t (list), -x (extract) is required; all three require -f to name the archive. Flags include --compression, --compression-args, --toc-cksum, --file-cksum, --exclude, --keep-existing, -C (chdir before extract). -s names a file subdocuments are extracted to, or an XML file added as one; --dump-toc writes the XML header to the file it names; --extract-subdoc writes <name>.xml. Apple has deprecated xar and recommends alternative formats. Extracting (-x) is refused, as tar extraction is: the archive decides the paths written and their modes."
+url = "https://mackyle.github.io/xar/"
+researched_version = "xar 1.8 (macOS bundled)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--coalesce-heap", "--distribution",
+    "--dump-header", "--dump-toc-cksum",
+    "--keep-existing", "--keep-setuid",
+    "--link-same", "--list-subdocs",
+    "-P", "-a", "-c",
+    "-j", "-k", "-l", "-p",
+    "-t", "-v", "-x", "-z",
+]
+valued = [
+    "--compression", "--compression-args",
+    "--dump-toc", "--exclude",
+    "--extract-subdoc", "--file-cksum",
+    "--no-compress",
+    "--prop-exclude", "--prop-include",
+    "--rsize", "--toc-cksum",
+    "-C", "-f", "-n", "-s",
+]
+examples_safe = ["xar -c -f ./out.xar ./src", "xar -t -f ./archive.xar"]
+
+# -f is the archive: written by -c, read by -t. Gating the strictest role is the fail-closed choice,
+# as pax, 7z and cpio do. The operands of -c are hierarchies xar walks and stores.
+[command.path_gate]
+positional = "read_tree"
+flags = { "-f" = "write", "-C" = "write", "-s" = "write", "--dump-toc" = "write", "--extract-subdoc" = "write" }

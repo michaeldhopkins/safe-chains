@@ -3543,12 +3543,17 @@ ktrace trace -x x	inert
 ktrace trace x	inert
 ktrace x	denied
 kubectl	denied
+kubectl --filename x	denied
 kubectl --help	inert
+kubectl --help --filename x	denied
 kubectl --help --version	denied
 kubectl --help x	denied
+kubectl --kustomize x	denied
 kubectl --version	inert
 kubectl -V	inert
+kubectl -f x	denied
 kubectl -h	inert
+kubectl -k x	denied
 kubectl api-resources	inert
 kubectl api-resources --api-group x	inert
 kubectl api-resources --help	inert
@@ -3609,14 +3614,17 @@ kubectl config get-contexts x	inert
 kubectl config view	inert
 kubectl config view --flatten	inert
 kubectl config view --flatten --help	inert
-kubectl config view --flatten --output x	inert
+kubectl config view --flatten --minify	inert
+kubectl config view --flatten --output x	denied
+kubectl config view --flatten --raw	denied
 kubectl config view --flatten x	inert
 kubectl config view --help	inert
 kubectl config view --minify	inert
-kubectl config view --output x	inert
-kubectl config view --raw	inert
+kubectl config view --output x	denied
+kubectl config view --raw	denied
+kubectl config view --raw=true	denied
 kubectl config view -h	inert
-kubectl config view -o x	inert
+kubectl config view -o x	denied
 kubectl config view x	inert
 kubectl config x	denied
 kubectl describe	denied
@@ -3639,6 +3647,7 @@ kubectl diff --field-manager --filename x	inert
 kubectl diff --field-manager --force-conflicts	inert
 kubectl diff --field-manager x	inert
 kubectl diff --filename x	inert
+kubectl diff --filename=~/.aws/credentials	denied
 kubectl diff --force-conflicts	inert
 kubectl diff --help	inert
 kubectl diff --kustomize x	inert
@@ -3647,8 +3656,10 @@ kubectl diff --prune-allowlist x	inert
 kubectl diff --selector x	inert
 kubectl diff --server-side	inert
 kubectl diff -f x	inert
+kubectl diff -f ~/.ssh/id_rsa	denied
 kubectl diff -h	inert
 kubectl diff -k x	inert
+kubectl diff -k ~/.ssh	denied
 kubectl diff -l x	inert
 kubectl diff x	inert
 kubectl events	inert
@@ -3659,13 +3670,13 @@ kubectl events --all-namespaces x	inert
 kubectl events --for x	inert
 kubectl events --help	inert
 kubectl events --namespace x	inert
-kubectl events --output x	inert
+kubectl events --output x	denied
 kubectl events --types x	inert
 kubectl events --watch	inert
 kubectl events -A	inert
 kubectl events -h	inert
 kubectl events -n x	inert
-kubectl events -o x	inert
+kubectl events -o x	denied
 kubectl events -w	inert
 kubectl events x	inert
 kubectl explain	denied
@@ -3789,22 +3800,27 @@ kustomize --version	denied
 kustomize -h	inert
 kustomize -o x	denied
 kustomize build	inert
-kustomize build --enable-alpha-plugins	inert
-kustomize build --enable-alpha-plugins --enable-exec	inert
-kustomize build --enable-alpha-plugins --env x	inert
-kustomize build --enable-alpha-plugins x	inert
-kustomize build --enable-exec	inert
-kustomize build --enable-helm	inert
+kustomize build --enable-alpha-plugins	denied
+kustomize build --enable-exec	denied
+kustomize build --enable-helm	denied
 kustomize build --env x	inert
 kustomize build --helm-command x	inert
 kustomize build --help	inert
-kustomize build --load-restrictor	inert
+kustomize build --help --env x	inert
+kustomize build --help -h	inert
+kustomize build --help x	inert
+kustomize build --load-restrictor LoadRestrictionsNone	denied
+kustomize build --load-restrictor LoadRestrictionsRootOnly	inert
+kustomize build --load-restrictor x	denied
+kustomize build --load-restrictor=LoadRestrictionsNone ./overlays/dev	denied
 kustomize build --mount x	inert
 kustomize build --output x	inert
 kustomize build -h	inert
 kustomize build -o ./rendered.yaml	inert
 kustomize build -o x	inert
 kustomize build ./overlays/dev	inert
+kustomize build github.com/kubernetes-sigs/kustomize//examples/helloWorld?ref=v5.8.1	denied
+kustomize build https://github.com/org/repo/overlays/dev	denied
 kustomize build x	inert
 kustomize version	inert
 kustomize version --help	inert

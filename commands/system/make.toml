@@ -3,20 +3,16 @@ name = "make"
 description = "GNU Make, the classic Unix build automation tool that executes shell commands defined in Makefiles to compile, link, and install software. Normal invocation runs arbitrary shell commands from Makefile recipes, which can do anything the current user can do. The covered modes are dry-run (-n/--dry-run) and print-database (-p), which print what would be executed or dump the internal rule database without actually running any recipes. Note that -n still parses the Makefile and evaluates $(shell ...) calls in variable assignments, so a malicious Makefile can still execute code during the parse phase even in dry-run mode. GNU Make's interface is extremely stable with infrequent releases."
 url = "https://www.gnu.org/software/make/manual/make.html"
 level = "Inert"
+writes_cwd = "code"
 bare = false
-require_any = ["-n", "--dry-run", "--just-print", "--recon", "-p", "--print-data-base"]
-examples_safe = [
-  "make -n",
-  "make -n -j 4",
-  "make -n -C .",
-  "make -n -f Makefile",
-  "make -p",
-]
+require_any = ["-n", "--dry-run", "--just-print", "--recon"]
 standalone = [
     "--dry-run", "--help", "--just-print", "--print-data-base",
     "--question", "--recon", "--version",
     "-V", "-h", "-n", "-p", "-q",
 ]
+examples_safe = ["make -n", "make -n -j 4", "make -n -C .", "make -n -C src", "make -n -f Makefile", "make -nq"]
+examples_denied = ["make -p", "make -n -C /tmp/x", "make -n -f /tmp/x/Makefile", "make -n A=1", "make -n -f -"]
 valued = [
     "--directory", "--file", "--jobs", "--makefile",
     "-C", "-f", "-j",
@@ -25,4 +21,4 @@ valued = [
 # `-n` still evaluates `$(shell …)` while reading the Makefile, so the directory (`-C`) and the
 # makefile (`-f`) select code. `-j` is a job count.
 [command.path_gate]
-flags = { "-C" = "exec", "--directory" = "exec", "-f" = "exec", "--file" = "exec", "--makefile" = "exec", "-j" = "ignore", "--jobs" = "ignore" }
+flags = { "--directory" = "exec", "-C" = "exec", "--file" = "exec", "--makefile" = "exec", "-f" = "exec", "-j" = "ignore", "--jobs" = "ignore" }

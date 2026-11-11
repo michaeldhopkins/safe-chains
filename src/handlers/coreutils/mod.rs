@@ -1,9 +1,14 @@
+pub(crate) mod archive_extract;
 pub(crate) mod awk;
+pub(crate) mod chmod_mode;
 mod find;
 pub(crate) mod find_skip;
 mod grep;
 mod net;
+pub(crate) mod rsync_remote;
+pub(crate) mod rsync_shell;
 pub(crate) mod sed;
+pub(crate) mod stdin_names;
 mod tar;
 
 use crate::parse::Token;

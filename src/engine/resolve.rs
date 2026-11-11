@@ -15,10 +15,12 @@ use crate::parse::{Token, has_flag};
 mod backup;
 mod capability;
 mod path_verdicts;
+mod tar_paths;
 mod transfer;
 pub(crate) use path_verdicts::{
     read_content_verdict, read_tree_verdict, rebind_is_stricter_than_write, worst_path_element, write_target_verdict,
 };
+pub(crate) use tar_paths::tar_bound;
 use transfer::resolve_transfer;
 mod flags;
 pub(crate) mod frozen_reach;
@@ -125,9 +127,9 @@ pub(crate) fn execute_file_verdict(path: &str) -> crate::verdict::Verdict {
     // command's own handler gates the network, and a URL's `..` is a path segment rather than a
     // filesystem escape. In an EXECUTOR slot that reasoning inverts: the thing has to be a local
     // file the project owns, and `http://…` is not one however harmless its `..` are. Third member
-    // of the same family as the glob and process-substitution rules above.
-    if crate::engine::resolve::locus::is_url(path) {
-        return crate::engine::bridge::project(&worst("URL executor — the code that would run is not a workspace file (§6)"));
+    // of the same family as the glob and process-substitution rules above, as is any file below `node_modules` or `.git`.
+    if crate::engine::resolve::locus::is_url(path) || frozen_reach::runs_unreviewed_code(path) {
+        return crate::engine::bridge::project(&worst("URL, package or frozen-folder executor — the code is not the project's own (§6)"));
     }
     // An executor slot names a PATH. A value carrying whitespace is a command LINE, and judging it
     // as one path is how `BORG_RSH='sh -c evil'` and `rsync -e 'sh -c evil'` were auto-approved:
@@ -181,7 +183,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
 }
 
 fn resolve_command(tokens: &[Token]) -> Option<Profile> {
-    let arg0 = tokens.first()?;
+    let arg0 = tokens.first().filter(|t| !crate::handlers::direct_script::is_relative_command_path(t.as_str()))?;
     // Canonicalize the invoked token through the registry's alias map (`gcat` → `cat`) BEFORE the
     // resolver lookup: Homebrew installs GNU coreutils as g-prefixed aliases, and without this
     // they'd miss every resolver and fall through to the ungated legacy classifier (a fail-open —
@@ -308,7 +310,7 @@ fn resolve_command(tokens: &[Token]) -> Option<Profile> {
     // dd/tar/sed/grep declare a `hook`). No declaration → the command is unresearched for the
     // engine, so return `None` (the caller falls back to the legacy classifier).
     let spec = crate::registry::command_behavior(canonical)?;
-    // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`, `~/bin/grep`)
+    // A resolvable basename reached via a NON-STANDARD path (`/tmp/cat`, `~/bin/grep`)
     // is not necessarily the real tool — a planted binary named `cat` would be certified as safe
     // coreutils. Don't certify it; worst-case (§0). Bare names and standard bin paths are
     // trusted. (Legacy classifies purely by basename and inherits the spoof; the engine is
@@ -1035,13 +1037,12 @@ fn grep_long_known(flag: &str) -> bool {
     KNOWN.contains(&name)
 }
 
-/// The long spelling of the dangerous grep short `-R`: `--dereference-recursive` (follows
-/// symlinks out of the classified locus, M2). Recognized so both spellings worst-case; every
-/// OTHER unrecognized `--token` is a search pattern, not a flag. (`--perl-regexp`/`-P` is NOT
-/// here — PCRE2 executes no code, so it is benign, like `-E`/`-F`.)
+/// `--dereference-recursive`, the long `-R` (follows symlinks out of the classified locus, M2), and `--file`. GNU grep
+/// takes any unambiguous prefix of a long option, so a prefix counts too. Every OTHER unrecognized `--token` is a
+/// search pattern, not a flag. (`--perl-regexp`/`-P` is NOT here — PCRE2 executes no code, so it is benign, like `-E`.)
 fn grep_long_dangerous(flag: &str) -> bool {
     let name = flag.split('=').next().unwrap_or(flag);
-    matches!(name, "--dereference-recursive")
+    name.len() > 3 && ["--dereference-recursive", "--file"].iter().any(|option| option.starts_with(name))
 }
 
 /// `dd if=IN of=OUT bs=… …` — the operand-model breaker: `dd` takes NO getopt flags or
@@ -1147,18 +1148,6 @@ type TarPositional<'a> = (Option<String>, &'a str);
 /// A tar positional borrowed for classification: (`-C` dir, path).
 type TarRef<'a> = (Option<&'a str>, &'a str);
 
-/// A tar member/archive path resolved against an active `-C` directory: `DIR/path` for a
-/// relative path, or `path` unchanged when there is no `-C` or the path is absolute (an
-/// absolute member ignores `-C`).
-fn tar_bound(dir: Option<&str>, path: &str) -> String {
-    match dir {
-        Some(d) if !path.starts_with('/') && !path.starts_with('~') && !path.starts_with('-') => {
-            format!("{}/{}", d.trim_end_matches('/'), path)
-        }
-        _ => path.to_string(),
-    }
-}
-
 /// Accumulated `tar` parse: the mode, whether `-f` wants an archive, and `reject` — set by
 /// any option we can't model safely (an unknown letter, or a value-taking option like `-T`
 /// / `-X` whose ordered operand consumption we don't track). `-C` IS modeled (see
@@ -1237,6 +1226,9 @@ impl<'a> TarParse<'a> {
         };
         // A `-` archive (or none) is a stdout/stdin stream, not a file to gate.
         let archive_file = archive.filter(|(_, a)| *a != "-");
+        if archive_file.is_some_and(|(_, a)| tar_paths::names_a_remote_archive(a)) {
+            return worst("tar: GNU tar opens an archive named host:path on another machine over rsh or ssh — worst-cased (§0)");
+        }
 
         match mode {
             b'c' | b'r' | b'u' => {
@@ -2262,6 +2254,13 @@ mod tests {
         // outside the worktree → denied by locus
         for cmd in [vec!["mkdir", "/etc/evil"], vec!["mkdir", "~/newdir"], vec!["mkdir", "$HOME/x"]] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("mkdir")), Verdict::Denied, "{cmd:?}");
+        }
+        // Creating a protected path is the same write as putting a file there.
+        for cmd in ["mkdir .git", "mkdir -p a/.git", "mkdir /etc/foo"] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd}");
+        }
+        for cmd in ["mkdir build", "mkdir -p src/x"] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd}");
         }
         // a glued valued short (-m755) and its value must not be read as operands
         let g = resolve(&toks(&["mkdir", "-m755", "./x"])).expect("mkdir");
@@ -3415,10 +3414,10 @@ bare = true
             vec!["rm", "--no-preserve-root", "-rf", "/"], // enables rm -rf / → must worst-case
             vec!["rm", "-Z", "x"],                        // unknown flag
             vec!["rm"],                                   // no operand (usage error)
-            vec!["./rm", "x"],                            // basename spoof
         ] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("resolves")), Verdict::Denied, "{cmd:?}");
         }
+        assert!(resolve(&toks(&["./rm", "x"])).is_none(), "a worktree path is a script, not rm");
     }
 
     #[test]
@@ -3435,8 +3434,8 @@ bare = true
 
     #[test]
     fn a_resolvable_name_from_a_non_standard_path_worst_cases() {
-        // ./cat, /tmp/cat, ~/bin/grep may be impostors → worst-case, not certified safe
-        for cmd in [vec!["./cat", "x"], vec!["/tmp/cat", "x"], vec!["~/bin/grep", "foo", "f"]] {
+        assert!(resolve(&toks(&["./cat", "x"])).is_none(), "a worktree path is a script, not cat");
+        for cmd in [vec!["/tmp/cat", "x"], vec!["~/bin/grep", "foo", "f"]] {
             let p = resolve(&toks(&cmd)).expect("resolvable name");
             assert!(!read_local().admits(&p), "{cmd:?} from a non-standard path must worst-case");
         }

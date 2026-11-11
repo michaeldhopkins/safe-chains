@@ -1,9 +1,6 @@
 7z
-7z x
 7za
-7za x
 7zz
-7zz x
 @11ty/eleventy
 @11ty/eleventy x
 PlistBuddy
@@ -80,9 +77,6 @@ asn1Parser x
 astro build
 astro sync
 at
-at x
-atrm
-atrm x
 autoconf
 autoconf x
 autoflake
@@ -117,8 +111,6 @@ b64decode
 b64decode x
 b64encode
 b64encode x
-batch
-batch x
 biber
 biber x
 binhex
@@ -132,8 +124,6 @@ bison grammar.y
 bison x
 bitcode_strip
 bitcode_strip x
-borg check
-borg config
 brakeman
 brotli
 brotli x
@@ -194,12 +184,6 @@ codesign_allocate
 codesign_allocate x
 codex apply
 codex cloud
-codex exec
-codex features
-codex fork
-codex mcp
-codex resume
-codex sandbox
 codium
 composer
 compress
@@ -632,7 +616,6 @@ mig x
 migcom
 migcom x
 mise set
-mise trust
 mise unset
 mise untrust
 mise use
@@ -685,8 +668,6 @@ mutool poster
 mutool recolor
 mutool sign
 mutool trim
-mvn compile
-mvn test-compile
 mysqlcheck
 mysqlcheck x
 nasm
@@ -955,7 +936,6 @@ psktool x
 ptar
 ptar x
 ptargrep
-ptargrep x
 pyenv local
 pyupgrade
 pyupgrade x
@@ -1020,6 +1000,7 @@ ros use
 rspec
 rsync
 rsync x
+rsync x:foo
 rubycritic
 rufo
 rufo x
@@ -1106,7 +1087,6 @@ steep check
 steep init
 steep vendor
 streamzip
-streamzip x
 stree w
 stree write
 strip
@@ -1347,6 +1327,7 @@ youtube-dl x
 yt-dlp
 yt-dlp x
 ytt
+zforce
 zforce x
 zip
 zipcloak

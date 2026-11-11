@@ -1,6 +1,6 @@
 [[command]]
 name = "ditto"
-description = "Copy directory hierarchies and create/extract archives (CPIO via -c, optionally compressed with -z / -j; PKZip via -c -k; extraction via -x). Preserves resource forks, extended attributes, ACLs, and quarantine metadata by default on macOS; toggled with --rsrc / --norsrc / --extattr / --noextattr / --acl / --noacl / --qtn / --noqtn. --arch thins universal binaries; --bom limits the copy set."
+description = "Copy directory hierarchies and create/extract archives (CPIO via -c, optionally compressed with -z / -j; PKZip via -c -k; extraction via -x). Preserves resource forks, extended attributes, ACLs, and quarantine metadata by default on macOS; toggled with --rsrc / --norsrc / --extattr / --noextattr / --acl / --noacl / --qtn / --noqtn. --arch thins universal binaries; --bom limits the copy set. Extracting (-x) is refused, as tar extraction is: the archive decides the paths written and their modes, set-id bits included."
 url = "https://ss64.com/mac/ditto.html"
 researched_version = "ditto (macOS 14+)"
 level = "SafeWrite"

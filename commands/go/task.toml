@@ -1,24 +1,19 @@
 [[command]]
 name = "task"
+writes_cwd = "code"
 description = "Task runner / build tool with a YAML config (Taskfile.yml). Each invocation runs the matching task definition, which contains arbitrary shell — same risk profile as Make. The diagnostic --version / --help and `-l/--list` (list tasks without running) and `-a/--list-all` are part of the safe surface."
 url = "https://taskfile.dev/"
 researched_version = "task 3.x"
 level = "SafeRead"
 bare = false
+require_any = ["--help", "--list", "--list-all", "--version", "-a", "-h", "-l"]
 standalone = [
-    "--color", "--concurrency", "--dry",
-    "--exit-code", "--force", "--global",
-    "--help", "--init", "--insecure",
-    "--interval", "--json",
+    "--color", "--dry",
+    "--help", "--insecure", "--json",
     "--list", "--list-all",
     "--no-color", "--offline",
-    "--parallel", "--silent",
-    "--status", "--summary",
-    "--verbose", "--version",
-    "--watch",
-    "-C", "-d", "-f", "-g", "-h", "-i",
-    "-j", "-l", "-n", "-p", "-s", "-t", "-v", "-w",
-    "-a",
+    "--silent", "--verbose", "--version",
+    "-a", "-h", "-j", "-l", "-n", "-s", "-v",
 ]
 valued = [
     "--dir", "--output", "--taskfile",
@@ -30,4 +25,34 @@ valued = [
 # `make build`, `just build`, `rake build`, `mise run build`) denied.
 max_positional = 0
 examples_safe = ["task --list", "task -l", "task --list-all", "task --version", "task --dry --list"]
-examples_denied = ["task build", "task deploy", "task FOO=bar", "task default"]
+examples_denied = [
+    "task build",
+    "task deploy",
+    "task FOO=bar",
+    "task default",
+    "task --silent",
+    "task -v",
+    "task --force",
+    "task --watch",
+    "task --parallel",
+    "task --exit-code",
+    "task --global",
+    "task -g",
+    "task --status",
+    "task --init",
+    "task -i",
+    "task -tl",
+    "task -dl",
+    "task -i --dir=/etc",
+    "task --list -t=/etc/passwd",
+    "task -l --taskfile=~/.ssh/id_rsa",
+    "task -d /tmp/evil --list",
+    "task --status --dir=/tmp/evil",
+]
+
+# `--dir` and `--taskfile` pick the Taskfile that gets loaded, and loading one evaluates its `sh:`
+# variables whenever it declares `dotenv` (task 3.54.0 `setup.go`, `readDotEnvFiles` calling
+# `GetTaskfileVariables` with shell evaluation on), even for `--list`. So the value selects code
+# to run, and is gated by where that code comes from rather than as a plain read.
+[command.path_gate]
+flags = { "--dir" = "exec", "-d" = "exec", "--taskfile" = "exec", "-t" = "exec" }

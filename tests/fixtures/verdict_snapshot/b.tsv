@@ -1,3 +1,4 @@
+BORG_PASSCOMMAND=/tmp/evil borg list repo	denied
 b2sum	inert
 b2sum --binary	inert
 b2sum --binary --check	inert
@@ -321,18 +322,17 @@ bat -p	inert
 bat -r x	inert
 bat -u	inert
 bat x	inert
-batch	safe-write
-batch --help	safe-write
-batch --help -V	safe-write
-batch --help -f x	safe-write
-batch --help x	safe-write
+batch	denied
+batch --help	inert
+batch --help --help	inert
+batch --help -f x.sh	denied
+batch --help -h	inert
+batch --help x	denied
 batch --version	denied
-batch -V	safe-write
-batch -f x	safe-write
-batch -m	safe-write
-batch -q x	safe-write
-batch -v	safe-write
-batch x	safe-write
+batch -V	denied
+batch -f x.sh	denied
+batch -h	inert
+batch x	denied
 bazel	denied
 bazel --help	inert
 bazel --help --version	denied
@@ -506,7 +506,7 @@ biber -h	safe-write
 biber -q	safe-write
 biber -v	safe-write
 biber x	safe-write
-bin/rails db:create	denied
+bin/rails db:create	safe-write
 binhex	denied
 binhex --directory x	safe-write
 binhex --force	safe-write
@@ -765,17 +765,22 @@ bombardier -v	safe-read
 bombardier x	safe-read
 borg	denied
 borg --bypass-lock	denied
-borg --bypass-lock --bypass-lock x	denied
 borg --bypass-lock --consider-checkpoints	denied
+borg --bypass-lock --debug-topic x	denied
+borg --bypass-lock create check ./repo::a /	denied
+borg --bypass-lock delete info ./repo	denied
+borg --bypass-lock serve version	denied
 borg --bypass-lock x	denied
 borg --consider-checkpoints	denied
 borg --debug	denied
 borg --debug-topic x	denied
+borg --exclude x	denied
+borg --exclude-from x	denied
 borg --help	inert
 borg --info	denied
-borg --lock-wait	denied
 borg --lock-wait x	denied
 borg --no-cache-sync	denied
+borg --patterns-from x	denied
 borg --progress	denied
 borg --remote-path x	denied
 borg --remote-ratelimit x	denied
@@ -787,6 +792,7 @@ borg --verbose	denied
 borg --version	inert
 borg --warning	denied
 borg -V	inert
+borg -e x	denied
 borg -h	inert
 borg benchmark	denied
 borg benchmark x	denied
@@ -794,21 +800,19 @@ borg break-lock	denied
 borg break-lock x	denied
 borg check	denied
 borg check --archives-only	safe-read
-borg check --archives-only --archives-only x	safe-read
-borg check --archives-only --first	safe-read
+borg check --archives-only --first x	safe-read
+borg check --archives-only --help	safe-read
 borg check --archives-only x	safe-read
-borg check --first	safe-read
 borg check --first x	safe-read
 borg check --help	safe-read
-borg check --last	safe-read
 borg check --last x	safe-read
 borg check --match-archives x	safe-read
 borg check --max-duration x	safe-read
 borg check --prefix x	safe-read
-borg check --repair	safe-write
+borg check --repair --archives-only repo	denied
+borg check --repair repo	denied
 borg check --repository-only	safe-read
 borg check --save-space	safe-read
-borg check --sort-by	safe-read
 borg check --sort-by x	safe-read
 borg check --verify-data	safe-read
 borg check -a x	safe-read
@@ -819,14 +823,19 @@ borg compact	denied
 borg compact x	denied
 borg config	denied
 borg config --cache	safe-read
-borg config --cache --delete	safe-write
+borg config --cache --help	safe-read
 borg config --cache x	safe-read
-borg config --delete	safe-write
+borg config --delete repo	denied
+borg config --delete ~/repo k	denied
 borg config --help	safe-read
 borg config --list	safe-read
 borg config -c	safe-read
+borg config -d repo	denied
+borg config -d repo k	denied
 borg config -h	safe-read
+borg config -l -d repo	denied
 borg config repo	safe-read
+borg config repo append_only 0	denied
 borg config x	safe-read
 borg create	denied
 borg create x	denied
@@ -836,13 +845,13 @@ borg delete	denied
 borg delete x	denied
 borg diff	denied
 borg diff --exclude x	safe-read
+borg diff --exclude-caches	safe-read
+borg diff --exclude-caches --exclude x	safe-read
+borg diff --exclude-caches --help	safe-read
 borg diff --exclude-caches x	safe-read
 borg diff --exclude-from x	safe-read
 borg diff --exclude-if-present x	safe-read
 borg diff --help	safe-read
-borg diff --help --exclude x	safe-read
-borg diff --help --json-lines	safe-read
-borg diff --help x	safe-read
 borg diff --json-lines	safe-read
 borg diff --numeric-ids	safe-read
 borg diff --patterns-from x	safe-read
@@ -860,17 +869,15 @@ borg import-tar x	denied
 borg info	denied
 borg info --exclude x	safe-read
 borg info --exclude-from x	safe-read
-borg info --first	safe-read
-borg info --first --exclude x	safe-read
-borg info --first --help	safe-read
 borg info --first x	safe-read
 borg info --help	safe-read
+borg info --help --exclude x	safe-read
+borg info --help --json	safe-read
+borg info --help x	safe-read
 borg info --json	safe-read
-borg info --last	safe-read
 borg info --last x	safe-read
 borg info --match-archives x	safe-read
 borg info --patterns-from x	safe-read
-borg info --sort-by	safe-read
 borg info --sort-by x	safe-read
 borg info -a x	safe-read
 borg info -e x	safe-read
@@ -884,21 +891,18 @@ borg key x	denied
 borg list	denied
 borg list --exclude x	safe-read
 borg list --exclude-from x	safe-read
-borg list --first	safe-read
-borg list --first --exclude x	safe-read
-borg list --first --format	safe-read
 borg list --first x	safe-read
-borg list --format	safe-read
 borg list --format x	safe-read
 borg list --help	safe-read
+borg list --help --exclude x	safe-read
+borg list --help --json	safe-read
+borg list --help x	safe-read
 borg list --json	safe-read
 borg list --json-lines	safe-read
-borg list --last	safe-read
 borg list --last x	safe-read
 borg list --match-archives x	safe-read
 borg list --patterns-from x	safe-read
 borg list --short	safe-read
-borg list --sort-by	safe-read
 borg list --sort-by x	safe-read
 borg list -a x	safe-read
 borg list -e x	safe-read
@@ -2789,6 +2793,7 @@ bzcmp --version	denied
 bzcmp ./a.bz2 ./b.bz2	inert
 bzcmp a.bz2 b.bz2	inert
 bzcmp x	inert
+bzcmp ~/.ssh/id_ed25519 ./b.bz2	denied
 bzdiff	denied
 bzdiff --help	denied
 bzdiff --version	denied
@@ -2807,6 +2812,7 @@ bzgrep --help	denied
 bzgrep --version	denied
 bzgrep TODO ./log.bz2	inert
 bzgrep x	inert
+bzgrep x ~/.ssh/id_ed25519	denied
 bzgrep x ~/.ssh/id_rsa	denied
 bzip2	safe-write
 bzip2 --compress	safe-write
@@ -2891,11 +2897,131 @@ bzip2recover -v	safe-write
 bzip2recover -z	safe-write
 bzip2recover x	safe-write
 bzless	inert
-bzless --help	denied
-bzless --version	denied
+bzless '+!id' ./a.bz2	denied
+bzless --LINE-NUMBERS	inert
+bzless --LINE-NUMBERS --LONG-PROMPT	inert
+bzless --LINE-NUMBERS --pattern x	inert
+bzless --LINE-NUMBERS x	inert
+bzless --LONG-PROMPT	inert
+bzless --QUIT-AT-EOF	inert
+bzless --RAW-CONTROL-CHARS	inert
+bzless --chop-long-lines	inert
+bzless --help	inert
+bzless --ignore-case	inert
+bzless --no-init	inert
+bzless --pattern x	inert
+bzless --prompt x	inert
+bzless --quiet	inert
+bzless --quit-at-eof	inert
+bzless --quit-if-one-screen	inert
+bzless --raw-control-chars	inert
+bzless --shift x	inert
+bzless --silent	inert
+bzless --squeeze-blank-lines	inert
+bzless --tabs x	inert
+bzless --tag x	inert
+bzless --version	inert
+bzless --window x	inert
+bzless -E	inert
+bzless -F	inert
+bzless -G	inert
+bzless -I	inert
+bzless -J	inert
+bzless -K	inert
+bzless -L	inert
+bzless -M	inert
+bzless -N	inert
+bzless -P x	inert
+bzless -Q	inert
+bzless -R	inert
+bzless -S	inert
+bzless -V	inert
+bzless -W	inert
+bzless -X	inert
+bzless -a	inert
+bzless -b x	inert
+bzless -c	inert
+bzless -e	inert
+bzless -f	inert
+bzless -g	inert
+bzless -h x	inert
+bzless -i	inert
+bzless -j x	inert
+bzless -m	inert
+bzless -n	inert
+bzless -o ./log ./a.bz2	denied
+bzless -p TODO ./a.bz2	inert
+bzless -p x	inert
+bzless -q	inert
+bzless -r	inert
+bzless -s	inert
+bzless -t x	inert
+bzless -w	inert
+bzless -x x	inert
+bzless -y x	inert
+bzless -z x	inert
+bzless ./a.bz2	inert
 bzless x	inert
 bzmore	inert
-bzmore --help	denied
-bzmore --version	denied
+bzmore '+!id' ./a.bz2	denied
+bzmore --LINE-NUMBERS	inert
+bzmore --LINE-NUMBERS --LONG-PROMPT	inert
+bzmore --LINE-NUMBERS --prompt x	inert
+bzmore --LINE-NUMBERS x	inert
+bzmore --LONG-PROMPT	inert
+bzmore --QUIT-AT-EOF	inert
+bzmore --RAW-CONTROL-CHARS	inert
+bzmore --chop-long-lines	inert
+bzmore --help	inert
+bzmore --ignore-case	inert
+bzmore --no-init	inert
+bzmore --prompt x	inert
+bzmore --quiet	inert
+bzmore --quit-at-eof	inert
+bzmore --quit-if-one-screen	inert
+bzmore --raw-control-chars	inert
+bzmore --shift x	inert
+bzmore --silent	inert
+bzmore --squeeze-blank-lines	inert
+bzmore --tabs x	inert
+bzmore --tag x	inert
+bzmore --version	inert
+bzmore --window x	inert
+bzmore -E	inert
+bzmore -F	inert
+bzmore -G	inert
+bzmore -I	inert
+bzmore -J	inert
+bzmore -K	inert
+bzmore -L	inert
+bzmore -M	inert
+bzmore -N	inert
+bzmore -P x	inert
+bzmore -Q	inert
+bzmore -R	inert
+bzmore -S	inert
+bzmore -V	inert
+bzmore -W	inert
+bzmore -X	inert
+bzmore -a	inert
+bzmore -b x	inert
+bzmore -c	inert
+bzmore -e	inert
+bzmore -f	inert
+bzmore -g	inert
+bzmore -h x	inert
+bzmore -i	inert
+bzmore -j x	inert
+bzmore -m	inert
+bzmore -n	inert
+bzmore -p '!id' ./a.bz2	denied
+bzmore -q	inert
+bzmore -r	inert
+bzmore -s	inert
+bzmore -t x	inert
+bzmore -w	inert
+bzmore -x x	inert
+bzmore -y x	inert
+bzmore -z x	inert
 bzmore ./a.bz2	inert
 bzmore x	inert

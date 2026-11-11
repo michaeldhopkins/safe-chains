@@ -15,7 +15,7 @@ use super::check::{
     MAX_CD_SCAN_DEPTH, ShellEffects, charge_classify_work, poison_function, redirect_verdict, scan_script_effects, script_verdict,
     words_sub_verdict,
 };
-use super::{Cmd, Script, Word, WordPart};
+use super::{Branch, Cmd, Script, Word, WordPart};
 use crate::verdict::Verdict;
 
 pub(super) fn for_verdict(var: &str, items: &[Word], body: &Script, redirs: &[super::Redir]) -> Verdict {
@@ -47,6 +47,25 @@ pub(super) fn while_verdict(cond: &Script, body: &Script, redirs: &[super::Redir
         None => Vec::new(),
     };
     cond_v.combine(script_verdict(body)).combine(redir_v)
+}
+
+/// An `if`: each condition runs after the ones before it, and a branch after its own condition and
+/// every earlier one, so what they assign or change directory to (`if cd ~; then cargo fmt; fi`) is
+/// in force there. Which branch runs is decided at run time, so every one counts.
+pub(super) fn if_verdict(branches: &[Branch], else_body: Option<&Script>) -> Verdict {
+    let conds: Vec<&Script> = branches.iter().map(|b| &b.cond).collect();
+    let after = |ran: &[&Script], script: &Script| {
+        let _carried = Carried::enter(ran, None);
+        script_verdict(script)
+    };
+    let mut v = Verdict::Allowed(crate::verdict::SafetyLevel::Inert);
+    for (i, b) in branches.iter().enumerate() {
+        v = v.combine(after(&conds[..i], &b.cond)).combine(after(&conds[..=i], &b.body));
+    }
+    if let Some(eb) = else_body {
+        v = v.combine(after(&conds, eb));
+    }
+    v
 }
 
 /// The body classified once per distinct value, the variable bound to it. Each pass draws on the

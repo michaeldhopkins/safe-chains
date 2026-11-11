@@ -1,6 +1,6 @@
 [[command]]
 name = "cargo"
-description = "Rust package manager and build system with a very large subcommand surface. Build operations (build, test, check, clippy, doc, bench, run) execute build scripts (build.rs) from every crate in the dependency tree, which can run arbitrary code. `--manifest-path DIR/Cargo.toml` points any of these at a DIFFERENT project, so it selects whose code runs. The `--config KEY=VALUE` flag sets arbitrary Cargo config on the command line, including code-execution keys like `target.<cfg>.runner`, `build.rustc-wrapper`, and `[alias]` shell escapes — it is a general command-injection surface, so it is not exposed here (use `.cargo/config.toml` instead). install has two modes: `cargo install crate-name` downloads from crates.io (network), while `cargo install --path .` builds from local source only — we allow --path but block positional crate names, --git, --registry, and --index to prevent remote-source installs. fmt without --check rewrites files. publish without --dry-run uploads to a registry. Third-party subcommands (nextest, deny, clippy, etc.) are added via cargo plugins and each has its own flag surface. Cargo releases with each Rust release (every 6 weeks) and frequently adds new flags. `cargo help NAME` shows a manual page through man (and so whatever MANPAGER names), and for a NAME that is not built in it runs the external `cargo-NAME --help` found on PATH; a one-word alias in project config is expanded first, so `cargo help NAME` can run `cargo-<alias target> --help`; `cargo version` only prints. Among third-party plugins, `cargo binstall` downloads prebuilt executables from GitHub Releases or the quickinstall host and installs them into the cargo bin directory, and `cargo watch` (in maintenance mode since its last release in 2024) re-runs cargo commands or arbitrary shell commands on every file change."
+description = "Rust package manager and build system with a very large subcommand surface. Build operations (build, test, check, clippy, doc, bench, run) execute build scripts (build.rs) from every crate in the dependency tree, which can run arbitrary code. `--manifest-path DIR/Cargo.toml` points any of these at a DIFFERENT project, so it selects whose code runs. The `--config KEY=VALUE` flag sets arbitrary Cargo config on the command line, including code-execution keys like `target.<cfg>.runner`, `build.rustc-wrapper`, and `[alias]` shell escapes — it is a general command-injection surface, so it is not exposed here (use `.cargo/config.toml` instead). install builds a crate (from crates.io, a git repository or a local --path) and writes its executables into the cargo bin directory (~/.cargo/bin, or the directory --root names), outside the project, where they replace any program of the same name and run whenever that name is typed; `cargo install --list` only prints what is installed. fmt without --check rewrites files. publish without --dry-run uploads to a registry. Third-party subcommands (nextest, deny, clippy, etc.) are added via cargo plugins and each has its own flag surface. Cargo releases with each Rust release (every 6 weeks) and frequently adds new flags. `cargo help NAME` shows a manual page through man (and so whatever MANPAGER names), and for a NAME that is not built in it runs the external `cargo-NAME --help` found on PATH; a one-word alias in project config is expanded first, so `cargo help NAME` can run `cargo-<alias target> --help`; `cargo version` only prints. Among third-party plugins, `cargo binstall` downloads prebuilt executables from GitHub Releases or the quickinstall host and installs them into the cargo bin directory, and `cargo watch` (in maintenance mode since its last release in 2024) re-runs cargo commands or arbitrary shell commands on every file change."
 url = "https://doc.rust-lang.org/cargo/commands/"
 researched_version = "Rust 1.99.0 / cargo 0.100.0 (2026-10-01)"
 bare_flags = ["--help", "--version", "-V", "-h"]
@@ -18,6 +18,8 @@ examples_safe = [
   "cargo sweep --time 5",
   "cargo sweep -r --installed",
   "cargo sweep --dry-run --maxsize 500",
+  "cargo install --list",
+  "cargo install --help",
   "cargo run",
   "cargo run --release",
   "cargo run --bin server",
@@ -47,6 +49,12 @@ examples_safe = [
   "cargo swift package --features foo --all-features",
 ]
 examples_denied = [
+  "cargo install --path .",
+  "cargo install --path . --force --bin safe-chains",
+  "cargo install --path . --root ./out",
+  "cargo install ripgrep",
+  "cargo install --git https://github.com/x/y",
+  "cargo install --list --path .",
   # A toolchain selector selects a toolchain; it must not launder the SUBCOMMAND past its own
   # classification, nor admit a token that is not a toolchain name.
   "cargo +nightly publish",
@@ -160,6 +168,7 @@ valued = [
 
 [[command.sub]]
 name = "bench"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--workspace",
@@ -226,6 +235,7 @@ valued = [
 
 [[command.sub]]
 name = "check"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--all-features", "--all-targets", "--benches", "--bins", "--examples",
@@ -243,6 +253,7 @@ valued = [
 
 [[command.sub]]
 name = "clippy"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--all-features", "--all-targets", "--benches", "--bins", "--examples",
@@ -336,25 +347,12 @@ valued = ["--color", "--index", "--registry"]
 
 [[command.sub]]
 name = "install"
-writes_cwd = "none"
-level = "SafeWrite"
+guard = "--list"
+level = "Inert"
 bare = false
 max_positional = 0
-standalone = [
-    "--all-features", "--bins", "--debug",
-    "--force", "--frozen", "--help",
-    "--ignore-rust-version", "--keep-going",
-    "--locked", "--no-default-features", "--no-track",
-    "--offline", "--quiet", "--timings", "--verbose",
-    "-f", "-h", "-q", "-v",
-]
-valued = [
-    "--bin", "--color", "--example",
-    "--features", "--jobs", "--message-format",
-    "--path", "--profile", "--root",
-    "--target", "--target-dir",
-    "-F", "-Z", "-j",
-]
+standalone = ["--frozen", "--help", "--list", "--locked", "--offline", "--quiet", "--verbose", "-h", "-q", "-v"]
+valued = ["--color"]
 
 [[command.sub]]
 name = "license"
@@ -463,6 +461,7 @@ valued = ["--color", "--index", "--limit", "--registry"]
 
 [[command.sub]]
 name = "test"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all",
@@ -537,6 +536,7 @@ valued = ["--color", "--manifest-path"]
 # imply cargo-mutants accepts `-V` as a version flag — it does not.
 [[command.sub]]
 name = "mutants"
+writes_cwd = "code"
 level = "SafeRead"
 max_positional = 0
 standalone = [
@@ -566,6 +566,7 @@ nested_bare = true
 standalone = ["--help", "--version", "-V", "-h"]
 [[command.sub.sub]]
 name = "run"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all-features", "--all-targets", "--help", "--lib",
@@ -717,6 +718,7 @@ valued = [
 
 [[command.sub]]
 name = "llvm-cov"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all-features", "--all-targets", "--help", "--html", "--json",
@@ -861,6 +863,7 @@ valued = [
 
 [[command.sub]]
 name = "udeps"
+writes_cwd = "code"
 level = "SafeRead"
 standalone = [
     "--all", "--all-features", "--all-targets", "--benches",

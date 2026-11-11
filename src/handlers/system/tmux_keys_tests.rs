@@ -18,7 +18,7 @@ fn keys_that_type_nothing_are_approved() {
 
 #[test]
 fn typed_text_is_approved_only_as_an_approved_command_it_submits() {
-    for cmd in ["tmux send-keys -t work 'git status' Enter", "tmux send-keys 'ls -la' C-m", "tmux send -t w 'git log' Enter C-c"] {
+    for cmd in ["tmux send-keys -t work 'ls' Enter", "tmux send-keys 'ls -la' C-m", "tmux send -t w 'pwd' Enter C-c"] {
         assert!(is_safe_command(cmd), "{cmd}");
     }
     for cmd in [
@@ -93,7 +93,8 @@ proptest! {
         let cmd = format!("tmux send-keys -t work {} {submit} {}", shell_words::quote(text), after.join(" "));
         let typed = verdict(text);
         if typed.is_allowed() {
-            prop_assert_eq!(verdict(&cmd), typed.combine(Verdict::Allowed(SafetyLevel::SafeWrite)), "{}", cmd);
+            let sent = verdict(&cmd);
+            prop_assert!(!sent.is_allowed() || sent == typed.combine(Verdict::Allowed(SafetyLevel::SafeWrite)), "{}", cmd);
         } else {
             prop_assert!(!verdict(&cmd).is_allowed(), "{}", cmd);
         }
@@ -107,4 +108,17 @@ proptest! {
         let cmd = format!("tmux send-keys -t work {} {}", shell_words::quote(text), after.join(" "));
         prop_assert!(!verdict(&cmd).is_allowed(), "{}", cmd);
     }
+}
+
+#[test]
+fn typed_text_is_judged_where_the_pane_may_be_not_where_the_agent_is() {
+    let root = "/work/proj".to_string();
+    let ctx = || crate::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root.clone()), session_id: None };
+    for line in ["rm -rf src", "touch x", "echo x > notes.txt"] {
+        assert!(crate::command_verdict_in(line, ctx()).is_allowed(), "{line} is approved in the project");
+        let cmd = format!("tmux send -t x {} Enter", shell_words::quote(line));
+        assert!(!crate::command_verdict_in(&cmd, ctx()).is_allowed(), "{cmd} was approved");
+    }
+    assert!(crate::command_verdict_in("tmux send -t x 'ls -la' Enter", ctx()).is_allowed());
+    assert!(!crate::command_verdict_in("tmux send -t x 'git status' Enter", ctx()).is_allowed(), "the pane may be in any repository");
 }

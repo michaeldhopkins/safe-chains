@@ -28,6 +28,8 @@ read = [
   "expand", "unexpand", "colrm", "pr", "col", "column",
   # pagers / viewers
   "less", "more", "most", "bat", "cat",
+  # editors, which draw the file on standard output when it is not a terminal (nano: [roles."nano"])
+  "vim", "nvim", "nano", "emacs",
   # field / column / line tools
   "cut", "paste", "join", "comm", "sort", "uniq", "tsort", "ptx", "shuf", "numsum", "datamash",
   # encoding / format converters (read a file, emit transformed content)
@@ -45,6 +47,11 @@ read = [
   "shasum", "cksum", "sum", "b2sum", "b3sum", "xxhsum", "rhash",
   # compressed-content viewers
   "zcat", "gzcat", "bzcat", "xzcat", "lzcat", "zstdcat", "zless", "bzless", "xzless", "zmore",
+  "bzmore", "xzmore", "lzless", "lzmore", "zstdless", "xzdec", "lzmainfo",
+  # compressed-content comparers (decompress, then cmp or diff the content)
+  "zcmp", "bzcmp", "xzcmp", "xzdiff", "lzcmp", "lzdiff",
+  # first-member extractor (`funzip x.zip` prints the member to stdout)
+  "funzip",
   # visible-encoding filters (`vis`/`unvis` print their file operands transformed)
   "vis", "unvis",
 ]
@@ -77,6 +84,8 @@ write = [
   # (`gtruncate`/`gunlink`/`gmknod` are standalone GNU-form commands, not aliases, so they're
   #  listed by their own names; `mkfifo`/`gmkfifo` share a spec via the alias map.)
   "mkfifo", "gmkfifo", "mknod", "gmknod", "unlink", "gunlink", "gtruncate",
+  # gzip's `zforce` renames each operand to end in .gz
+  "zforce",
   # in-place (re)compressors / optimizers that rewrite the file in its directory
   "bzip2", "xz", "lzma", "zstd", "lz4", "brotli", "compress", "zip",
   "pigz", "unpigz", "pbzip2", "plzip", "lzip", "optipng", "jpegoptim",
@@ -89,6 +98,9 @@ write = [
   # (`unzip` was here for `unzip -p ~/.ssh/id_rsa`. That is a READ, and it is gated as one in
   #  [roles.unzip] below — see the note there for why the write gate was the wrong instrument.)
   "7z", "7za", "7zr", "cpio",
+  # libzip's ziptool: the archive operand is rewritten, and `add_file`/`add_from_zip` read the files
+  # they name. Every operand is gated as a write, which also refuses those reads outside the workspace.
+  "ziptool",
   # other HTTP downloaders (curl/wget have richer grammars in [roles.*]). The blanket write
   # gate catches a `-o`/`-d`/`-P` path into a sensitive locus; a URL classifies worktree.
   "aria2c", "http", "https", "xh", "httpie",
@@ -191,7 +203,7 @@ flags = { "-i" = "ignore", "-F" = "ignore", "-o" = "ignore", "-J" = "ignore", "-
 # worktree.
 positional = "read_tree"
 shape = "remote"
-flags = { "-e" = "ignore", "--rsh" = "ignore" }
+flags = { "-e" = "ignore", "--rsh" = "ignore", "-M" = "ignore", "--remote-option" = "ignore" }
 
 # Converters whose OUTPUT is the last positional: the input is a non-disclosing transcode
 # (ignore, so a home input like ~/Downloads/x still allows), the last operand is the write.
@@ -564,7 +576,9 @@ flags = { "--output-file" = "write", "-o" = "write" }
 flags = { "--output-file" = "write", "-o" = "write" }
 
 [roles."nano"]
-flags = { "--backupdir" = "write", "--operatingdir" = "write", "-C" = "write", "-o" = "write" }
+# nano draws the file on standard output when it is not a terminal, so the file is read.
+positional = "read"
+flags = { "--backupdir" = "write", "--operatingdir" = "write", "-C" = "write", "-o" = "write", "-J" = "ignore", "-Q" = "ignore", "-T" = "ignore", "-X" = "ignore", "-Y" = "ignore", "-r" = "ignore" }
 
 [roles."nmedit"]
 flags = { "-o" = "write" }
@@ -818,6 +832,22 @@ positional = "write"
 [roles."swiftlint autocorrect"]
 positional = "write"
 
+# `mise set --file F`, `mise unset --file F` and `mise use --path F` rewrite the TOML file F, which
+# need not be a mise config at all, and `mise use --cd DIR` writes DIR's mise.toml. Without a role
+# `mise set --file ~/.config/mise/conf.d/x.toml …` reconfigured every project. `-f` on set is not a
+# mise flag but is declared valued there, so it is gated with `--file`.
+[roles."mise set"]
+flags = { "--file" = "write", "-f" = "write" }
+
+[roles."mise unset"]
+flags = { "--file" = "write", "-f" = "write" }
+
+[roles."mise use"]
+flags = { "--path" = "write", "-p" = "write", "--cd" = "write" }
+
+[roles."mise u"]
+flags = { "--path" = "write", "-p" = "write", "--cd" = "write" }
+
 # `git diff` prints the CONTENT of the files it is given, and with two paths outside the worktree it
 # stops being a VCS command at all: `git diff --no-index /etc/shadow /dev/null` renders a credential
 # file into the caller's context as a unified diff. git engages that mode implicitly too — its own
@@ -898,11 +928,13 @@ valued = ["-c"]
 # the gate ate the path as `-w`'s value) and left the real shape wide open:
 # `shfmt -w ./a.sh ~/.ssh/config` auto-approved, overwriting a credential file with formatted shell.
 #
-# `write_when`, not `positional = "write"`: without `-w` shfmt prints to stdout and `-d`/`-l` only
-# report, so the operands are reads and gating them unconditionally would deny ordinary inspection.
+# `write_when`, not `positional = "write"`: without `-w` shfmt prints the formatted file (or with
+# `-d` its diff) to stdout, so the operands are disclosing reads, gated by the read locus.
+# `--filename` only names standard input for dialect detection; shfmt never opens it.
 [roles."shfmt"]
-positional = "ignore"
+positional = "read"
 write_when = ["-w", "--write"]
+flags = { "--check" = "ignore", "--filename" = "ignore", "-filename" = "ignore", "--lang" = "ignore", "-lang" = "ignore", "-ln" = "ignore", "-i" = "ignore" }
 
 [roles."weasyprint"]
 shape = "last_write"
@@ -972,6 +1004,12 @@ shape = "last_write"
 [roles."pfbtopfa"]
 shape = "last_write"
 [roles."ps2epsi"]
+shape = "last_write"
+[roles."ps2ascii"]
+positional = "read"
+shape = "last_write"
+[roles."fix-qdf"]
+positional = "read"
 shape = "last_write"
 [roles."ps2pdf12"]
 shape = "last_write"
@@ -1147,6 +1185,10 @@ handler = "ar_archive"
 handler = "ar_archive"
 [roles."llvm-ar"]
 handler = "ar_archive"
+# pax: with -r -w the last operand is the destination, written, and each source lands below it under
+# its own path; otherwise every operand is a tree read. The -f archive is gated by the command's own flags.
+[roles."pax"]
+handler = "pax_mode"
 # The jq family (jq, gojq, jaq, xq, tomlq, yq): every operand is a read, and the filter itself can
 # read files no operand names: a program file (-f), modules (import, include, modulemeta, -L) and
 # yq's load operators. The handler refuses those and then gates the operands as reads.

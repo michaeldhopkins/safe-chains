@@ -198,7 +198,7 @@ fn the_cli_checks_and_explains_with_the_folder_unknown() {
     assert_eq!(code, 1, "reads leaves it to the prompt");
     let (out, code) = cli(&[
         &root[..],
-        &["--unknown-folder", "developer", "--explain", "echo x > notes.md && echo x >> .zshrc && rm -rf build && mise trust"],
+        &["--unknown-folder", "developer", "--explain", "echo x > notes.md && echo x >> .zshrc && rm -rf build && mise untrust"],
     ]
     .concat());
     assert_eq!(code, 1);
@@ -209,7 +209,7 @@ fn the_cli_checks_and_explains_with_the_folder_unknown() {
         format!("`notes.md` is {plain}: judged as a path in the workspace"),
         format!("`.zshrc` is {sensitive}: its name means something wherever the folder is"),
         format!("`build` is {plain}: `developer` leaves deleting"),
-        "`mise trust` writes in its folder".to_string(),
+        "`mise untrust` writes in its folder".to_string(),
     ] {
         assert!(out.contains(&expected), "missing `{expected}` in:\n{out}");
     }

@@ -81,26 +81,27 @@ Aliases: `antigravity`
 ### `codex`
 <p class="cmd-url"><a href="https://github.com/openai/codex">https://github.com/openai/codex</a></p>
 
-- **apply**: Positional args accepted
-- **cloud apply**: Positional args accepted
-- **cloud diff**: Positional args accepted
-- **cloud list**: Positional args accepted
-- **cloud status**: Positional args accepted
+- **apply**: Flags: --help, -h
+- **cloud apply**: Flags: --help, -h. Valued: --attempt
+- **cloud diff**: Flags: --help, -h. Valued: --attempt
+- **cloud list**: Flags: --help, --json, -h. Valued: --cursor, --env, --limit
+- **cloud status**: Flags: --help, -h
 - **completion**: Flags: --help, -h. Valued: --shell, -s
-- **debug app-server**: Positional args accepted
-- **exec**: Positional args accepted
-- **features disable**: Positional args accepted
-- **features enable**: Positional args accepted
+- **debug app-server**: Flags: --help, -h
+- **exec**: Flags: --help, -h
 - **features list**: Flags: --help, -h
-- **fork**: Positional args accepted
-- **mcp add**: Positional args accepted
-- **mcp get**: Positional args accepted
-- **mcp list**: Positional args accepted
-- **mcp remove**: Positional args accepted
-- **resume**: Positional args accepted
-- **review**: Positional args accepted
-- **sandbox**: Positional args accepted
+- **mcp get**: Flags: --help, -h
+- **mcp list**: Flags: --help, -h
+- **resume**: Flags: --help, -h
+- **sandbox**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `codex debug app-server --help`
+- `codex mcp list --help`
+- `codex mcp get --help`
+- `codex features list`
 
 ### `fm`
 <p class="cmd-url"><a href="https://developer.apple.com/documentation/FoundationModels">https://developer.apple.com/documentation/FoundationModels</a></p>

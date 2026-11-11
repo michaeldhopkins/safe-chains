@@ -29,7 +29,6 @@ lsblk
 pcre2grep
 @shopify/theme-check
 stern
-task
 test
 tokei
 xsel

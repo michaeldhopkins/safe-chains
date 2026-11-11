@@ -41,6 +41,7 @@ mod tests {
         tar_change_dir_worktree: "tar -cf out.tar -C ./src main.rs lib.rs",
         tar_change_dir_long: "tar -cf out.tar --directory=./build a.o",
         tar_change_dir_glued: "tar -cf out.tar -C./src main.rs",
+        tar_list_an_archive_with_a_colon_below_a_folder: "tar -tf ./backups/a:b.tar",
     }
 
     denied! {
@@ -62,6 +63,10 @@ mod tests {
         tar_no_list: "tar -f archive.tar",
         tar_bundled_extract: "tar -txf archive.tar",
         tar_old_style_xf: "tar xf archive.tar",
+        tar_create_to_a_remote_archive: "tar -c -f user@host:a.tar src",
+        tar_create_to_a_remote_archive_glued: "tar -cfhost:a.tar src",
+        tar_create_to_a_remote_archive_long: "tar -c --file=host:/tmp/a.tar src",
+        tar_list_a_remote_archive: "tar tf host:a.tar",
     }
 
     // Property tests: invariants of `is_safe_command` / `command_verdict` as exercised on tar.
@@ -126,6 +131,23 @@ mod tests {
                 "tar extract with benign archive was allowed: `{}`",
                 line,
             );
+        }
+
+        /// GNU tar opens an archive whose name has a colon before its first slash on another
+        /// machine: refused in every mode and spelling, while the same name below a folder is a
+        /// local file.
+        #[test]
+        fn an_archive_named_host_colon_path_is_refused(
+            user in proptest::option::of(proptest::string::string_regex("[a-z]{1,6}").unwrap()),
+            host in proptest::string::string_regex("[a-z][a-z0-9.]{0,10}").unwrap(),
+            name in proptest::string::string_regex("[a-z]{1,8}").unwrap(),
+            form in proptest::sample::select(vec!["tar -cf {} ./src", "tar -c --file={} ./src", "tar tf {}", "tar --list --file {}"]),
+        ) {
+            let remote = format!("{}{host}:{name}.tar", user.map(|u| format!("{u}@")).unwrap_or_default());
+            let line = form.replace("{}", &remote);
+            proptest::prop_assert!(!crate::is_safe_command(&line), "{}", line);
+            let local = form.replace("{}", &format!("./{remote}"));
+            proptest::prop_assert!(crate::is_safe_command(&local), "{}", local);
         }
     }
 }

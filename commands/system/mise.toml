@@ -1,8 +1,18 @@
 [[command]]
 name = "mise"
-description = "Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also provides environment variable management and a task runner. The full CLI can install/uninstall tool versions, modify config files, run arbitrary tasks, and self-update. The covered subcommands span a wide range: read-only queries (list, current, which, where, doctor, outdated, search, registry, latest, ls-remote, bin-paths, env, tool, completion, backends ls, tasks list/deps/info), config/settings management (config get/list/set, settings get/list/set/add/unset), plugin operations (plugins list/ls-remote/install/uninstall/update), task execution (tasks run/add/edit), cache management (cache path/clear/prune), and exec delegation (exec with --). The exec subcommand delegates to arbitrary downstream commands. Mise releases very frequently, often multiple times per week, with a YYYY.M.P versioning scheme; new subcommands appear regularly and coverage should be reviewed often."
+description = """
+Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also manages environment variables and runs tasks.
+State: tools live under ~/.local/share/mise, settings and config in mise.toml files (project, ~/.config/mise), caches under ~/.cache/mise; reads are free of side effects, writes are recoverable by editing the file or reinstalling.
+Network: install, upgrade, use, uninstall, ls-remote, latest, search, registry, outdated, lock and plugins fetch version lists and downloads from GitHub, registries and package indexes; install and upgrade then run the backend's own code (a plugin script, ruby-build, npm, pipx, cargo or go install), so what they run comes from the network and persists as installed executables and shims.
+Read-only queries: ls/list, current, which, where, latest, ls-remote, outdated, registry, search, bin-paths, env (prints every variable mise sets, values included, and those may come from secrets files), tool, doctor, completion, config get/ls, settings get/ls, tasks ls/deps/info, cache path, backends ls.
+Config writers: use, set, unset, config set, settings set/add/unset, tool-alias and shell-alias set/unset, trust/untrust, tasks add/edit, edit, fmt.
+Executors: exec (and x), run (and r), tasks run, watch, en and shell run commands under mise's environment (activate only prints a shell script).
+Config is code: a mise.toml value may hold a template whose exec() runs a command, and [env] directives, hooks and tasks run commands, so a file must be trusted first; trust is granted by mise trust and automatically by mise install, exec, run and watch for the active config.
+self-update downloads the newest release (or VERSION) from GitHub Releases, verifies its signature and replaces the running binary and installed plugins; implode deletes mise and all its data.
+Releases come very often, several times a week, on a YYYY.M.N scheme (v2026.10.18 on 2026-10-23), and new subcommands (bootstrap, deps, dotfiles, install-into, oci, ssh, tool-stub, packslip) keep appearing.
+"""
 url = "https://mise.jdx.dev/cli/"
-researched_version = "v2026.5.3 (May 2026; YYYY.M.P scheme)"
+researched_version = "v2026.10.18 (2026-10-23; YYYY.M.N scheme)"
 env_assignment_positionals = true
 # `mise set NAME=VALUE` writes the variable into mise.toml's [env], which mise then injects
 # into every command run in that directory — persistently, across sessions. That is the
@@ -25,13 +35,81 @@ examples_safe = [
     "eval \"$(mise activate bash)\"",
     "eval \"$(mise activate bash --shims)\"",
     "eval \"$(mise activate /bin/zsh --quiet)\"",
+    "mise set FOO=bar",
+    "mise set NODE_ENV=production",
+    "mise set --file ./mise.toml FOO=bar",
+    "mise set -E staging FOO=bar",
+    "mise use -E production node@20",
+    "mise use -e sandbox node@20",
+    "mise set --env=dev FOO=bar",
+    "mise unset FOO",
+    "mise use --path ./mise.toml ruby@4.0.3",
+    "mise u -p ./mise.toml ruby@4.0.3",
+    "mise use -g node@20",
+    "mise use --global node@20",
+    "mise u -g node@20",
+    "mise use -gf node@20",
+    "mise unset -g FOO",
 ]
 examples_denied = [
+    "mise install 'cargo:ripgrep[postinstall=touch pwned]'",
+    "mise i 'node@20[postinstall=touch pwned]'",
+    "mise upgrade 'cargo:ripgrep[postinstall=touch pwned]'",
+    "mise up 'node[postinstall=touch pwned]'",
+    "mise install cargo:rg{\\[,}x",
+    "mise exec 'node[postinstall=touch pwned]' -- true",
     "mise exec",
+    "mise trust",
+    "mise trust .",
+    "mise trust --all",
+    "mise trust --ignore",
+    "mise trust -a -q",
     "mise tasks run my-task",
+    "mise self-update",
+    "mise self-update --yes",
     "eval \"$(mise activate --help)\"",
     "eval \"$(mise list)\"",
     "eval \"$(mise activate $SHELL)\"",
+    "mise set --file ./mise.toml FOO='{{ exec(command=\"touch pwned\") }}'",
+    "mise set FOO='{{ exec(command=\"id\") }}'",
+    "mise set FOO='x{{ env.HOME }}'",
+    "mise set FOO='{% if true %}x{% endif %}'",
+    "mise set FOO='{# comment #}'",
+    "mise set -E prod 'FOO={{ exec(command=\"id\") }}'",
+    "mise set --file='./mise.toml' 'FOO={{ exec(command=\"id\") }}'",
+    "mise set _.source=./x.sh",
+    "mise set _.path=/tmp/bin",
+    "mise set _=x",
+    "mise set -- _.source=./x.sh",
+    "mise use 'node@{{ exec(command=\"id\") }}'",
+    "mise u 'node@{% if true %}20{% endif %}'",
+    "mise use 'node@{# x #}'",
+    "mise use 'cargo:ripgrep[features=pcre2]'",
+    "mise u 'cargo:ripgrep[postinstall=id]'",
+    'mise set "FOO=$(cat payload.txt)"',
+    'mise set FOO=`cat payload.txt`',
+    'mise set "FOO=$X"',
+    'mise set FOO={\{x}}',
+    'mise set _{\.,}source=./x.sh',
+    'mise use node@{\{x}}',
+    'mise u cargo:rg{\[,}x',
+    "mise set --file ~/.config/mise/conf.d/x.toml FOO=bar",
+    "mise set --file=/etc/mise/config.toml FOO=bar",
+    "mise unset --file ~/.config/mise/config.toml FOO",
+    "mise use --path ~/.config/mise/config.toml node@20",
+    "mise u -p ~/mise.toml node@20",
+    "mise use --cd ~ node@20",
+    "mise set -E /../../out/evil FOO=bar",
+    "mise set -Ex/../../y FOO=1",
+    "mise set --env=../x FOO=1",
+    "mise use --env=/../../x node@20",
+    "mise u -e /../x node@20",
+    "mise use node@path:/tmp/evil",
+    "mise u git@path:/tmp/evil",
+    "mise install node@path:/tmp/evil",
+    "mise i node@path:/tmp/evil",
+    "mise upgrade node@path:/tmp/evil",
+    "mise exec node@path:/tmp/evil -- true",
 ]
 
 [[command.sub]]
@@ -77,21 +155,23 @@ name = "use"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--env", "--force", "--fuzzy", "--global", "--help", "--path",
-    "--pin", "--quiet", "--remove", "--verbose",
-    "-E", "-f", "-g", "-p", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--global", "--help", "--pin",
+    "--quiet", "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
 ]
-valued = ["--cd"]
+valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]
+ascii_letter_flags = ["--env", "-E", "-e"]
 
 [[command.sub]]
 name = "install"
-writes_cwd = "none"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--quiet", "--verbose",
     "-f", "-q", "-v", "-h",
 ]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "uninstall"
@@ -102,10 +182,11 @@ standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "upgrade"
-writes_cwd = "source"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "prune"
@@ -115,8 +196,9 @@ standalone = ["--dry-run", "--help", "--plugins", "--tools", "-n", "-h"]
 
 [[command.sub]]
 name = "trust"
-level = "SafeWrite"
-standalone = ["--all", "--help", "--ignore", "--quiet", "--show", "-a", "-h", "-q"]
+level = "SafeRead"
+guard = "--show"
+standalone = ["--all", "--help", "--quiet", "--show", "-a", "-h", "-q"]
 
 [[command.sub]]
 name = "untrust"
@@ -126,16 +208,25 @@ standalone = ["--all", "--help", "-a", "-h"]
 [[command.sub]]
 name = "set"
 level = "SafeWrite"
-standalone = ["--file", "--global", "--help", "--remove", "-f", "-g", "-h"]
+standalone = ["--global", "--help", "--remove", "-g", "-h"]
+valued = ["--env", "--file", "-E", "-f"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "_", "_.*"]
+ascii_letter_flags = ["--env", "-E"]
 
 [[command.sub]]
 name = "unset"
 level = "SafeWrite"
-standalone = ["--file", "--global", "--help", "-f", "-g", "-h"]
+standalone = ["--global", "--help", "-g", "-h"]
+valued = ["--file", "-f"]
 
 [[command.sub]]
 name = "self-update"
-candidate = true
+profile = "supply-chain-build"
+fact = "`mise self-update [VERSION]` installs the newest stable release (or VERSION) from GitHub Releases, verifies its signature, replaces the running mise binary, and also updates installed plugins unless --no-plugins is given."
+source = "https://mise.jdx.dev/cli/self-update.html"
+judgment = "The nearest archetype: network-sourced code is fetched and installed as an executable that runs later. The locus is the mise binary's own directory rather than a worktree, and the download is signature-checked, which the archetype does not say."
+standalone = ["--force", "--help", "--no-plugins", "--yes", "-f", "-h", "-y"]
+valued = ["--minimum-release-age"]
 
 [[command.sub]]
 name = "u"
@@ -143,21 +234,23 @@ writes_cwd = "source"
 level = "SafeWrite"
 bare = false
 standalone = [
-    "--env", "--force", "--fuzzy", "--global", "--help", "--path",
-    "--pin", "--quiet", "--remove", "--verbose",
-    "-E", "-f", "-g", "-p", "-q", "-v", "-h",
+    "--force", "--fuzzy", "--global", "--help", "--pin",
+    "--quiet", "--remove", "--verbose", "-f", "-g", "-q", "-v", "-h",
 ]
-valued = ["--cd"]
+valued = ["--cd", "--env", "--path", "-E", "-e", "-p"]
+refuse_operands = ["*{{*", "*{%*", "*{#*", "*[*", "*@path:*"]
+ascii_letter_flags = ["--env", "-E", "-e"]
 
 [[command.sub]]
 name = "i"
-writes_cwd = "none"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--quiet", "--verbose",
     "-f", "-q", "-v", "-h",
 ]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "rm"
@@ -175,15 +268,17 @@ standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "up"
-writes_cwd = "source"
+writes_cwd = "code"
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "env"
-standalone = ["--help", "--json", "-J", "-h"]
-valued = ["--shell", "-s"]
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "outdated"
@@ -416,7 +511,12 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "exec"
+aliases = ["x"]
+writes_cwd = "code"
 delegate_after = "--"
+standalone = ["--raw", "-q", "--quiet", "-v", "--verbose"]
+valued = ["--jobs", "-j"]
+refuse_operands = ["*[*", "*@path:*"]
 
 [[command.sub]]
 name = "activate"

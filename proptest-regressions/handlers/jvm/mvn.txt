@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 3f9fbfe6fddeb81e7622a19cd993a5386afa7336443cc95c170d5c8158f99566 # shrinks to phase = "compile", operand = "a"
+cc 604e2a6a231cf9400abb12e28b7148c75239ac2df46bf07582b62cb6201bc63e # shrinks to name = "a", value = ""
+cc e36ed5dfb06f36008cc343553abb4f6b2d62ee3ee280ba8d390cdb1d2ec389fa # shrinks to flag = "--log-file", value = "pom.xml"

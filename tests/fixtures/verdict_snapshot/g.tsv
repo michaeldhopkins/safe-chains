@@ -265,9 +265,9 @@ gcc --version	inert
 gcc -v	inert
 gcc x	denied
 gchmod	denied
+gchmod +s x	denied
 gchmod --changes	denied
 gchmod --changes --dereference	denied
-gchmod --changes --reference x	denied
 gchmod --changes x	safe-write
 gchmod --dereference	denied
 gchmod --help	inert
@@ -275,7 +275,6 @@ gchmod --no-dereference	denied
 gchmod --preserve-root	denied
 gchmod --quiet	denied
 gchmod --recursive	denied
-gchmod --reference x	denied
 gchmod --silent	denied
 gchmod --verbose	denied
 gchmod --version	inert
@@ -6269,6 +6268,9 @@ ghc --print-project-version	inert
 ghc --supported-extensions	inert
 ghc --supported-languages	inert
 ghc --version	inert
+ghc --version '+RTS' -tpwned	denied
+ghc --version +RTS -tpwned	denied
+ghc --version -- +RTS -tpwned	denied
 ghc -?	inert
 ghc x	denied
 ghead	inert
@@ -7489,6 +7491,7 @@ git ls-files -v	inert
 git ls-files -x x	inert
 git ls-files -z	inert
 git ls-files x	inert
+git ls-files | cpio -pdm ./dst	safe-write
 git ls-remote	inert
 git ls-remote --branches	inert
 git ls-remote --branches --exit-code	inert
@@ -8367,10 +8370,13 @@ git-lfs version x	inert
 git-lfs x	denied
 gitleaks	denied
 gitleaks --help	inert
+gitleaks --help --report-path x	denied
 gitleaks --help --version	denied
 gitleaks --help x	denied
+gitleaks --report-path x	denied
 gitleaks --version	inert
 gitleaks -h	inert
+gitleaks -r x	denied
 gitleaks detect	safe-read
 gitleaks detect --baseline-path x	safe-read
 gitleaks detect --config x	safe-read
@@ -8381,19 +8387,22 @@ gitleaks detect --help --baseline-path x	safe-read
 gitleaks detect --help --no-banner	safe-read
 gitleaks detect --help x	safe-read
 gitleaks detect --log-level x	safe-read
-gitleaks detect --log-opts x	safe-read
+gitleaks detect --log-opts=--output=x	denied
 gitleaks detect --max-target-megabytes x	safe-read
 gitleaks detect --no-banner	safe-read
 gitleaks detect --no-color	safe-read
 gitleaks detect --redact	safe-read
 gitleaks detect --report-format x	safe-read
+gitleaks detect --report-path report.json	safe-read
 gitleaks detect --report-path x	safe-read
+gitleaks detect --report-path ~/.zshrc	denied
 gitleaks detect --source x	safe-read
 gitleaks detect --verbose	safe-read
 gitleaks detect -c x	safe-read
 gitleaks detect -h	safe-read
 gitleaks detect -l x	safe-read
 gitleaks detect -r x	safe-read
+gitleaks detect -r.git/config	denied
 gitleaks detect -s x	safe-read
 gitleaks detect -v	safe-read
 gitleaks detect x	safe-read
@@ -8414,6 +8423,7 @@ gitleaks protect --report-format x	safe-read
 gitleaks protect --report-path x	safe-read
 gitleaks protect --source x	safe-read
 gitleaks protect --staged	safe-read
+gitleaks protect --staged -r build/report.json	safe-read
 gitleaks protect --verbose	safe-read
 gitleaks protect -c x	safe-read
 gitleaks protect -h	safe-read
@@ -11275,16 +11285,17 @@ gmd5sum -w	inert
 gmd5sum -z	inert
 gmd5sum x	inert
 gmkdir	denied
-gmkdir --context x	denied
+gmkdir --context	denied
+gmkdir --context --help	inert
+gmkdir --context --mode x	denied
+gmkdir --context x	safe-write
 gmkdir --help	inert
-gmkdir --help --context x	inert
-gmkdir --help --parents	inert
-gmkdir --help x	safe-write
 gmkdir --mode x	denied
 gmkdir --parents	denied
 gmkdir --verbose	denied
 gmkdir --version	inert
 gmkdir -Z	denied
+gmkdir -m u+s d	denied
 gmkdir -m x	denied
 gmkdir -p	denied
 gmkdir -v	denied
@@ -12617,16 +12628,17 @@ gpg -q	denied
 gpg -v	denied
 gpg secret.gpg	denied
 gpg x	denied
-gprintenv	inert
+gprintenv	denied
 gprintenv --help	inert
-gprintenv --help --null	inert
-gprintenv --help x	inert
-gprintenv --null	inert
+gprintenv --help --help	inert
+gprintenv --help --version	inert
+gprintenv --help -V	inert
+gprintenv --help -h	inert
+gprintenv --help x	denied
 gprintenv --version	inert
-gprintenv -0	inert
 gprintenv -V	inert
 gprintenv -h	inert
-gprintenv x	inert
+gprintenv x	denied
 gprintf	denied
 gprintf --help	inert
 gprintf --help --version	inert

@@ -1,15 +1,18 @@
 [[command]]
 name = "vim"
 aliases = ["vi", "view", "rvim", "vimdiff", "rview", "ex"]
-description = "Vi IMproved — the venerable modal editor. Bare invocation and file-opening forms drop into an interactive session. Aliases cover the common driver names: vi, view, rvim, vimdiff, rview, ex. The covered flag surface stays inside session constraints and metadata. Session-constraint flags: `-R` read-only, `-Z` restricted mode (no shell-out from inside), `-m`/`-M` modifications disabled, `--clean`/`--noplugin` disable user config, `-n` disable swap. Display flags: `-p`/`-o`/`-O` for tabs and splits with optional count suffix, `+N` line positioning via numeric_dash. Recovery: `-r`/`-L` list and recover swap files. Mode selectors: `-d` diff mode, `-y` easy mode, `-v` vi mode, `-b` binary, `-l` lisp, `-C`/`-N` compatibility toggles. Valued flags whose value is metadata: `-T <terminal>`, `-i <viminfo>`, `-t <tag>`, `-q <errorfile>`. Diagnostic: `--version`, `--help`, `-D` debug, `--not-a-term`, `--ttyfail`, `-x` encrypted-file mode. Active project with frequent patches; this surface has been stable across 8.x and 9.x."
+description = "Vi IMproved — the venerable modal editor. Bare invocation and file-opening forms drop into an interactive session. Aliases cover the common driver names: vi, view, rvim, vimdiff, rview, ex. The covered flag surface stays inside session constraints and metadata. Session-constraint flags: `-R` read-only, `-Z` restricted mode (no shell-out from inside), `-m`/`-M` modifications disabled, `--clean`/`--noplugin` disable user config, `-n` disable swap. Display flags: `-p`/`-o`/`-O` for tabs and splits with optional count suffix, `+N` line positioning. Recovery: `-r`/`-L` list and recover swap files. Mode selectors: `-d` diff mode, `-y` easy mode, `-v` vi mode, `-b` binary, `-l` lisp, `-C`/`-N` compatibility toggles. Valued flags whose value is metadata: `-T <terminal>`, `-i <viminfo>`, `-t <tag>`, `-q <errorfile>`. Diagnostic: `--version`, `--help`, `-D` debug, `--not-a-term`, `--ttyfail`, `-x` encrypted-file mode. A `+` operand that is not a line number runs as an Ex command at startup (`vim '+!id'` runs `id`), and when standard input is not a terminal vim reads its keystrokes from it, so `printf ':!id\\n' | vim` runs `id` too. `--startuptime FILE` and `--log FILE` append to FILE. Active project with frequent patches; this surface has been stable across 8.x and 9.x."
 url = "https://www.vim.org/"
 researched_version = "vim 9.2.x"
 level = "Inert"
 bare = true
 numeric_dash = true
+reads_commands_from = ["plus", "stdin"]
+examples_safe = ["vim +42 ./notes.md", "vi + ./notes.md", "view -R ./notes.md"]
+examples_denied = ["vim '+!id' ./notes.md", "vim +q ./notes.md", "ex +!id", "vim --startuptime ./log ./notes.md", "printf x | vim", "vim < ./keys"]
 standalone = [
-    "--clean", "--help", "--log", "--noplugin", "--not-a-term",
-    "--startuptime", "--ttyfail", "--version",
+    "--clean", "--help", "--noplugin", "--not-a-term",
+    "--ttyfail", "--version",
     "-C", "-D", "-L", "-M", "-N", "-R", "-Z",
     "-b", "-d", "-h", "-l", "-m", "-n", "-r", "-v", "-x", "-y",
 ]

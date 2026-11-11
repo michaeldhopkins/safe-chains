@@ -1,14 +1,26 @@
+pub(crate) use super::dispatch::delegate::DelegateAfter;
 use serde::Deserialize;
 
 use crate::verdict::SafetyLevel;
 
+#[path = "types_behavior.rs"]
+mod behavior;
+#[path = "shapes.rs"]
+mod shapes;
+#[path = "types_sub.rs"]
+mod sub;
 #[path = "types_tables.rs"]
 mod tables;
 #[path = "transfer.rs"]
 mod transfer;
+pub(crate) use behavior::*;
+pub(super) use shapes::{misshapen, sub_shape};
+pub(super) use sub::*;
 pub(super) use tables::*;
 pub(super) use transfer::TomlTransfer;
 pub(crate) use transfer::{TransferSource, TransferSpec};
+mod hooks;
+pub(super) use hooks::SpecHooks;
 
 #[derive(Debug, Deserialize)]
 pub(super) struct TomlFile {
@@ -36,16 +48,17 @@ pub(super) struct TomlCommand {
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
-    /// This command PUTS ITS `NAME=VALUE` POSITIONALS INTO THE ENVIRONMENT (`export`, `declare -x`).
-    /// Each one is classified through `envvars.toml`, exactly as the `VAR=value cmd` prefix form is,
-    /// so the two spellings of one capability cannot disagree.
+    /// This command PUTS ITS `NAME=VALUE` POSITIONALS INTO THE ENVIRONMENT (`export`, `declare -x`), each classified through
+    /// `envvars.toml` as the `VAR=value cmd` prefix form is (`exported_assignments_verdict`).
     #[serde(default)]
     pub env_assignment_positionals: Option<bool>,
     /// Lowered into [`LineChecks::flag_value_shapes`].
     #[serde(default)]
     pub flag_value_shapes: std::collections::BTreeMap<String, String>,
-    /// Removed in favor of `tolerate_unknown_short` / `tolerate_unknown_long`; build panics if a TOML
-    /// still sets it (SAMPLE.toml has the migration), and keeping it here lets the panic name the command.
+    /// Lowered into [`SpecHooks`]: the command is built with GHC, so any `+RTS` argument is refused.
+    #[serde(default)]
+    pub ghc_rts: Option<bool>,
+    /// Removed for `tolerate_unknown_short`/`_long`; build panics if a TOML sets it, naming the command (SAMPLE.toml migrates).
     #[serde(default)]
     pub positional_style: Option<bool>,
     #[serde(default)]
@@ -56,6 +69,8 @@ pub(super) struct TomlCommand {
     pub numeric_dash: Option<bool>,
     #[serde(default)]
     pub single_dash_words: Option<bool>,
+    #[serde(default)]
+    pub reads_commands_from: Vec<String>,
     #[serde(default)]
     pub standalone: Vec<String>,
     #[serde(default)]
@@ -349,253 +364,6 @@ pub(super) struct TomlMatrixActionDetailed {
     pub guard_short: Option<String>,
 }
 
-/// One `[[command.sub.flag]]`: a flag that escalates its sub's classification when present.
-#[derive(Debug, Deserialize)]
-pub(super) struct TomlSubFlag {
-    pub name: String,
-    /// The archetype (`archetypes.toml`) this flag's presence ADDS to the profile — or
-    /// `"unclassified"` to worst-case (fail-closed) a flag whose effect we can't yet name.
-    pub classifies: String,
-    /// Optional value-match: escalate only when the flag's VALUE starts with this prefix (space
-    /// form `-c core.sshCommand=…` or glued `--flag=core.sshCommand=…`). Absent = escalate on the
-    /// flag's mere PRESENCE (a bare flag like `--force`). This is what lets ONE valued flag be
-    /// benign for most values and dangerous for a specific key (`git -c core.sshCommand=` = exec).
-    #[serde(default)]
-    pub value_prefix: Option<String>,
-    /// `true` INVERTS the trigger: escalate when the flag is ABSENT, not present. For a SAFETY flag
-    /// whose absence is the risk — `npm ci` runs lifecycle scripts UNLESS `--ignore-scripts` is
-    /// given, so its base profile (local-install-pinned) escalates to supply-chain-build when
-    /// `--ignore-scripts` is missing. Mutually exclusive with `value_prefix`.
-    #[serde(default)]
-    pub when_absent: Option<bool>,
-    #[serde(default)]
-    pub fact: Option<String>,
-    #[serde(default)]
-    pub source: Option<String>,
-    #[serde(default)]
-    pub judgment: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub(super) struct TomlSub {
-    pub name: String,
-    /// This sub also matches with ONE arbitrary trailing `:segment`, which inherits this sub's
-    /// classification unchanged.
-    ///
-    /// For Rails' per-database rake tasks. A Rails 8 app has four databases out of the box
-    /// (solid_cache, solid_queue, solid_cable), and rake generates a variant of each schema task
-    /// per database: `db:migrate:primary`, `db:create:cache`, `db:drop:queue`. Fourteen base tasks
-    /// times four databases is 56 names, and enumerating them does not even work — the segment is
-    /// a key out of the app's own `config/database.yml`, so another app has `db:migrate:analytics`.
-    ///
-    /// Sound because the variant is strictly NARROWER than the base: `db:migrate:primary` migrates
-    /// one of the databases `db:migrate` migrates all of. Inheriting the base's classification is
-    /// therefore never a widening — `db:drop:cache` lands wherever `db:drop` already sits.
-    ///
-    /// Set it only where that containment argument holds. It is not a general "ignore the tail":
-    /// the suffix must be a single plain identifier, and a sub that means something DIFFERENT with
-    /// a suffix must keep declaring it separately.
-    #[serde(default)]
-    pub per_database: bool,
-    #[serde(default)]
-    pub candidate: Option<bool>,
-    /// A facet archetype name (`archetypes.toml`) — the Phase-1 successor to `candidate = true`:
-    /// instead of hand-marking the sub above the line, it declares which recurring capability
-    /// profile it is, and the engine DERIVES the verdict by projecting that profile through the
-    /// levels. See `docs/design/behavioral-taxonomy-archetypes.md`.
-    #[serde(default)]
-    pub profile: Option<String>,
-    /// Per-item research provenance for the classification (required when `profile` is set — the
-    /// `every_profiled_sub_has_provenance` guard). Three layers so a future researcher can act on
-    /// each precisely: `fact` = what the upstream tool DOCUMENTS (re-check `source` if it moves),
-    /// the `profile` itself = our inference (which archetype it maps to), `judgment` = our stance
-    /// where the source doesn't decide it (a policy call they may revisit). `source` cites the
-    /// upstream doc/section. See `docs/design/behavioral-taxonomy-archetypes.md` §3.
-    #[serde(default)]
-    pub fact: Option<String>,
-    #[serde(default)]
-    pub source: Option<String>,
-    #[serde(default)]
-    pub judgment: Option<String>,
-    #[serde(default)]
-    pub aliases: Vec<String>,
-    #[serde(default)]
-    pub level: Option<TomlLevel>,
-    #[serde(default)]
-    pub bare: Option<bool>,
-    #[serde(default)]
-    pub max_positional: Option<usize>,
-    #[serde(default)]
-    pub min_positional: Option<usize>,
-    /// Removed; see TomlCommand::positional_style.
-    #[serde(default)]
-    pub positional_style: Option<bool>,
-    #[serde(default)]
-    pub tolerate_unknown_short: Option<bool>,
-    #[serde(default)]
-    pub tolerate_unknown_long: Option<bool>,
-    #[serde(default)]
-    pub numeric_dash: Option<bool>,
-    #[serde(default)]
-    pub standalone: Vec<String>,
-    #[serde(default)]
-    pub valued: Vec<String>,
-    #[serde(default)]
-    pub optional_valued: Vec<String>,
-    #[serde(default)]
-    pub guard: Option<String>,
-    #[serde(default)]
-    pub guard_short: Option<String>,
-    #[serde(default)]
-    pub allow_all: Option<bool>,
-    /// Reference a `[command.handler_policy.KEY]` block by name, copying
-    /// its standalone/valued/bare/etc. into this sub's effective policy.
-    /// Lets a single-sub form (search, browse, gh status) re-use the
-    /// same flag list a matrix entry would, without duplicating the
-    /// WordSets. Mutually exclusive with inline standalone/valued.
-    #[serde(default)]
-    pub policy: Option<String>,
-    #[serde(default)]
-    pub sub: Vec<TomlSub>,
-    /// Per-FLAG escalation + provenance (`[[command.sub.flag]]`): a flag that, when present, ADDS a
-    /// capability to this sub's resolved profile — `git push --force` (→ destroy), `-c
-    /// core.sshCommand=` (→ execution). The level algebra takes the max over the added capabilities,
-    /// so a benign base + a dangerous flag lands at the flag's tier. See
-    /// `docs/design/behavioral-taxonomy-archetypes.md` §3 (per-flag layer).
-    #[serde(default)]
-    pub flag: Vec<TomlSubFlag>,
-    /// `true` marks the sub's first positional as a NETWORK DESTINATION whose *provenance* the
-    /// engine classifies onto `locus.provenance` (established remote-name / literal URL / opaque
-    /// `$VAR`), and whose command-transport form (`ext::<cmd>`) worst-cases as RCE. For
-    /// `git push` and its kin (`scp`/`rsync`/`curl -d`). See `behavioral-taxonomy-exposure.md` §4.
-    #[serde(default)]
-    pub network_destination: Option<bool>,
-    /// A flag that ALSO carries the destination and OVERRIDES the positional (`git push
-    /// --repo=<dest>`). Classified with the same provenance rules — so `--repo=ext::sh` is caught as
-    /// RCE. Requires `network_destination`.
-    #[serde(default)]
-    pub destination_flag: Option<String>,
-    /// Flags whose VALUE is a local output-file path, for a `data-export` sub (`supabase db dump
-    /// -f`, `pg_dump --file`). When one is present the engine adds a path-gated write capability at
-    /// that file's locus — a dump to `./out.sql` is a worktree write, one to `/etc/cron.d/job` a
-    /// system write. Absent (the export goes to stdout) → no write, just the bulk remote read.
-    /// Requires `profile` (only a `data-export` sub has an output file). See
-    /// `behavioral-taxonomy-exposure.md`.
-    #[serde(default)]
-    pub output_path_flags: Vec<String>,
-    /// What this sub writes in the folder it runs in without naming a path: `"output"` (with
-    /// `output_dirs`), `"source"`, or `"none"`. See `registry::cwd_writes`.
-    #[serde(default)]
-    pub writes_cwd: Option<String>,
-    #[serde(default)]
-    pub output_dirs: Vec<String>,
-    /// Flags naming a network endpoint that must be on THIS machine (`--endpoint-url
-    /// http://localhost:8000`). Two effects, both keyed on `netloc::is_loopback`: the flag is
-    /// admitted only with a loopback value, and a loopback value re-classifies the sub's
-    /// non-destroy capabilities as local (`resolve`'s loopback modifier). Declare only where a
-    /// local emulator is a researched workflow for that service.
-    #[serde(default)]
-    pub loopback_valued: Vec<String>,
-    /// Whether a `loopback_valued` flag naming this machine re-classifies the sub: `resolve` clears
-    /// the destination-determined facets (remote reach, net direction, payload, metered cost) and
-    /// leaves everything describing the operation alone. Absent = the sub keeps its remote
-    /// classification whatever the destination; mandatory for destroy archetypes, build-enforced.
-    #[serde(default)]
-    pub loopback_localizes: Option<bool>,
-    #[serde(default)]
-    pub nested_bare: Option<bool>,
-    #[serde(default)]
-    pub require_any: Vec<String>,
-    #[serde(default)]
-    pub first_arg: Vec<String>,
-    /// Flags a `first_arg` GLOB family accepts. The glob admits an invocation on its first
-    /// positional alone, so without these it never examines the flags at all and
-    /// `--endpoint-url http://evil.com` rides along on a read. Empty = family not yet researched
-    /// (permissive, grandfathered — see `no_new_unresearched_first_arg_family`).
-    #[serde(default)]
-    pub first_arg_standalone: Vec<String>,
-    #[serde(default)]
-    pub first_arg_valued: Vec<String>,
-    /// Flags admitted only when their VALUE names this machine (`--endpoint-url
-    /// http://localhost:8000`). Same arity as `first_arg_valued`; the value is classified by
-    /// `netloc::is_loopback`, and anything not positively recognized as loopback denies.
-    #[serde(default)]
-    pub first_arg_loopback_valued: Vec<String>,
-    /// First-positional globs (`secret`, `secret/*`) that make this sub a CREDENTIAL-READ: matching
-    /// denies, before the allow-glob. The value-dependent complement to `profile=credential-read`
-    /// (whole sub) — `kubectl get secret/x`, `aws configure get aws_secret_access_key`.
-    #[serde(default)]
-    pub credential_first_arg: Vec<String>,
-    #[serde(default)]
-    pub write_flags: Vec<String>,
-    #[serde(default)]
-    pub delegate_after: Option<String>,
-    #[serde(default)]
-    pub delegate_skip: Option<usize>,
-    /// `"file"` (first positional is the executor path — `go run ./cmd`) or `"project"`
-    /// (the current project is the executor — `cargo run`). Gates via the execution-origin
-    /// engine instead of a flat level. See `DispatchKind::Executor`.
-    #[serde(default)]
-    pub executor: Option<String>,
-    /// A valued flag whose value redirects the executor out of the project
-    /// (`cargo run --manifest-path DIR/Cargo.toml`); its value is locus-gated. `Project` only.
-    #[serde(default)]
-    pub executor_redirect_flag: Option<String>,
-    /// Predicate the executor path must satisfy (`"go-package"`), else deny. `File` only.
-    #[serde(default)]
-    pub positional_shape: Option<String>,
-    /// Tokens after the executor path are the SCRIPT's argv, not this command's own arguments.
-    ///
-    /// An interpreter passes them through (`python3 ./task.py --flag arg`) and its flag grammar
-    /// cannot describe them, so only the prefix up to the script is checked. A tool that merely
-    /// TAKES a path does not: a second positional on `karma start` is a second config file it
-    /// loads and executes, and it must be counted by `max_positional`.
-    ///
-    /// Defaults to false, the enforcing answer, so a new File executor is governed by its own
-    /// declared grammar unless someone states otherwise.
-    #[serde(default)]
-    pub passes_argv: Option<bool>,
-    #[serde(default)]
-    pub handler: Option<String>,
-    #[serde(default)]
-    pub doc_body: Option<String>,
-    /// Marks this sub's leaf invocation as safe inside
-    /// `eval "$(CMD SUB ...)"`. The leaf is the deepest matched dispatch
-    /// node — if this sub has nested sub-subs and the invocation matches
-    /// deeper, the tag does NOT apply; the sub-sub must be tagged itself.
-    /// Unset = not eval-safe (the default).
-    #[serde(default)]
-    pub eval_safe: Option<bool>,
-    /// Flag allowlist that extends `eval_safe = true` — these `-`-prefixed
-    /// tokens are also permitted inside the substitution. Default empty,
-    /// meaning only the bare form plus positionals are eval-safe.
-    /// Build panics if this is set without `eval_safe = true`.
-    #[serde(default)]
-    pub eval_safe_flags: Vec<String>,
-    /// Per-valued-flag value allowlist (same semantics as the
-    /// command-level field). Maps each valued flag (which MUST also
-    /// appear in `eval_safe_flags`) to its permitted values.
-    #[serde(default)]
-    pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
-    /// Flags where AT LEAST ONE must appear (same semantics as the
-    /// command-level field).
-    #[serde(default)]
-    pub eval_safe_required_flags: Vec<String>,
-    /// `[command.sub.output]` — what THIS SUB's stdout can name (same shape and
-    /// semantics as the command-level `[command.output]`).
-    ///
-    /// Sub-scoped because the claim rarely holds for a whole multi-command tool:
-    /// `git diff --name-only` prints worktree paths, while `git log` prints prose
-    /// and `git config --get` prints whatever was configured. A command-level
-    /// claim would have to be voided by an `invalidated_by` list naming every
-    /// other subcommand, which is a denylist and fails open on the next one git
-    /// adds.
-    #[serde(default)]
-    pub output: Option<TomlOutput>,
-    #[serde(default)]
-    pub passthrough: Option<TomlPassthrough>,
-}
-
 #[derive(Debug, Clone, Copy, Deserialize)]
 pub(super) enum TomlLevel {
     Inert,
@@ -662,223 +430,8 @@ pub struct CommandSpec {
     pub(super) output: Option<OutputSpec>,
     pub(super) writes_cwd: Option<crate::pathctx::anchor::Anchor>,
     pub(super) line_checks: LineChecks,
+    pub(super) hooks: SpecHooks,
     pub(super) kind: DispatchKind,
-}
-
-/// A command's declarative facet behavior, lowered from `[command.behavior]` (`TomlBehavior`)
-/// with every facet string resolved to its enum at build time. The generic resolver reads this
-/// plus the tokens and builds a `Profile`. Clone so it can be attached uniformly across the
-/// `build_command` construction sites.
-#[derive(Debug, Clone)]
-pub(crate) struct BehaviorSpec {
-    pub operation: crate::engine::facet::Operation,
-    pub positionals: PositionalRole,
-    pub scale: ScaleModel,
-    /// Behavior's own flag grammar, pre-split for the shared `walk_positionals`.
-    pub short: Vec<u8>,
-    pub valued_short: Vec<u8>,
-    pub long: Vec<String>,
-    pub valued_long: Vec<String>,
-    pub numeric_shorthand: bool,
-    /// Flags whose presence widens the scale to unbounded (`rm -r`, `grep -r`).
-    pub unbounded_flags: Vec<String>,
-    /// Valued flags whose VALUE is a path to gate (`touch -r REF` reads REF), with its role.
-    pub path_flags: Vec<PathFlag>,
-    pub hook: Option<BehaviorHook>,
-    /// Transfer semantics, present iff `positionals == Transfer`.
-    pub transfer: Option<TransferSpec>,
-}
-
-/// A valued flag whose value is a path safe-chains gates by locus. One spelling per entry (a
-/// flag with both short and long forms is two entries); the resolver scans for each.
-#[derive(Debug, Clone)]
-pub(crate) struct PathFlag {
-    pub short: Option<u8>,
-    pub long: Option<String>,
-    pub role: PathRole,
-}
-
-/// The role a path-flag's value plays — read (gated by read locus) or write (by write locus).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum PathRole {
-    Read,
-    Write,
-}
-
-/// The closed set of operand-role shapes (§ design doc: the `Operands` enum, as data).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum PositionalRole {
-    None,
-    Read,
-    Write,
-    PatternThenRead,
-    Transfer,
-}
-
-/// How a command's `Scale` is computed from its operands.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ScaleModel {
-    /// Every operation is a single item regardless of operand count (cat/head).
-    Single,
-    /// Count, glob, or a recursion flag widen it (`breadth_scale`) — rm/mkdir.
-    Breadth,
-}
-
-/// Runtime form of `[command.output]`: how to derive the locus of a command's stdout.
-#[derive(Debug, Clone)]
-pub(crate) struct OutputSpec {
-    pub locus_from: OutputLocus,
-    /// Flags that void the claim (see `TomlOutput::invalidated_by`).
-    pub invalidated_by: Vec<String>,
-    /// Value-taking flags (see `TomlOutput::valued`).
-    pub valued: Vec<String>,
-    /// Flags of which at least one must be present (see `TomlOutput::requires`).
-    pub requires: Vec<String>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum OutputLocus {
-    /// Beneath the command's own path operands — the worst `read_locus` over them, or the cwd
-    /// when it has none (`fd pattern` with no root searches `.`).
-    Operands,
-    /// The working directory itself (`pwd`).
-    Cwd,
-    /// A subset of what it was piped (`head -1`, `sort`, `uniq`) — so the locus is the PREVIOUS
-    /// pipeline stage's. Only when the command has no path operand: `head f.txt` prints the
-    /// contents of a file rather than filtering a stream, and contents are not paths.
-    Stdin,
-    /// The output words are ATOMS: they carry no path separator, so splicing one into a path
-    /// cannot move which directory the path names. `seq` prints integers; `basename` prints a
-    /// single component by definition.
-    ///
-    /// This is a different KIND of claim from the others, which all answer "which locus does this
-    /// output name". An atom names no locus at all — the point is that it cannot CHANGE one. That
-    /// is what makes `for i in $(seq 1 4); do … > "$SP/dx_$i.txt"; done` confinable: the prefix is
-    /// literal, and an atom spliced into the leaf cannot escape it.
-    ///
-    /// Separator-freedom alone is not sufficient — an atom that IS a whole component could be
-    /// `..`. Confinement additionally requires the interpolation to be flanked by literal text
-    /// within its component, which is a property of the PATH, not of this declaration. See
-    /// `docs/design/behavioral-taxonomy-*` and the plan recorded in TODO.md.
-    Atom,
-}
-
-/// A named thin resolver hook for irreducible token logic a declaration can't express — a
-/// command whose operand syntax is not getopt positional (grep's pattern disambiguation, dd's
-/// `key=value`, tar's dashless mode bundles, sed's mini-language script). The hook parses the
-/// tokens; the facets still come from the declaration + the builders.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum BehaviorHook {
-    Grep,
-    Dd,
-    Tar,
-    Sed,
-    Perl,
-}
-
-/// Runtime form of a `[[command.sub.flag]]` — the engine-relevant part of an escalating flag: its
-/// `name` (matched against the tokens) and the archetype it `classifies` as when present. Its
-/// research provenance (`fact`/`source`/`judgment`) lives on the TOML side and is validated at build
-/// time, not carried here.
-#[derive(Debug, Clone)]
-pub(super) struct FlagProvenance {
-    pub name: String,
-    pub classifies: String,
-    /// See `TomlSubFlag::value_prefix` — `None` = escalate on presence; `Some` = only when the
-    /// flag's value starts with this.
-    pub value_prefix: Option<String>,
-    /// See `TomlSubFlag::when_absent` — escalate when the flag is ABSENT (a safety flag whose
-    /// absence is the risk).
-    pub when_absent: bool,
-}
-
-/// How a sub's declared name is matched. An enum rather than a bool because the two are genuinely
-/// different matching MODES, and because a third boolean on `SubSpec` is the point at which the
-/// struct stops being readable — `name_match: WithDatabaseSuffix` says what `per_database: true`
-/// only implied.
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Default)]
-pub(super) enum NameMatch {
-    #[default]
-    Exact,
-    /// Also matches `name:<dbname>` for one plain identifier — see `TomlSub::per_database`.
-    WithDatabaseSuffix,
-}
-
-#[derive(Debug, Clone)]
-pub(super) struct SubSpec {
-    pub name: String,
-    pub kind: DispatchKind,
-    /// How this sub's name is matched against an argument.
-    pub name_match: NameMatch,
-    /// The facet archetype this sub is classified as (`archetypes.toml`), if declared via
-    /// `profile = …`. The engine resolves the sub to this archetype's static capability profile
-    /// (`registry::sub_archetype`), deriving the verdict rather than taking a hand-marked level.
-    /// (Its research provenance — `fact`/`source`/`judgment` — lives on the TOML side only and is
-    /// validated at build time; it is not carried on the runtime spec.)
-    pub profile: Option<String>,
-    /// Escalating flags: each, when present, adds `classifies`'s capability to the resolved profile.
-    pub flags: Vec<FlagProvenance>,
-    /// The sub's DECLARED flag allowlist, preserved for a PROFILED sub. Its legacy `kind` is forced
-    /// to deny-all at build time, but the engine classifies a profiled sub straight from its
-    /// archetype and never reaches that kind — so without keeping the lists here the declaration
-    /// would be discarded and ANY flag would ride along on the profile. That was a fail-OPEN:
-    /// `git rebase --exec 'rm -rf /'` and `supabase db dump --frobnicate` both classified as their
-    /// benign base profile. `sub_archetypes` validates presented flags against these.
-    pub allowed_standalone: Vec<String>,
-    pub allowed_valued: Vec<String>,
-    /// The sub's declared tolerance for flags it does not enumerate — the existing, explicit way to
-    /// say "this tool's flag surface is genuinely unbounded" (a cloud API's per-service options).
-    /// Preserved alongside the allowlist so the profiled path honors it: a sub that declares it stays
-    /// open BY DECLARATION (reviewable in the TOML) rather than by a silent engine default, and a sub
-    /// that does not — `git rebase`, where a flag changes the operation — enforces.
-    pub allowed_unknown: crate::policy::UnknownTolerance,
-    /// If this sub was declared with `policy = "key"`, the referenced
-    /// handler_policy name is preserved for docs rendering so a sub
-    /// that points at a policy also shown in **Shared flag sets** can
-    /// render as a reference rather than duplicating the flag list.
-    pub policy_ref: Option<String>,
-    /// True when this sub's leaf invocation is tagged as safe-to-eval.
-    /// Walked by `registry::is_eval_safe_invocation()`.
-    pub eval_safe: bool,
-    /// Flag allowlist extending `eval_safe` — flags permitted in the
-    /// substituted invocation when the walker stops at this sub.
-    pub eval_safe_flags: Vec<String>,
-    /// Per-valued-flag value allowlist (same semantics as on
-    /// `CommandSpec`).
-    pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
-    /// Lowered `[command.sub.output]` — this sub's own stdout claim, consulted by
-    /// `registry::sub_output_locus` before the command-level one.
-    pub output: Option<OutputSpec>,
-    /// Flags where at least one must appear in the substituted
-    /// invocation (same semantics as on `CommandSpec`).
-    pub eval_safe_required_flags: Vec<String>,
-    /// `true` = classify this sub's first positional as a network destination onto
-    /// `locus.provenance` (see `TomlSub::network_destination`).
-    pub network_destination: bool,
-    /// A flag that overrides the positional destination (`git push --repo=…`); see
-    /// `TomlSub::destination_flag`.
-    pub destination_flag: Option<String>,
-    /// Output-file flags for a `data-export` sub; a present one adds a path-gated write capability
-    /// at the file's locus (see `TomlSub::output_path_flags`).
-    pub output_path_flags: Vec<String>,
-    pub writes_cwd: Option<crate::pathctx::anchor::Anchor>,
-    /// Endpoint flags gated on naming this machine; see `TomlSub::loopback_valued`.
-    pub loopback_valued: Vec<String>,
-    /// What a loopback endpoint buys this sub; see `TomlSub::loopback_localizes`.
-    pub loopback_effect: LoopbackEffect,
-}
-
-/// What a recognized loopback destination buys a sub. Gating the FLAG and re-classifying the
-/// OPERATION are separate powers: a read only needs the former (it already passes), while a write
-/// needs the latter to stop looking like a call to a cloud service.
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
-pub(super) enum LoopbackEffect {
-    /// The endpoint flag is admissible when local; the classification is untouched.
-    #[default]
-    AdmitOnly,
-    /// Also clears the facets the destination determines (remote reach, net direction, payload,
-    /// metered cost), leaving the ones describing the operation alone.
-    Localizes,
 }
 
 #[derive(Debug, Clone)]
@@ -886,6 +439,8 @@ pub(super) enum DispatchKind {
     Policy {
         policy: OwnedPolicy,
         level: SafetyLevel,
+        /// A predicate the first positional must meet, from the sub's `positional_shape`.
+        shape: Option<crate::policy::PositionalShape>,
     },
     FirstArg {
         patterns: Vec<String>,
@@ -927,9 +482,7 @@ pub(super) enum DispatchKind {
         base_level: SafetyLevel,
         write_flags: Vec<String>,
     },
-    DelegateAfterSeparator {
-        separator: String,
-    },
+    DelegateAfterSeparator(DelegateAfter),
     DelegateSkip {
         skip: usize,
         shape: Option<crate::policy::PositionalShape>,
@@ -997,16 +550,6 @@ pub(super) enum DispatchKind {
 pub(super) enum ExecutorKind {
     File,
     Project,
-}
-
-impl ExecutorKind {
-    pub(super) fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "file" => Some(Self::File),
-            "project" => Some(Self::Project),
-            _ => None,
-        }
-    }
 }
 
 pub use super::policy::OwnedPolicy;

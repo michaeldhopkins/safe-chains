@@ -47,10 +47,10 @@ pub(super) fn script_verdict(script: &Script) -> Verdict {
 /// per-segment explain classified the `ls` call without the definition in scope, the hook's coverage
 /// fallback (which uses the explainer) would re-allow the very thing the whole-command verdict denied.
 pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt) -> T) -> Vec<T> {
-    let _walk = ScopeWalk::enter();
+    let (_walk, _dot_names) = (ScopeWalk::enter(), super::opaque::glob::enter_dot_names(script));
+    let _pager = super::pager_set::enter_pager_set(script);
     let mut running = crate::pathctx::cwd();
-    let mut _vars: Vec<crate::pathctx::VarGuard> = Vec::new();
-    let mut _funcs: Vec<FuncScope> = Vec::new();
+    let (mut _vars, mut _funcs): (Vec<crate::pathctx::VarGuard>, Vec<FuncScope>) = (Vec::new(), Vec::new());
     let mut out = Vec::with_capacity(script.0.len());
     for stmt in &script.0 {
         // Held across the `cd` update: `$(pwd)` is claimed from the directory the shell is in now,
@@ -145,7 +145,7 @@ fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut Shell
                 return; // a bare `VAR=x` — handled precisely by `statement_assignments`
             };
             out.vars.extend(super::opaque::declared_names(s));
-            if name == "cd" {
+            if matches!(name.as_str(), "cd" | "pushd" | "popd") {
                 out.cwd = true;
                 return;
             }
@@ -422,14 +422,7 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             if let Verdict::Denied = redir_v {
                 return Verdict::Denied;
             }
-            let mut v = redir_v;
-            for b in branches {
-                v = v.combine(script_verdict(&b.cond)).combine(script_verdict(&b.body));
-            }
-            if let Some(eb) = else_body {
-                v = v.combine(script_verdict(eb));
-            }
-            v
+            redir_v.combine(super::loops::if_verdict(branches, else_body.as_ref()))
         }
         Cmd::DoubleBracket { words, redirs } => super::arith::double_bracket_verdict(words).combine(redirect_verdict(redirs)),
         // Which arm runs is decided at runtime, so — exactly as for `If` — every arm body counts
@@ -503,9 +496,9 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     let env_name_v = cmd
         .env
         .iter()
-        .map(|(name, value)| crate::envvars::assignment_verdict(name, &value.eval()))
+        .map(|(name, value)| crate::envvars::statement_assignment_verdict(name, &value.eval(), cmd.words.is_empty()))
         .fold(crate::envvars::rebinding_verdict(&cmd.words).combine(super::arith::command_verdict(cmd)), Verdict::combine);
-    let sub_v = env_sub_v.combine(word_sub_v).combine(env_name_v);
+    let sub_v = env_sub_v.combine(word_sub_v).combine(env_name_v).combine(super::search_quote::verdict(cmd));
 
     if let Verdict::Denied = sub_v {
         return Verdict::Denied;
@@ -543,12 +536,11 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     sub_v.combine(cmd_v).combine(redir_v)
 }
 
-/// The command leaf's verdict. The behavioral-capability engine is authoritative for every
-/// command it can resolve; the legacy classifier handles the rest (`…-engine` §4). There is
-/// no opt-out — the engine is the default and only path.
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
-    let legacy = handlers::dispatch(tokens);
-    super::netargs::with_egress(tokens, crate::engine::bridge::gated_engine_verdict(tokens).unwrap_or(legacy))
+    crate::handlers::direct_script::judged(tokens, |tokens| {
+        let legacy = handlers::dispatch(tokens);
+        super::netargs::with_egress(tokens, crate::engine::bridge::gated_engine_verdict(tokens).unwrap_or(legacy))
+    })
 }
 
 fn eval_verdict(cmd: &SimpleCmd) -> Verdict {
@@ -901,7 +893,7 @@ mod tests {
         assign_bare_param: "rc=$?",
         assign_bare_var: "x=$y",
         assign_bare_dollar_var_braced: "x=${y}",
-        assign_bare_path: "PATH=/foo",
+        assign_bare_path: "PATH=/usr/bin:/bin",
         assign_bare_multiple: "a=1 b=2 c=3",
         assign_bare_arith: "x=$((1 + 2))",
         assign_in_for_body: "for i in 1 2; do x=1; done",

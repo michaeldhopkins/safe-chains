@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 8f40738232bd87adafb3a24d8a5b913dc8477e779b2d9af18c0ca760688cc8b6 # shrinks to command = "pax -r", extra = []
+cc 0e5b66ed6b265a4e19007ed4239eda6393ddb78a224d62c85000f81aba660f17 # shrinks to command = "xip --expand", extra = []

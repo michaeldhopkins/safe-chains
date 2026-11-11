@@ -361,7 +361,9 @@ pub(crate) mod tests {
                 };
                 let sub = if observing { pick.get(OBSERVING) } else { pick.get(MUTATING) };
                 let command = format!("jj {flag} {sub}{tail}");
-                let reach = crate::workspace_overreach(&command);
+                let ungranted = crate::workspace_overreach(&command);
+                assert!(!matches!(ungranted, Some((_, ReachReason::RepositorySnapshot))), "{command}: {ungranted:?}");
+                let reach = crate::engine::resolve::regions::with_grants(&[(repo.as_str(), true, true)], || crate::workspace_overreach(&command));
                 if observing {
                     assert_eq!(reach, Some((repo.clone(), ReachReason::RepositorySnapshot)), "{command}");
                 } else {
@@ -377,8 +379,10 @@ pub(crate) mod tests {
         in_a_project(|home| {
             let repo = format!("{home}/.claude");
             let command = format!("jj -R {repo} log");
+            let read = format!("jj --ignore-working-copy -R {repo} log");
             assert!(!crate::is_safe_command(&command));
-            assert!(crate::is_safe_command(&format!("jj --ignore-working-copy -R {repo} log")));
+            assert!(!crate::is_safe_command(&read), "a repository outside the project is not opened ungranted");
+            assert!(with_grants(&[(repo.as_str(), true, true)], || crate::is_safe_command(&read)));
             assert!(!with_grants(&[(repo.as_str(), false, true)], || crate::is_safe_command(&command)));
             assert!(!ReachReason::RepositorySnapshot.grant_helps());
             for other in [format!("{home}/.config/safe-chains.toml"), "/etc/sudoers".to_string(), format!("{home}/x")] {
@@ -387,7 +391,11 @@ pub(crate) mod tests {
             }
             assert_eq!(super::repository_snapshot(&format!("jjx -R {repo} log")), None);
             let snapshot = ReachReason::RepositorySnapshot;
-            assert_eq!(snapshot.settled(&command, &|c| crate::is_safe_command(c)), snapshot);
+            assert_eq!(snapshot.settled(&command, &|c| crate::is_safe_command(c)), ReachReason::FrozenTrustRoot);
+            assert_eq!(
+                with_grants(&[(repo.as_str(), true, true)], || snapshot.settled(&command, &|c| crate::is_safe_command(c))),
+                snapshot
+            );
             assert_eq!(snapshot.settled(&command, &|_| false), ReachReason::FrozenTrustRoot);
             assert_eq!(ReachReason::OutsideWorkspace.settled(&command, &|_| false), ReachReason::OutsideWorkspace);
         });

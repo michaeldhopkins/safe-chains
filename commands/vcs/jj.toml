@@ -21,15 +21,15 @@ valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 
 # `-R`/`--repository` picks the repo every sub acts on, so a write sub lands outside the workspace:
 # `jj -R /etc new` created a commit in a repo under /etc and auto-approved. Gated at the WRITE locus
-# rather than `exec` because jj mutates that repo's store — it does not run code out of it — so
-# `-R /tmp/scratch-repo` stays workable while system and home paths do not. With
-# `--ignore-working-copy` an observing sub (log, diff, status, …) skips the snapshot and writes
-# nothing, so the handler judges the value as a read there. The handler is declared in pathgates.toml
-# (`[roles.jj]`), and -R/--repository are gated there in every position.
+# rather than `exec` because jj mutates that repo's store. With `--ignore-working-copy` an observing
+# sub (log, diff, status, …) skips the snapshot and writes nothing, so the handler judges the value
+# as a read there. The handler is declared in pathgates.toml (`[roles.jj]`), and -R/--repository
+# are gated there in every position.
 # `config path` is not an observing sub here: it creates the repository's config id to print
 # the path. Loading a repository reads its config, and a legacy .jj/repo/config.toml can name a
-# program jj runs; that is the same exposure as `cd DIR && jj --ignore-working-copy log` or
-# `git -C DIR diff`, which are approved, so it is accepted here rather than refused only for -R.
+# program jj runs, so a repository outside the project (every -R, or the folder jj runs in) is
+# refused with or without the flag unless a write grant names it, as `git -C DIR` is
+# (`refuses_its_arguments` in src/handlers/mod.rs).
 # The handler judges the working directory the same way, so `cd DIR && jj log` without the flag
 # is a write into DIR.
 [command.path_gate]

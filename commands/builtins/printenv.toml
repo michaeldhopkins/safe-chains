@@ -1,8 +1,13 @@
 [[command]]
 name = "printenv"
 aliases = ["gprintenv"]
-description = "Prints the values of environment variables to stdout. Purely a reader with no side effects -- it cannot set, modify, or delete variables, nor can it write to the filesystem. Note that output may contain sensitive values (API keys, tokens) if present in the environment. Part of GNU coreutils; stable for decades."
+description = "Prints the values of environment variables to stdout: every variable with no operand, or the ones named. The environment carries credentials (API keys, tokens), and what printenv prints reaches the agent, so printing is refused; only --help and --version (GNU) and -h and -V, which print no variable, are approved. BSD printenv takes no options and answers each of those with its usage line. Part of GNU coreutils and of BSD; stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation"
+researched_version = "GNU coreutils 9.x; BSD printenv (macOS)"
 level = "Inert"
-bare = true
-standalone = ["--help", "--null", "--version", "-0", "-V", "-h"]
+bare = false
+require_any = ["--help", "--version", "-V", "-h"]
+standalone = ["--help", "--version", "-V", "-h"]
+max_positional = 0
+examples_safe = ["printenv --help", "printenv --version", "gprintenv -h"]
+examples_denied = ["printenv", "printenv HOME", "printenv --help HOME", "printenv -0", "gprintenv"]

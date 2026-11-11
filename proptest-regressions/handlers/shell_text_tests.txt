@@ -1,0 +1,11 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 21858dcd343aa1842cc790441f7c7c062da42d1adac75244dc25be6d4f097745 # shrinks to program = "man", word = "\""
+cc 29217a9a71f6835d74985a2ab45ab265ff7809e79393b05fd9960160f902cee5 # shrinks to program = "zmore", before = [], flag = "--prompt=", value = "", c = ' ', rest = ""
+cc 4341bb9a0122cdd5c4ea98ef50cae4345657cfe11b090f366136ef0b1aa8abe3 # shrinks to program = "zless", first = "a{b,c}", setter = "PAGER=pax "
+cc ac422af9e4da6018e43c49363219bdedd079486c68247a4f5bca7157ea2fa2fc # shrinks to program = "zless", first = "{a,b}-r", setter = "PAGER=pax "
+cc 547500a490ae8e88e976946fa2122edd3c2f83640f07f9af6272da7d75b789cb # shrinks to program = "zless", first = "{a,-r}", setter = "PAGER=pax "

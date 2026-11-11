@@ -34,8 +34,8 @@ dylib could not be loaded`. Since an agent's toolchain is overwhelmingly Homebre
 than `/bin`, this narrows the example without narrowing the exposure. `LD_PRELOAD` proper is a Linux
 concern (CI, Linux users), and the non-loader vectors below — `PATH`, `GIT_SSH_COMMAND`, `GIT_DIR` —
 depend on no OS protection and work everywhere. The `PATH` case is worth singling out because AGENTS.md §scope already
-commits to worst-casing a name reached via a non-standard path (`./cat`, `/tmp/cat`); redefining
-`PATH` achieves the same shadowing without the spelling that triggers the guard.
+commits to worst-casing a name reached via a non-standard path outside the worktree (`/tmp/cat`); redefining
+`PATH` achieves the same shadowing without the spelling that triggers the guard. A relative path inside the worktree is the project's own file, not that guard.
 
 ## An env assignment is a facet modifier
 

@@ -32,7 +32,6 @@ cargo audit	-n
 cargo clean	-n
 cargo geiger	-f
 cargo geiger	-i
-cargo install	-f
 cargo outdated	-n
 cargo public-api	-s
 cargo publish	-n
@@ -191,6 +190,12 @@ jj tag list	-c
 jj tag list	-t
 ktrace trace	-t
 kubectl logs	-f
+# right: mise -f is --force (reinstall) on install, use and self-update; only unset takes a file with it
+mise i	-f
+mise install	-f
+mise self-update	-f
+mise u	-f
+mise use	-f
 nerdctl logs	-f
 oc logs	-f
 oc whoami	-c

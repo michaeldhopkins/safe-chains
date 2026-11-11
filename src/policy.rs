@@ -36,19 +36,36 @@ impl UnknownTolerance {
 /// allowlist. `unknown` controls flag-shaped unknowns; `numeric_dash` opts
 /// into `-NUMBER` shorthand (e.g. `head -20`); `single_dash_words` stops a single-dash token
 /// being read as a cluster of short flags, for tools whose options are whole words (`exiftool -if`
-/// is one option that runs Perl, never `-i -f`).
+/// is one option that runs Perl, never `-i -f`). `reads_commands.plus` is for a pager or editor that
+/// runs a `+word` operand as its first command (`less +!id`, `vim '+!id'`): only a line number
+/// (`+42`) or a bare `+` passes. `reads_commands.stdin` is for one that reads keystrokes from a
+/// standard input that is not a terminal (`printf ':!id\n' | vim`): fed anything, it is refused.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct FlagTolerance {
     pub unknown: UnknownTolerance,
     pub numeric_dash: bool,
     pub single_dash_words: bool,
+    pub reads_commands: CommandSources,
+}
+
+/// Where a pager or editor takes commands from besides its options: a `+word` operand, and a
+/// standard input that is not a terminal.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct CommandSources {
+    pub plus: bool,
+    pub stdin: bool,
 }
 
 impl FlagTolerance {
     /// Strict allowlist: deny every unrecognized flag-shaped token.
     /// `const`-callable for use in static `FlagPolicy` literals.
     pub const fn strict() -> Self {
-        Self { unknown: UnknownTolerance::Strict, numeric_dash: false, single_dash_words: false }
+        Self {
+            unknown: UnknownTolerance::Strict,
+            numeric_dash: false,
+            single_dash_words: false,
+            reads_commands: CommandSources { plus: false, stdin: false },
+        }
     }
 }
 
@@ -71,6 +88,12 @@ pub enum PositionalShape {
     /// reads a toolchain argument with a path separator as a toolchain directory and runs its
     /// binaries. The shape `cargo +name` admits.
     ToolchainName,
+    /// A local folder that cannot be read as a remote address. kustomize clones any target it can
+    /// parse as a git repository (`github.com/org/repo`, `https://…`, `git@host:…`, `gh:org/repo`,
+    /// `host/org/repo.git`) before it looks for a local folder, so a target with a scheme, a
+    /// colon, an `@`, a query, a `//` subpath, a `.git` component, or a host-like first component
+    /// is not a local path.
+    LocalPath,
 }
 
 impl PositionalShape {
@@ -79,6 +102,7 @@ impl PositionalShape {
             Self::Path => looks_like_path(token),
             Self::GoPackage => is_go_local_package(token),
             Self::ToolchainName => crate::envvars::is_toolchain_name(token),
+            Self::LocalPath => is_local_path(token),
         }
     }
 
@@ -87,6 +111,7 @@ impl PositionalShape {
             "path" => Some(Self::Path),
             "go-package" => Some(Self::GoPackage),
             "toolchain-name" => Some(Self::ToolchainName),
+            "local-path" => Some(Self::LocalPath),
             _ => None,
         }
     }
@@ -96,6 +121,21 @@ impl PositionalShape {
         name.map(|n| Self::from_name(n).ok_or_else(|| format!("{owner}: unknown positional_shape `{n}`")))
             .transpose()
     }
+}
+
+/// Whether `token` names a local folder that no tool could read as a remote address. See
+/// [`PositionalShape::LocalPath`].
+pub fn is_local_path(token: &str) -> bool {
+    if token.is_empty() || token.starts_with('-') || token.contains("//") {
+        return false;
+    }
+    if token.chars().any(|c| matches!(c, ':' | '@' | '?' | '\\')) {
+        return false;
+    }
+    let mut components = token.split('/');
+    let first = components.next().unwrap_or_default();
+    let host_like = !first.starts_with('.') && !first.starts_with('~') && first.contains('.');
+    !host_like && !token.split('/').any(|c| c == "_git" || c.ends_with(".git"))
 }
 
 /// Whether `token` is a go LOCAL package/file (a filesystem path), as opposed to a
@@ -253,7 +293,11 @@ pub fn count_positionals<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
             break;
         }
 
-        if !t.starts_with('-') {
+        if tolerance.reads_commands.plus && t.starts_with('+') && !t[1..].bytes().all(|b| b.is_ascii_digit()) {
+            return None;
+        }
+
+        if !t.starts_with('-') || (*t == "-" && !standalone.contains_flag(t)) {
             positionals += 1;
             i += 1;
             continue;
@@ -341,6 +385,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn local_path_refuses_an_empty_word_a_flag_and_a_double_slash() {
+        for refused in ["", "-x", "a//b"] {
+            assert!(!is_local_path(refused), "{refused:?} is not a local folder");
+        }
+        for local in ["src", "./docs", "a/b"] {
+            assert!(is_local_path(local), "{local} is a local folder");
+        }
+    }
+
+    #[test]
     fn go_local_package_each_alternative_alone() {
         for local in [".", "..", "./x", "../x", "/x", "x.go"] {
             assert!(is_go_local_package(local), "{local} is local");
@@ -379,6 +433,25 @@ mod tests {
             tolerance: FlagTolerance::strict(),
         };
         assert!(check(&toks(&["uname"]), &policy));
+    }
+
+    #[test]
+    fn a_lone_dash_is_an_operand_and_counts_toward_max_positional() {
+        for max in 0..3usize {
+            let policy = FlagPolicy {
+                standalone: WordSet::flags(&["--version", "-V"]),
+                valued: WordSet::flags(&["-e"]),
+                bare: true,
+                max_positional: Some(max),
+                tolerance: FlagTolerance::strict(),
+            };
+            for dashes in 0..5usize {
+                let mut words = vec!["Rscript", "--version"];
+                words.extend(std::iter::repeat_n("-", dashes));
+                assert_eq!(check(&toks(&words), &policy), dashes <= max, "max {max}, {dashes} dashes");
+                assert_eq!(count_positionals(&toks(&words), &policy.standalone, &policy.valued, policy.tolerance), Some(dashes));
+            }
+        }
     }
 
     /// What a flag declared in BOTH lists actually does — measured, because the answer decides
@@ -598,7 +671,12 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: true,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
+        tolerance: FlagTolerance {
+            unknown: UnknownTolerance::Both,
+            numeric_dash: false,
+            single_dash_words: false,
+            ..FlagTolerance::strict()
+        },
     };
 
     #[test]
@@ -647,7 +725,12 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: false, single_dash_words: false },
+        tolerance: FlagTolerance {
+            unknown: UnknownTolerance::Short,
+            numeric_dash: false,
+            single_dash_words: false,
+            ..FlagTolerance::strict()
+        },
     };
 
     #[test]
@@ -688,7 +771,12 @@ mod tests {
         valued: WordSet::flags(&[]),
         bare: false,
         max_positional: None,
-        tolerance: FlagTolerance { unknown: UnknownTolerance::Long, numeric_dash: false, single_dash_words: false },
+        tolerance: FlagTolerance {
+            unknown: UnknownTolerance::Long,
+            numeric_dash: false,
+            single_dash_words: false,
+            ..FlagTolerance::strict()
+        },
     };
 
     #[test]
@@ -738,7 +826,12 @@ mod tests {
             valued: WordSet::flags(&[]),
             bare: true,
             max_positional: Some(2),
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false, single_dash_words: false },
+            tolerance: FlagTolerance {
+                unknown: UnknownTolerance::Both,
+                numeric_dash: false,
+                single_dash_words: false,
+                ..FlagTolerance::strict()
+            },
         };
         assert!(check(&toks(&["echo", "--unknown", "hello"]), &policy));
         assert!(!check(&toks(&["echo", "--a", "--b", "--c"]), &policy));
@@ -822,7 +915,12 @@ mod tests {
     fn single_dash_words_under_short_tolerance_count_unknowns_as_positionals() {
         let policy = FlagPolicy {
             max_positional: Some(1),
-            tolerance: FlagTolerance { unknown: UnknownTolerance::Short, single_dash_words: true, numeric_dash: false },
+            tolerance: FlagTolerance {
+                unknown: UnknownTolerance::Short,
+                single_dash_words: true,
+                numeric_dash: false,
+                ..FlagTolerance::strict()
+            },
             ..WORDS_POLICY
         };
         assert!(check(&toks(&["exiftool", "-if"]), &policy));
@@ -873,6 +971,28 @@ mod tests {
     fn positional_shape_from_name() {
         assert_eq!(PositionalShape::from_name("path"), Some(PositionalShape::Path));
         assert_eq!(PositionalShape::from_name("nope"), None);
+        assert_eq!(PositionalShape::from_name("local-path"), Some(PositionalShape::LocalPath));
+    }
+
+    proptest::proptest! {
+        /// Every spelling kustomize reads as a git repository is refused as a local folder, and a
+        /// folder spelled with plain words, anchored or not, is accepted.
+        #[test]
+        fn a_repository_address_is_never_a_local_path(
+            host in proptest::string::string_regex("[a-z]{1,8}\\.(com|org|io)").unwrap(),
+            parts in proptest::collection::vec(proptest::string::string_regex("[a-z][a-z0-9_-]{0,7}").unwrap(), 1..4),
+            anchor in proptest::sample::select(vec!["", "./", "../", "~/", "/"]),
+            form in proptest::sample::select(vec![
+                "{h}/{p}", "https://{h}/{p}", "ssh://git@{h}/{p}", "git@{h}:{p}", "gh:{p}",
+                "{h}/{p}?ref=v1", "{h}/{p}//sub", "local/{p}.git", "{p}/_git/x", "file:///{p}",
+            ]),
+        ) {
+            let path = parts.join("/");
+            let remote = form.replace("{h}", &host).replace("{p}", &path);
+            proptest::prop_assert!(!is_local_path(&remote), "{}", remote);
+            let local = format!("{anchor}{path}");
+            proptest::prop_assert!(is_local_path(&local), "{}", local);
+        }
     }
 
     #[test]
@@ -933,7 +1053,8 @@ mod tests {
 
     #[test]
     fn describe_reports_tolerances() {
-        let lenient = FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: true, single_dash_words: false };
+        let lenient =
+            FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: true, single_dash_words: false, ..FlagTolerance::strict() };
         assert_eq!(
             described(&[], &[], false, lenient),
             "- Hyphen-prefixed positional arguments accepted\n- Numeric shorthand accepted (e.g. -20 for -n 20)"

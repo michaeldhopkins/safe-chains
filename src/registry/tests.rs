@@ -2153,6 +2153,38 @@ fn credential_store_reads_are_denied() {
     );
 }
 
+/// A `first_arg` glob admits a VERB or resource name, never a flag. `*` matches any word, and the
+/// flag check after it starts one word further on, so an unlisted flag standing where the verb goes
+/// was admitted unexamined: `kubectl get --raw /api/v1/secrets` read every Secret through the raw
+/// API, and `kubectl get -oyaml secrets` slipped past the Secret gate as an unknown first word.
+/// Walks every glob arm in the registry, so a new one is covered the day it lands.
+#[test]
+fn a_first_arg_glob_never_admits_an_unlisted_flag_in_the_verb_position() {
+    fn collect(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
+        let DispatchKind::Branching { subs, first_arg, .. } = kind else { return };
+        if !first_arg.is_empty() {
+            out.push(prefix.to_string());
+        }
+        for s in subs {
+            collect(&format!("{prefix} {}", s.name), &s.kind, out);
+        }
+    }
+    let mut prefixes = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        collect(name, &spec.kind, &mut prefixes);
+    }
+    assert!(prefixes.iter().any(|p| p == "kubectl get"), "the walk must reach kubectl get: {prefixes:?}");
+    for prefix in &prefixes {
+        for tail in ["--sc-unlisted", "--sc-unlisted x", "--sc-unlisted=x", "-Z", "-Zvalue x"] {
+            let inv = format!("{prefix} {tail}");
+            assert_eq!(crate::command_verdict(&inv), Verdict::Denied, "an unlisted flag in the verb position must deny: {inv}");
+        }
+    }
+    for c in ["kubectl get --raw /api/v1/secrets", "kubectl get --raw=/api/v1/namespaces/x/secrets", "kubectl get -oyaml secrets"] {
+        assert!(!crate::is_safe_command(c), "must deny: {c}");
+    }
+}
+
 /// The `credential_first_arg` mechanism (dispatch_branching): a first-positional glob classifies
 /// the invocation as a credential-read (deny) while every other value falls through the allow-glob.
 /// Guards the value-dependent credential class — every NAME FORM of the secret resource denies
@@ -2169,6 +2201,52 @@ fn credential_first_arg_gates_every_secret_name_form() {
         "kubectl get SECRET.v1.core db", "aws configure get AWS_SECRET_ACCESS_KEY",
     ] {
         assert!(!crate::is_safe_command(c), "credential first-arg must deny: {c}");
+    }
+    // kubectl reads several kinds in one call (`pods,secrets`, `pod/a secret/b`), so a credential
+    // name is one wherever the glob's arguments put it, not only first.
+    for name in ["secret", "secrets", "Secret", "SECRETS", "secret.v1.core"] {
+        for args in [
+            format!("pods,{name}"),
+            format!("{name},pods"),
+            format!("all,{name} -o yaml"),
+            format!("pod/x {name}/y -o yaml"),
+            format!("pods {name}"),
+            format!("-n prod pods,{name}"),
+            format!("pods -o yaml {name}"),
+        ] {
+            let c = format!("kubectl get {args}");
+            assert!(!crate::is_safe_command(&c), "a credential name in any position must deny: {c}");
+        }
+    }
+    // An unquoted pattern is expanded by the shell against the directory before kubectl or aws
+    // sees it, so one that could spell a credential name reads as that name.
+    for c in [
+        "kubectl get sec*", "kubectl get 'sec*'", "kubectl get s?cret", "kubectl get secr[e]ts", "kubectl get *", "kubectl get pods,*ets",
+        "kubectl get S*", "kubectl get secret/*", "kubectl get secret.*", "kubectl get [s]ecret/db", "aws configure get aws_*",
+        "aws configure get *token", "kubectl get pods s*",
+    ] {
+        assert!(!crate::is_safe_command(c), "a pattern that could spell a credential name must deny: {c}");
+    }
+    // A listed valued short flag may carry its value glued on, as pflag reads it.
+    for c in [
+        "kubectl get -oyaml pods", "kubectl get -nx pods", "kubectl get -lapp=x pods", "kubectl get -nsecrets pods",
+        "kubectl get -nx -oyaml pods", "kubectl get -ojsonpath={.items} pods",
+    ] {
+        assert!(crate::is_safe_command(c), "a glued listed value must allow: {c}");
+    }
+    for c in [
+        "kubectl get -oyaml secrets", "kubectl get -nx secret/db", "kubectl get -lapp=x pods,secrets", "kubectl get -oyaml pods secrets",
+        "kubectl get -Xyaml pods", "kubectl get -wyaml pods",
+    ] {
+        assert!(!crate::is_safe_command(c), "a glued value must not hide a credential or an unlisted flag: {c}");
+    }
+    for c in ["kubectl get pod*", "kubectl get p?ds", "kubectl get d?ployments", "aws configure get reg*", "kubectl get deploy*"] {
+        assert!(crate::is_safe_command(c), "a pattern no credential name fits must allow: {c}");
+    }
+    for c in [
+        "kubectl get pods,services", "kubectl get pods -n secrets", "kubectl get pods -l app=secret", "kubectl get pod/x service/y -o yaml",
+    ] {
+        assert!(crate::is_safe_command(c), "a credential word as a flag's value or a lookalike must allow: {c}");
     }
     for c in [
         "kubectl get pods", "kubectl get mycustomresource",
@@ -2900,6 +2978,21 @@ fn every_output_locus_variant_states_whether_it_can_exceed_the_user_rung() {
 ///
 /// The threshold is evidence, not proof, so the fixture is a WORKLIST rather than a deny-list:
 /// a row means "check this one tool", and some rows will turn out correct as written.
+fn confirmed_arity_rows(path: &std::path::Path) -> std::collections::HashSet<(String, String)> {
+    let raw = std::fs::read_to_string(path).expect("read flag_arity_confirmed.tsv");
+    raw.lines()
+        .filter(|l| !l.starts_with('#') && !l.trim().is_empty())
+        .map(|l| {
+            let cols: Vec<&str> = l.split('\t').map(str::trim).collect();
+            assert!(
+                cols.len() == 3 && cols.iter().all(|c| !c.is_empty()),
+                "flag_arity_confirmed.tsv: row {l:?} must be <scope>\\t<flag>\\t<why the declaration is right>"
+            );
+            (cols[0].to_string(), cols[1].to_string())
+        })
+        .collect()
+}
+
 #[test]
 fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
     use super::types::TomlFile;
@@ -2968,8 +3061,21 @@ fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
         .map(|(scope, flag)| (scope.trim().to_string(), flag.trim().to_string()))
         .collect();
 
-    let mut unlisted: Vec<String> = candidates.difference(&listed).map(|(s, f)| format!("  {s}\t{f}")).collect();
-    let mut stale: Vec<String> = listed.difference(&candidates).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    let confirmed = confirmed_arity_rows(&fixture.with_file_name("flag_arity_confirmed.tsv"));
+    let both: Vec<String> = confirmed.intersection(&listed).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    assert!(both.is_empty(), "these rows are both confirmed and still on the worklist; keep only one:\n{}", both.join("\n"));
+    let unconfirmed: HashSet<(String, String)> = candidates.difference(&confirmed).cloned().collect();
+    let mut stale_confirmed: Vec<String> = confirmed.difference(&candidates).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    stale_confirmed.sort();
+    assert!(
+        stale_confirmed.is_empty(),
+        "these flag_arity_confirmed.tsv rows are no longer candidates ({}) — delete them in the same change:\n{}",
+        stale_confirmed.len(),
+        stale_confirmed.join("\n"),
+    );
+
+    let mut unlisted: Vec<String> = unconfirmed.difference(&listed).map(|(s, f)| format!("  {s}\t{f}")).collect();
+    let mut stale: Vec<String> = listed.difference(&unconfirmed).map(|(s, f)| format!("  {s}\t{f}")).collect();
     unlisted.sort();
     stale.sort();
 
@@ -2978,8 +3084,8 @@ fn a_long_flag_is_not_standalone_where_it_is_valued_elsewhere() {
         unlisted.is_empty(),
         "these scopes declare a long flag `standalone` that is `valued` in many other \
              commands, and are not on the worklist ({}). Check the tool's grammar: move the flag \
-             to `valued` (or `optional_valued`), or add the row with a note saying the \
-             declaration is right:\n{}",
+             to `valued` (or `optional_valued`), or, when the tool's grammar shows the \
+             declaration is right, add it to flag_arity_confirmed.tsv with the reason:\n{}",
         unlisted.len(),
         unlisted.join("\n"),
     );
@@ -4084,7 +4190,7 @@ fn an_executor_named_flag_is_gated_at_the_executor_locus() {
                     }
                     checked += 1;
                     let role = gate_of(scope, &flag).or_else(|| gate_of(cmd, &flag));
-                    if role.as_deref() != Some("exec") {
+                    if !matches!(role.as_deref(), Some("exec" | "remote_shell")) {
                         failures.push(format!(
                             "{}: `{label} {flag}` names a program but its path_gate role is \
                                  {role:?} (needs \"exec\"; read/write would admit /tmp). If its \
@@ -4457,6 +4563,18 @@ positional_shape = "not-a-real-shape"
         );
     });
     assert!(result.is_err(), "loading an unknown positional_shape should panic with diagnostic",);
+}
+
+#[test]
+fn a_sub_positional_shape_that_its_dispatch_would_ignore_is_rejected() {
+    for extra in ["write_flags = [\"-w\"]", "guard = \"--check\"", "first_arg = [\"x*\"]", "require_any = [\"--dry-run\"]"] {
+        let toml = format!(
+            "[[command]]\nname = \"demo-shape-{}\"\n\n[[command.sub]]\nname = \"build\"\nstandalone = [\"-w\", \"--check\", \"--dry-run\"]\npositional_shape = \"local-path\"\n{extra}\n",
+            extra.len()
+        );
+        let result = std::panic::catch_unwind(|| load_one(&toml));
+        assert!(result.is_err(), "positional_shape with `{extra}` loaded, though that dispatch never reads it");
+    }
 }
 
 #[test]
@@ -5111,6 +5229,28 @@ fn researched_version_does_not_render_in_docs() {
 }
 
 #[test]
+fn require_any_keeps_each_policy_bullet_on_its_own_line() {
+    let spec = load_one(
+        r#"
+            [[command]]
+            name = "demo"
+            bare = false
+            require_any = ["-c", "-d", "-l", "-r"]
+            standalone = ["--help", "-c", "-d", "-l", "-r"]
+            valued = ["-q"]
+        "#,
+    );
+    let doc = spec.to_command_doc();
+    assert_eq!(
+        doc.description,
+        "\
+- Requires -c, -d, -l, -r.
+- Allowed standalone flags: --help, -c, -d, -l, -r
+- Allowed valued flags: -q"
+    );
+}
+
+#[test]
 fn handler_command_with_doc_body_renders_body() {
     let spec = load_one(
         r#"
@@ -5357,6 +5497,25 @@ standalone = ["--help"]
         }
         other => panic!("expected Custom, got {other:?}"),
     }
+}
+
+#[test]
+fn handler_command_with_only_a_fallback_renders_no_subcommand_header() {
+    let spec = load_one(
+        r#"
+[[command]]
+name = "demo-flat"
+handler = "demo_handler"
+
+[command.fallback]
+level = "Inert"
+bare = false
+standalone = ["--help", "--version"]
+"#,
+    );
+    let doc = spec.to_command_doc();
+    assert!(!doc.description.contains("Without a subcommand"), "a command with no subcommands needs no header: {}", doc.description);
+    assert!(doc.description.contains("- Allowed standalone flags: --help, --version"), "fallback flags must render: {}", doc.description);
 }
 
 #[test]
@@ -6694,6 +6853,7 @@ fn the_pre_filter_never_hides_a_denial_from_a_declared_gate() {
             Role::Write => crate::engine::resolve::write_target_verdict,
             Role::Exec => crate::engine::resolve::execute_file_verdict,
             Role::Plugin => crate::pathgate::plugin_verdict,
+            Role::RemoteShell => crate::handlers::coreutils::rsync_shell::remote_shell_verdict,
         };
         for value in VALUES {
             let judged_denied = judge(value) == crate::verdict::Verdict::Denied;
@@ -6762,6 +6922,7 @@ fn every_declared_path_flag_actually_gates() {
             // A /tmp executor is the discriminating hot path: `write` would ALLOW it
             // (Temp is writable), but `exec` must DENY it (running staged/foreign code).
             Role::Exec | Role::Plugin => "/tmp/sc-probe/Cargo.toml",
+            Role::RemoteShell => "/tmp/sc-probe/ssh",
             Role::Ignore => continue,
         };
         // Probe the space form (`flag hot`) AND the `flag=hot` glued form. A path-flag must
@@ -6999,6 +7160,13 @@ fn positional_and_output_dir_writers_gate_sensitive_paths() {
         format!("wkhtmltopdf in.html {S}"),
         format!("gdbm_dump db.gdbm {S}"),
         format!("pkgbuild --root ./r {S}"),
+        format!("ps2ascii in.ps {S}"),
+        format!("ps2ascii -- in.ps {S}"),
+        "ps2ascii in.ps /usr/local/bin/x".to_string(),
+        format!("fix-qdf in.pdf {S}"),
+        format!("fix-qdf -- in.pdf {S}"),
+        "ps2ascii ~/.ssh/id_rsa ./out.txt".to_string(),
+        "fix-qdf ~/.ssh/id_rsa ./out.pdf".to_string(),
         // in-place mutators: sensitive as the sole/last positional …
         format!("wasm-strip {S}"),
         format!("llvm-strip {S}"),
@@ -7016,7 +7184,8 @@ fn positional_and_output_dir_writers_gate_sensitive_paths() {
     for c in [
         "pdfunite a.pdf b.pdf ./out.pdf", "sphinx-build src ./_build", "weasyprint in.html ./out.pdf", "tiffcp in.tif ./out.tif",
         "mkdocs build -d ./site", "gs -o ./out.pdf x.ps", "dvipdf in.dvi ./out.pdf", "tiff2bw in.tif ./out.tif", "jpgicc in.jpg ./out.jpg",
-        "wasm-strip ./mod.wasm", "nbstripout ./a.ipynb ./b.ipynb",
+        "wasm-strip ./mod.wasm", "nbstripout ./a.ipynb ./b.ipynb", "ps2ascii in.ps ./out.txt", "ps2ascii in.ps",
+        "fix-qdf in.pdf ./out.pdf", "fix-qdf in.pdf",
     ] {
         assert!(crate::is_safe_command(c), "benign worktree write must allow: {c}");
     }
@@ -7104,7 +7273,7 @@ fn no_new_unresearched_first_arg_family() {
     );
 
     // Exact count, so migrating one family and adding another nets out visibly instead of silently.
-    const REMAINING: usize = 233;
+    const REMAINING: usize = 231;
     assert_eq!(
         found.len(),
         REMAINING,
@@ -7453,4 +7622,105 @@ proptest::proptest! {
         );
         proptest::prop_assert!(load_toml(&source, "test").is_err(), "{}", source);
     }
+}
+
+/// A file operand is judged by where it points, in every command that takes one.
+///
+/// A content reader or writer with no path role (no `[command.path_gate]`, no `pathgates.toml`
+/// entry) takes ANY path: `funzip ~/.ssh/id_ed25519` printed the key while `zcat` of the same file
+/// was refused, and `ziptool ~/.ssh/k.zip add a b` rewrote a file outside the workspace. Nothing in
+/// the entry says which positionals are files, but its `examples_safe` do: an author who writes
+/// `funzip ./out.zip` has written a file operand. So every `./` or `../` operand of every example is
+/// replaced by a credential path, and the result must be refused.
+///
+/// Commands that name a path without reading or writing its content (`ls`, `stat`, `cd`) approve
+/// such a probe rightly; they are listed in `tests/fixtures/credential_operand_worklist.tsv`, which
+/// may only shrink. Examples whose file operands are spelled without `./` are not probed.
+#[test]
+fn a_credential_path_in_place_of_an_example_file_operand_is_refused() {
+    const SECRET: &str = "~/.ssh/id_ed25519";
+    let acknowledged: std::collections::BTreeSet<&str> = include_str!("../../tests/fixtures/credential_operand_worklist.tsv")
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .filter_map(|l| l.split('\t').next())
+        .collect();
+    let mut approved: std::collections::BTreeMap<&str, String> = std::collections::BTreeMap::new();
+    let mut probed = 0usize;
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue;
+        }
+        for example in &spec.examples_safe {
+            for word in example.split_whitespace().skip(1).filter(|w| w.starts_with("./") || w.starts_with("../")) {
+                let probe = example.replacen(word, SECRET, 1);
+                probed += 1;
+                if crate::is_safe_command(&probe) {
+                    approved.entry(name.as_str()).or_insert(probe);
+                }
+            }
+        }
+    }
+    assert!(probed > 200, "only {probed} example operands probed; the walk is not finding them");
+    let unlisted: Vec<String> = approved
+        .iter()
+        .filter(|(name, _)| !acknowledged.contains(*name))
+        .map(|(name, probe)| format!("{name}: {probe}"))
+        .collect();
+    assert!(
+        unlisted.is_empty(),
+        "a credential path in place of an example's file operand was APPROVED ({}). Give the operand a \
+             path role (pathgates.toml or `[command.path_gate]`), or, for a command that names a path \
+             without reading or writing it, list it in tests/fixtures/credential_operand_worklist.tsv:\n  {}",
+        unlisted.len(),
+        unlisted.join("\n  ")
+    );
+    let stale: Vec<&&str> = acknowledged.iter().filter(|name| !approved.contains_key(**name)).collect();
+    assert!(stale.is_empty(), "listed in credential_operand_worklist.tsv but now refused; remove them: {stale:?}");
+}
+
+/// The example probe above reaches only commands whose `examples_safe` spell a file operand with
+/// `./`, so ptar, xar and zipinfo, whose examples did not, were never probed while each read or
+/// wrote a credential path it was given. So every command, and every subcommand, is also probed with
+/// a credential path as its only operand (`zipinfo ~/.ssh/id_ed25519`, `kubectl diff ~/.ssh/…`).
+/// One that approves it names the path without reading or writing its content, and is listed in
+/// `tests/fixtures/credential_operand_bare_probe.tsv` with the probe; the list may only shrink, and a
+/// command that starts refusing the probe must leave it.
+#[test]
+fn a_credential_path_as_the_only_operand_of_every_command_is_refused() {
+    const SECRET: &str = "~/.ssh/id_ed25519";
+    let listed: std::collections::BTreeSet<&str> = include_str!("../../tests/fixtures/credential_operand_bare_probe.tsv")
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .collect();
+    let mut approved: std::collections::BTreeSet<String> = std::collections::BTreeSet::new();
+    let mut probed = 0usize;
+    for (name, spec) in TOML_REGISTRY.iter() {
+        if name != &spec.name {
+            continue;
+        }
+        let mut probes = vec![format!("{name} {SECRET}")];
+        if let DispatchKind::Branching { subs, .. } = &spec.kind {
+            probes.extend(subs.iter().map(|sub| format!("{name} {} {SECRET}", sub.name)));
+        }
+        for probe in probes {
+            probed += 1;
+            if crate::is_safe_command(&probe) {
+                approved.insert(probe);
+            }
+        }
+    }
+    assert!(probed > 2000, "only {probed} commands and subcommands probed; the walk is not finding them");
+    let unlisted: Vec<&String> = approved.iter().filter(|probe| !listed.contains(probe.as_str())).collect();
+    assert!(
+        unlisted.is_empty(),
+        "a credential path as the only operand was APPROVED ({}). Give the operand a path role, or, for a \
+             command that names a path without reading or writing it, list the probe in \
+             tests/fixtures/credential_operand_bare_probe.tsv:\n{}",
+        unlisted.len(),
+        unlisted.iter().map(|p| p.as_str()).collect::<Vec<_>>().join("\n")
+    );
+    let stale: Vec<&&str> = listed.iter().filter(|probe| !approved.contains(**probe)).collect();
+    assert!(stale.is_empty(), "listed in credential_operand_bare_probe.tsv but now refused; remove them: {stale:?}");
 }

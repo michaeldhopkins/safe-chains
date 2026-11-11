@@ -13,11 +13,13 @@ static classifier must not, and it would be TOCTOU-racy anyway):
 
 - A `$PATH` shadow or a planted binary named after a safe tool is classified as that
   tool. (Mitigation the capability engine applies: a resolvable name reached via a
-  *non-standard path* — `./cat`, `/tmp/cat` — is worst-cased; a bare name resolved via
-  `$PATH`, and standard bin paths, are trusted.)
+  *non-standard path* outside the worktree — `/tmp/cat`, `~/bin/grep` — is worst-cased; a
+  bare name resolved via `$PATH`, and standard bin paths, are trusted. A relative path
+  that lands inside the worktree is the project's own file, judged as `bash` running that
+  path, not as the tool its basename spells.)
 - A hard link is not seen: two names for one file are two paths.
 
-Three deliberate exceptions read the filesystem, all racing the shell (accepted in
+Five deliberate exceptions read the filesystem, all racing the shell (accepted in
 `docs/design/hard-problems.md` HP-5); keep them the only ones:
 
 - A glob starting with a pattern character (`ls *`) is listed against the known working directory at
@@ -31,6 +33,16 @@ Three deliberate exceptions read the filesystem, all racing the shell (accepted 
   for a write-frozen name (`.git`, `.jj`, `.hg`, `.sl`, `.envrc`) and is judged as writing the first
   one it finds (`src/engine/resolve/frozen_reach.rs`). A walk that follows links also reports each
   link out of the tree (`src/engine/resolve/frozen_walk.rs`).
+- A `cargo run` whose arguments could change safe-chains' own rules reads the nearest `Cargo.toml`
+  unless `--bin safe-chains` or `-p safe-chains` says which binary runs (a `-p`, `--bin` or `--example` naming another
+  package or target still reads it), so the check applies only to this
+  project (`src/handlers/cargo_runs_this.rs`), after following links. An unknown or missing folder, or a
+  manifest that does not parse or has no package of its own, counts as this project; so does a
+  workspace with a member that is, or one whose members cannot all be read.
+- A Bundler subcommand that loads the bundle (`list`, `check`, `exec`, …) looks for `gems.rb` or
+  `Gemfile` in the folder it runs in and each folder above, as Bundler does, and judges the one it
+  finds as code run from that file (`src/handlers/ruby/gemfile.rs`), so a project with no Gemfile
+  does not load one from outside it.
 
 If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
 to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`

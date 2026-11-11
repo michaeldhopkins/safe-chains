@@ -1,17 +1,40 @@
 [[command]]
 name = "screen"
-description = "Full-screen window manager that multiplexes a physical terminal between several processes. Bare invocation opens a fresh session running the user's shell; -r reattaches an existing session; -ls / -list lists sessions; -wipe cleans up dead sessions. Sessions create utmp records and persist after detach. Entirely local."
+description = "Full-screen window manager that multiplexes a physical terminal between several processes. Bare invocation opens a fresh session running the user's shell; -r and -x reattach an existing session, -R and -RR reattach one or start a new session when none is detached, -S names the session started, -d / -D detach one, and each may be followed by the session's name; -ls / -list lists sessions and -wipe cleans up dead ones, either optionally matching a name; -h N sets the scrollback length. Sessions create utmp records and persist after detach. Entirely local. A positional operand is the program the new window runs (`screen sh -c '...'`), -s names the shell program, -c reads a screenrc whose `screen` lines start programs, and -X / -Q send a command to a running session (`-X stuff` types input into it, `-X exec` runs a program), so each of those executes code of the caller's choosing. -m starts a new session even inside one, and with -d it starts that session detached, needing no terminal: the shell named by $SHELL, and the rc file named by $SCREENRC or $SYSSCREENRC, then run unseen."
 url = "https://www.gnu.org/software/screen/manual/screen.html"
 researched_version = "GNU screen 5.0 (matches macOS-shipped screen)"
+handler = "screen"
+examples_safe = ["screen -r work", "screen -dr work", "screen -x work", "screen -ls work", "screen -h 5000 -r work"]
+examples_denied = [
+    "screen sh -c 'rm -rf ~'",
+    "screen -dm sh -c 'rm -rf ~'",
+    "screen -X stuff x",
+    "screen -S work -X stuff 'rm -rf ~\\n'",
+    "screen -S work -X exec rm -rf ~",
+    "screen -Q windows",
+    "screen -c evil.rc",
+    "screen -s /tmp/evil.sh -dm",
+    "screen -- sh",
+    "screen -dmS work rm -rf ~",
+    "screen -m",
+    "screen -dm",
+    "screen -Dm",
+    "screen -dmS work",
+    "screen -S work -d -m",
+    "screen -D -m",
+    "screen -A -dm",
+    "screen -U -dmS work",
+]
+
+[command.fallback]
 level = "SafeRead"
-tolerate_unknown_short = true
+max_positional = 0
 standalone = [
     "-a", "-A",
     "-d", "-D",
-    "-h", "--help",
+    "--help",
     "-l", "-L",
     "-list", "-ls",
-    "-m",
     "-O",
     "-q",
     "-r", "-R",
@@ -20,4 +43,4 @@ standalone = [
     "-wipe",
     "-x",
 ]
-valued = ["-c", "-e", "-p", "-s", "-S", "-t", "-T"]
+valued = ["-e", "-h", "-p", "-S", "-t", "-T"]

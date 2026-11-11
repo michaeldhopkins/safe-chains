@@ -4,7 +4,11 @@
 //! written in place of the variable, and a word whose text is unknown is never approved where a
 //! command reads it as code.
 
-use crate::handler_property_tests::workspace;
+const ROOT: &str = "/nonexistent/safe-chains-test-work";
+
+fn workspace() -> crate::pathctx::PathCtx {
+    crate::pathctx::PathCtx { cwd: Some(ROOT.into()), root: Some(ROOT.into()), ..Default::default() }
+}
 
 fn is_safe_command(cmd: &str) -> bool {
     crate::command_verdict_in(cmd, workspace()).is_allowed()

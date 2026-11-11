@@ -34,3 +34,31 @@ pub(crate) fn handler_policy_flag_sets(cmd_name: &str, key: &str) -> Option<(&'s
     let policy = handler_policies.get(key)?;
     Some((policy.standalone.as_slice(), policy.valued.as_slice()))
 }
+
+pub(crate) fn sub_valued_flags(cmd_name: &str, sub_name: &str) -> Option<&'static [String]> {
+    let spec = handler_spec(cmd_name)?;
+    let (DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. }) = &spec.kind else {
+        return None;
+    };
+    match &subs.iter().find(|s| s.name == sub_name)?.kind {
+        DispatchKind::Policy { policy, .. }
+        | DispatchKind::RequireAny { policy, .. }
+        | DispatchKind::WriteFlagged { policy, .. }
+        | DispatchKind::Executor { policy, .. } => Some(policy.valued.as_slice()),
+        _ => None,
+    }
+}
+
+pub(crate) fn command_flag_sets(cmd_name: &str) -> Option<(&'static [String], &'static [String])> {
+    match &handler_spec(cmd_name)?.kind {
+        DispatchKind::Policy { policy, .. }
+        | DispatchKind::RequireAny { policy, .. }
+        | DispatchKind::WriteFlagged { policy, .. }
+        | DispatchKind::Executor { policy, .. } => Some((policy.standalone.as_slice(), policy.valued.as_slice())),
+        _ => None,
+    }
+}
+
+pub(crate) fn command_valued_flags(cmd_name: &str) -> Option<&'static [String]> {
+    command_flag_sets(cmd_name).map(|(_, valued)| valued)
+}

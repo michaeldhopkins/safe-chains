@@ -1,10 +1,12 @@
 use crate::parse::Token;
-use crate::policy::FlagSet;
 use crate::verdict::{SafetyLevel, Verdict};
-
+mod credential_args;
+pub(super) mod delegate;
+mod pre_flags;
 use super::policy::{check_owned, flag_given};
 use super::types::*;
 use super::{CMD_HANDLERS, SUB_HANDLERS};
+use pre_flags::skip_pre_flags;
 
 type HandlerMap = std::collections::HashMap<&'static str, super::HandlerFn>;
 
@@ -47,7 +49,7 @@ fn dispatch_first_arg(
     if !matches {
         return Verdict::Denied;
     }
-    if super::glob_presents_unlisted_flag(tokens, 2, standalone, valued, loopback_valued) {
+    if super::glob_flags::glob_presents_unlisted_flag(tokens, 2, standalone, valued, loopback_valued) {
         return Verdict::Denied;
     }
     Verdict::Allowed(level)
@@ -67,63 +69,6 @@ fn dispatch_require_any(
         }
     }
     if flag_given(tokens, policy, require_any) && check_owned(tokens, policy) { Verdict::Allowed(level) } else { Verdict::Denied }
-}
-
-/// Whether `s` is a rustup toolchain selector (`+nightly`, `+1.90.0`, `+nightly-2026-01-01`).
-///
-/// A POSITIVE shape test, so an unrecognized spelling is simply not a selector and dispatch
-/// proceeds without stripping it (which then denies on the unknown token). The selector names an
-/// ALREADY-INSTALLED toolchain — rustup resolves `+name` through its own toolchain list and cannot
-/// be pointed at an arbitrary directory — so the shape is restricted to what a toolchain name can
-/// be. `/`, `~`, `$`, `.` and `..` are excluded by construction rather than by exclusion: only
-/// alphanumerics and `._-` are admitted, and a name must start alphanumeric so `+..` cannot form.
-fn is_toolchain_selector(s: &str) -> bool {
-    s.strip_prefix('+').is_some_and(crate::envvars::is_toolchain_name)
-}
-
-fn skip_pre_flags(tokens: &[Token], pre_standalone: &[String], pre_valued: &[String], toolchain_selector: bool, start: usize) -> usize {
-    let mut i = start;
-    // At most ONE, and only in front. `cargo +nightly build` selects which toolchain runs `build`;
-    // it does not change what `build` does, which is why the sub dispatch below is reached
-    // unchanged. Bounded to a single leading token so a `+`-prefixed OPERAND deeper in the line is
-    // never silently eaten.
-    if toolchain_selector
-        && let Some(t) = tokens.get(i)
-        && is_toolchain_selector(t.as_str())
-    {
-        i += 1;
-    }
-    while i < tokens.len() {
-        let t = &tokens[i];
-        let s = t.as_str();
-        if !s.starts_with('-') {
-            break;
-        }
-        if crate::policy::takes_next_word(pre_standalone, pre_valued, s) {
-            i += 2;
-            continue;
-        }
-        if let Some((flag, _)) = s.split_once('=')
-            && pre_valued.contains_flag(flag)
-        {
-            i += 1;
-            continue;
-        }
-        if pre_standalone.contains_flag(s) {
-            i += 1;
-            continue;
-        }
-        // POSIX-style short-flag cluster (`-vv`, `-vy`): every byte after
-        // the dash must be a known standalone short. Mirrors the same
-        // logic in policy::check_flags for non-wrapper subs.
-        let bytes = s.as_bytes();
-        if bytes.len() > 2 && bytes[1] != b'-' && bytes[1..].iter().all(|&b| pre_standalone.contains_short(b)) {
-            i += 1;
-            continue;
-        }
-        break;
-    }
-    i
 }
 
 /// The first-positional GLOB arm of a `Branching`: which verbs it admits, at what level, the flags
@@ -163,34 +108,24 @@ fn dispatch_branching(
         }
     }
     if let Some(sub) = subs.iter().find(|s| s.name == arg) {
-        return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
+        return dispatch_sub(&tokens[start..], sub);
     }
     // A per-database variant: `db:migrate:primary` is `db:migrate` aimed at one of the databases
     // it would otherwise migrate all of. Only subs that OPT IN (`per_database`) match this way,
     // and only for a single trailing plain identifier — see `TomlSub::per_database` for why the
     // set cannot be enumerated and why inheriting the base's classification cannot widen it.
     if let Some(sub) = per_database_variant(subs, arg) {
-        return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
+        return dispatch_sub(&tokens[start..], sub);
     }
-    let glob_match = |p: &str| match p.strip_suffix('*') {
-        Some(prefix) => arg.starts_with(prefix),
-        None => arg == p,
-    };
-    // A first positional naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
+    let glob_match = |p: &str| !arg.starts_with('-') && p.strip_suffix('*').map_or(arg == p, |prefix| arg.starts_with(prefix));
+    // An argument naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
     // aws_secret_access_key`) is a CREDENTIAL-READ — deny before the allow-glob admits it. The
-    // value-dependent complement to `profile=credential-read`; `arg` is already flag-aware. Matched
-    // CASE-INSENSITIVELY: kubectl resource kinds are case-insensitive (`get Secret`/`SECRET` reads
-    // secrets), so a case-variant must not slip past the deny into the `*` allow. The allow-glob
-    // below stays case-sensitive — a case-insensitive ALLOW would be fail-open.
-    let glob_match_ci = |p: &str| match p.strip_suffix('*') {
-        Some(prefix) => arg.len() >= prefix.len() && arg.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes()),
-        None => arg.eq_ignore_ascii_case(p),
-    };
-    if glob.credential.iter().any(|p| glob_match_ci(p)) {
+    // value-dependent complement to `profile=credential-read`.
+    if credential_args::names_a_credential(&tokens[start..], glob.credential, &[pre_valued, glob.valued]) {
         return Verdict::Denied;
     }
     if !glob.patterns.is_empty() && glob.patterns.iter().any(|p| glob_match(p)) {
-        if super::glob_presents_unlisted_flag(tokens, start + 1, glob.standalone, glob.valued, glob.loopback_valued) {
+        if super::glob_flags::glob_presents_unlisted_flag(tokens, start + 1, glob.standalone, glob.valued, glob.loopback_valued) {
             return Verdict::Denied;
         }
         return Verdict::Allowed(glob.level);
@@ -247,7 +182,13 @@ fn dispatch_wrapper(
 
 fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -> Verdict {
     match kind {
-        DispatchKind::Policy { policy, level } => super::policy::check_with_passthrough(tokens, policy, *level),
+        DispatchKind::Policy { policy, level, shape } => {
+            if misshapen(*shape, tokens, policy) {
+                Verdict::Denied
+            } else {
+                super::policy::check_with_passthrough(tokens, policy, *level)
+            }
+        }
         DispatchKind::FirstArg { patterns, level, standalone, valued, loopback_valued } => {
             dispatch_first_arg(tokens, patterns, *level, standalone, valued, loopback_valued)
         }
@@ -289,18 +230,7 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
             }
             write_flagged(tokens, *base_level, write_flags)
         }
-        DispatchKind::DelegateAfterSeparator { separator } => {
-            let sep_pos = tokens[1..].iter().position(|t| t == separator.as_str());
-            let Some(pos) = sep_pos else {
-                return Verdict::Denied;
-            };
-            let inner_start = pos + 2;
-            if inner_start >= tokens.len() {
-                return Verdict::Denied;
-            }
-            let inner = shell_words::join(tokens[inner_start..].iter().map(|t| t.as_str()));
-            crate::command_verdict(&inner)
-        }
+        DispatchKind::DelegateAfterSeparator(delegate) => delegate.verdict(tokens),
         DispatchKind::DelegateSkip { skip, shape } => {
             if tokens.len() <= *skip {
                 return Verdict::Denied;
@@ -325,12 +255,16 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
 }
 
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
-    spec.line_checks.judge(tokens, || dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS))
+    if spec.hooks.refuses(tokens) {
+        return Verdict::Denied;
+    }
+    spec.line_checks
+        .judge(tokens, || spec.hooks.classify_exports(tokens, dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS)))
 }
 
-/// A sub's kind, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs).
-pub(super) fn dispatch_sub_kind(tokens: &[Token], kind: &DispatchKind) -> Verdict {
-    dispatch_kind(tokens, kind, &SUB_HANDLERS)
+/// A sub, dispatched for `registry::try_sub_dispatch` (a handler consulting its TOML subs) and for a branching command.
+pub(super) fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
+    super::operands::gated_sub(tokens, sub, || dispatch_kind(tokens, &sub.kind, &SUB_HANDLERS))
 }
 
 pub(super) fn check_handler_policy_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {

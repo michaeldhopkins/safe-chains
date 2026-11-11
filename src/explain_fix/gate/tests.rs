@@ -153,7 +153,12 @@ fn segment(text: &str) -> GateKind {
 #[test]
 fn a_refused_segment_is_a_boundary_only_when_its_reason_is() {
     assert_eq!(segment("cat ~/.ssh/id_rsa"), GateKind::Boundary);
-    assert_eq!(segment("jj -R ~/.claude log"), GateKind::NotYet);
+    assert_eq!(segment("jj -R ~/.claude log"), GateKind::Boundary);
+    let granted = format!("{}/.claude", home());
+    assert_eq!(
+        crate::engine::resolve::regions::with_grants(&[(granted.as_str(), true, true)], || segment("jj -R ~/.claude log")),
+        GateKind::NotYet
+    );
 }
 
 #[test]

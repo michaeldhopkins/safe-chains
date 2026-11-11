@@ -161,6 +161,14 @@ command name, not a path supplying one piece of code). An `exec-path` list shape
 locus per element would cover it; it needs measuring against the PATH values agents set in practice
 (`PATH=./node_modules/.bin:$PATH`, a toolchain's bin directory) before it can refuse anything.
 
+## `cargo run -p <member>` is judged by the member's name, not its manifest
+
+`cargo run -p tool -- config add x` is approved when `tool` is not spelled like safe-chains, because
+the rule-change check asks only whether the package name could be this project. A workspace member
+can still depend on safe-chains, or build a binary that calls it. A better check reads the member's
+own manifest, as `cargo run --bin` reads this package's, and judges its binary names and
+dependencies.
+
 ## The open mechanism backlog, in order
 
 **Tier 1 — the schema cannot express what the model already knows.** These come
@@ -448,6 +456,10 @@ honest fix is to model the stdin-list commands (`cpio -o`, `tar -T`, `xargs -a`,
 and that wants doing once rather than per-tool.
 
 Found by the review probe alongside `pax -w ~` and `ditto ~/.ssh ./s`, which ARE fixed.
+
+`git ls-files | tar -cf out.tar -T -` is that false refusal for tar. `-T` is worst-cased before the
+names from the pipe can be judged, and a handler cannot un-deny an engine denial. `tar -cf out.tar
+-T /etc/shadow` stays refused: the list file is named on the line.
 
 ## A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace
 
@@ -3630,8 +3642,7 @@ predate that work. The unknown folder refuses all of them.
 - **A run-time item is judged by a stand-in name.** `echo .git/hooks/pre-commit | xargs touch` and
   `ls -A | while read f; do echo x >> "$f"; done` are approved in a project: the xargs or loop item
   is classified as an ordinary name, while the real item can be a hook or `.envrc`.
-- **A path in a flag or an environment variable a resolver does not gate.** `mise set --file
-  ~/.zshrc FOO=1`, `mise use --path .envrc node@20`, `GIT_INDEX_FILE=.envrc git add .`.
+- **A path in an environment variable a resolver does not gate.** `GIT_INDEX_FILE=.envrc git add .`.
 - **A brace-expanded redirect target.** `echo x > {.,}envrc` is approved; zsh's MULTIOS writes it
   to `.envrc` (bash refuses it as an ambiguous redirect).
 
@@ -3653,3 +3664,7 @@ Dropping the two flags would deny rule lines such as `echo "--- section ---"`, w
 `cargo watch` is the research target's one remaining `profiled` case for cargo, and it is a mechanism gap. It re-runs commands on every file change: by default `cargo check`, with `-x CMD` naming further cargo subcommands, `-s CMD` an arbitrary shell command, and trailing `-- CMD` a full command (which makes `-x` and `-s` ignored). The execution is local and caller-supplied. `archetypes.toml` has `remote-exec` (a remote locus) and `supply-chain-build` (network-sourced), and no local `execute` x `caller-inline` profile, so picking one would state a fact about the command that is not true.
 
 What is missing is either a local caller-inline execution archetype, or a wrapper declaration on a subcommand (as `watchexec` has at command level) that classifies the inner command from `-x`, `-s` and the `--` tail. Until then `watch` keeps `candidate = true`, the archetype test would otherwise need a new neighbour annotation, and `tests/fixtures/research_target_owed.tsv` pins cargo as owing `profiled`. cargo-watch itself is in maintenance mode (last release 8.5.3, 2024-10-02), so it is not urgent.
+
+## `mise use -g` and `mise set -g` write the global config
+
+`--file` (`set`, `unset`), `--path`, `-p` and `--cd` (`use`, `u`) are gated as writes at the locus they name (`pathgates.toml`), but `mise use -g node@20` and `mise set -g FOO=1` still write `~/.config/mise/config.toml`, which every project reads, and are approved. A decision: whether `-g` stays approved (`--override` is unlisted). `mise trust` stays approved on purpose: `install` and `exec` trust their active config themselves, so the content the write subs accept is what is gated (`refuse_operands` on `set`, `use`, `u`, and on the tool arguments of `install`, `upgrade` and `exec`, whose bracketed options can name a `postinstall` command).

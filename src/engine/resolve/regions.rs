@@ -14,20 +14,25 @@ use serde::Deserialize;
 
 use crate::engine::facet::{FacetTerm, LocalLocus};
 mod grant_faces;
+mod home_spelling;
+pub(crate) use home_spelling::absolute_other_home;
 pub(crate) mod hypothetical;
 pub(crate) mod metadata;
+mod path_text;
 mod protection;
+use path_text::{at_or_below, ci_starts_with, has_hidden_component};
+mod unicode_spelling;
 #[cfg(test)]
 pub(crate) use protection::anchored_protected_paths_here;
 use protection::role_is_protective;
-pub(crate) use protection::{home_nodes, keeps_absolute, names_a_region, names_a_secret, protection_covers};
+pub(crate) use protection::{
+    granted_for_writing, home_nodes, keeps_absolute, lies_in_root, names_a_region, names_a_secret, protection_covers,
+};
 
-/// Which faces a user grant may NOT widen.
-///
-/// Two distinct needs, and collapsing them was a real over-deny. safe-chains' own config must not
-/// be WRITTEN at all, because any write to it decides what gets approved next. Its parent directory
-/// is different: writing a file into `~/.config` is ordinary, and what must not happen is the
-/// directory being replaced by something pointing elsewhere.
+/// Which faces a user grant may NOT widen. Two distinct needs, and collapsing them was a real
+/// over-deny. safe-chains' own config must not be WRITTEN at all, because any write to it decides
+/// what gets approved next. Its parent directory is different: writing a file into `~/.config` is
+/// ordinary, and what must not happen is the directory being replaced by something pointing elsewhere.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) enum Frozen {
     /// A grant widens every face. The default.
@@ -211,34 +216,6 @@ impl Matcher {
             }
         })
     }
-}
-
-/// Whether `inner` sits at or below `outer` as a path, by whole components.
-///
-/// `~/.ssh` is at-or-below `~/.ssh` and `~/.ssh/known_hosts` is below it, but `~/.sshfoo` is not —
-/// hence the component boundary rather than a bare `starts_with`.
-fn at_or_below(inner: &str, outer: &str) -> bool {
-    let inner = inner.trim_end_matches('/');
-    let outer = outer.trim_end_matches('/');
-    // An empty `outer` would make every absolute path read as "below" it. No node roots at `/`
-    // today, so this is a fail-closed backstop rather than a live case: nothing NAMES a node that
-    // claims the whole filesystem.
-    if outer.is_empty() {
-        return false;
-    }
-    inner == outer || inner.strip_prefix(outer).is_some_and(|rest| rest.starts_with('/'))
-}
-
-/// Whether `remainder` (a path below a grant root) contains a hidden component — a dotfile/
-/// dotdir like `.ssh`, `.env`, `.git-credentials`. Credentials and config live in these, so a
-/// broad grant must not sweep them up; grant such a directory explicitly to reach inside it.
-fn has_hidden_component(remainder: &str) -> bool {
-    remainder.split('/').any(|seg| seg.len() > 1 && seg.starts_with('.'))
-}
-
-/// ASCII-case-insensitive `starts_with`, zero-alloc (for case-folded shield matching).
-fn ci_starts_with(haystack: &str, prefix: &str) -> bool {
-    haystack.len() >= prefix.len() && haystack.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
 }
 
 struct Node {
@@ -731,33 +708,13 @@ fn scratchpad_role(path: &str) -> Option<Role> {
 /// role) and `apply_grant` (which wants the root the naming test compares against) so the two can
 /// never disagree about which node is in play.
 fn secret_node(path: &str) -> Option<&'static Node> {
-    shield_spellings(path).into_iter().find_map(|p| {
+    home_spelling::shield_spellings(path).into_iter().find_map(|p| {
         REGIONS
             .nodes
             .iter()
             .filter(|n| n.applies_here() && n.role.reads_secret)
             .find(|n| n.matcher.specificity(&p, n.fold && current_os() == "macos").is_some())
     })
-}
-
-/// Every spelling a SHIELD must be asked about: the path itself, plus its macOS firmlink form
-/// when the `/private` prefix only matches under case folding.
-///
-/// `canonicalize` already folds `/private/etc/x` → `/etc/x`, but case-sensitively, because that
-/// fold also feeds admits and folding an admit would hand `/PRIVATE/tmp` the scratch rung. So the
-/// case variant of a firmlink never reached the shield: `/etc/SHADOW` was refused (nodes fold) and
-/// `/PRIVATE/etc/shadow` was not, though on the default macOS volume they are one file.
-///
-/// Extra spellings are offered to the shield ONLY. Everything else classifies the path as written,
-/// which is what keeps a case variant from reaching a permissive node.
-fn shield_spellings(path: &str) -> Vec<String> {
-    let mut out = vec![path.to_string()];
-    if let Some(folded) = super::locus::firmlink_fold_case_insensitive(path)
-        && folded != path
-    {
-        out.push(folded);
-    }
-    out
 }
 
 /// The root the naming test compares a grant against: the DEEPEST matching credential-store node.
@@ -770,7 +727,7 @@ fn shield_spellings(path: &str) -> Vec<String> {
 /// happen to give the deeper root; that is an accident of file order, not a property to rely on.
 fn secret_node_root(path: &str) -> Option<String> {
     let fold_shields = current_os() == "macos";
-    shield_spellings(path)
+    home_spelling::shield_spellings(path)
         .iter()
         .flat_map(|p| {
             REGIONS
@@ -805,6 +762,9 @@ fn base_region(path: &str) -> Role {
     // swallowing something sensitive underneath it.
     if let Some(node) = secret_node(path) {
         return node.role;
+    }
+    if let Some(role) = unicode_spelling::shield_role(path) {
+        return role;
     }
 
     let mut best: Option<(usize, Role)> = None;
@@ -860,25 +820,6 @@ fn other_user_home_role(path: &str) -> Option<Role> {
         rebind_locus: LocalLocus::Machine,
         reads_secret: true,
         frozen: Frozen::Nothing,
-    })
-}
-
-/// `/Users/someone/…`, `/home/someone/…` — another user's home written out in full.
-///
-/// Only the `~name` spelling was recognised, and while every machine-rung path was refused that
-/// was enough. Opening local reads made the two spellings disagree: `~someone/notes` stayed
-/// private and `/Users/someone/notes` read out. Our OWN home never arrives here as an absolute —
-/// `canonicalize` has already folded it to `~/…`.
-pub(crate) fn absolute_other_home(path: &str) -> bool {
-    let home = std::env::var("HOME").unwrap_or_default();
-    let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
-    // Both conventional roots, not just this host's: the classifier reads strings, and a Linux
-    // path handed to a macOS run must not come back with a different answer.
-    ["/Users", "/home"].iter().any(|parent| {
-        path.strip_prefix(parent)
-            .and_then(|r| r.strip_prefix('/'))
-            .and_then(|r| r.split('/').next())
-            .is_some_and(|user| !user.is_empty() && (ours.is_empty() || user != ours))
     })
 }
 
@@ -1457,6 +1398,67 @@ mod tests {
             };
             compare("no grant");
             with_grants(&[(tilde, true, true)], || compare("granted"));
+        }
+    }
+
+    /// On macOS the home folder answers to any case of its absolute spelling (`/users/me`,
+    /// `/USERS/ME`) and to its data-volume spelling (`/System/Volumes/Data/Users/me`), so every
+    /// credential store declared under `~/` stays a credential store in each of them. The tilde
+    /// fold matched `$HOME` case-sensitively, so `/users/me/.s3cfg` was an ordinary readable file.
+    /// Walks the region table, so a newly declared store is covered the day it lands.
+    #[test]
+    fn a_home_credential_store_is_shielded_in_every_spelling_of_home() {
+        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+            return;
+        };
+        let stores: Vec<String> = declared_region_paths()
+            .into_iter()
+            .filter(|p| p.starts_with("~/") && !p.contains('*'))
+            .map(|p| p.trim_end_matches('/').to_string())
+            .filter(|p| classify_region(p).reads_secret)
+            .collect();
+        assert!(stores.iter().any(|p| p == "~/.s3cfg"), "the walk must reach ~/.s3cfg: {stores:?}");
+        with_os("macos", || {
+            for store in &stores {
+                let rest = &store[1..];
+                for spelling in [
+                    format!("{}{rest}", home.to_ascii_lowercase()),
+                    format!("{}{rest}", home.to_ascii_uppercase()),
+                    format!("/System/Volumes/Data{home}{rest}"),
+                    format!("/system/volumes/data{}{rest}", home.to_ascii_lowercase()),
+                ] {
+                    assert!(classify_region(&spelling).reads_secret, "{spelling} must stay a credential store like {store}");
+                }
+            }
+        });
+    }
+
+    /// Another user's home written out in full is theirs in every spelling the default macOS
+    /// volume accepts: any case of `/Users` or `/home`, and the data-volume prefix. Only the exact
+    /// `/Users/someone` was recognised, so `/users/someone/notes` read out as an ordinary file.
+    #[test]
+    fn another_users_home_is_shielded_in_every_spelling_of_its_parent() {
+        let ours = std::env::var("HOME")
+            .ok()
+            .and_then(|h| h.rsplit_once('/').map(|(_, n)| n.to_string()))
+            .unwrap_or_default();
+        for os in ["macos", "linux"] {
+            with_os(os, || {
+                for spelling in [
+                    "/users/sc-someone-else/notes",
+                    "/USERS/sc-someone-else/notes",
+                    "/HOME/sc-someone-else/notes",
+                    "/System/Volumes/Data/Users/sc-someone-else/notes",
+                    "/system/volumes/data/users/sc-someone-else/notes",
+                    "/System/Volumes/Data/home/sc-someone-else/notes",
+                ] {
+                    assert!(classify_region(spelling).reads_secret, "{spelling} ({os}) is another user's home");
+                }
+                if !ours.is_empty() {
+                    let own = format!("/users/{ours}/notes.txt");
+                    assert!(!absolute_other_home(&own), "{own} ({os}) is our own home");
+                }
+            });
         }
     }
 

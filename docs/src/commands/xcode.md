@@ -32,7 +32,8 @@
 ### `codesign`
 <p class="cmd-url"><a href="https://ss64.com/mac/codesign.html">https://ss64.com/mac/codesign.html</a></p>
 
-- Requires --display, --verify, -d, -v. - Allowed standalone flags: --deep, --display, --verify, --xml, -R, -d, -v, --help, -h
+- Requires --display, --verify, -d, -v.
+- Allowed standalone flags: --deep, --display, --verify, --xml, -R, -d, -v, --help, -h
 - Allowed valued flags: --entitlements, --requirements, --verbose, -r
 
 **Examples:**
@@ -97,7 +98,8 @@
 ### `lipo`
 <p class="cmd-url"><a href="https://ss64.com/mac/lipo.html">https://ss64.com/mac/lipo.html</a></p>
 
-- Requires -archs, -create, -detailed_info, -extract, -extract_family, -info, -remove, -replace, -thin, -verify_arch. - Allowed standalone flags: -archs, -create, -detailed_info, -info, -verify_arch, --help, -h
+- Requires -archs, -create, -detailed_info, -extract, -extract_family, -info, -remove, -replace, -thin, -verify_arch.
+- Allowed standalone flags: -archs, -create, -detailed_info, -info, -verify_arch, --help, -h
 - Allowed valued flags: -arch, -extract, -extract_family, -output, -remove, -replace, -segalign, -thin
 
 **Examples:**
@@ -135,7 +137,8 @@
 ### `pkgutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/pkgutil.html">https://ss64.com/mac/pkgutil.html</a></p>
 
-- Requires --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. - Allowed standalone flags: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist, --regexp, --help, -h
+- Requires --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist.
+- Allowed standalone flags: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist, --regexp, --help, -h
 - Allowed valued flags: --volume
 
 ### `plutil`
@@ -244,7 +247,8 @@
 ### `spctl`
 <p class="cmd-url"><a href="https://ss64.com/mac/spctl.html">https://ss64.com/mac/spctl.html</a></p>
 
-- Requires --assess, -a. - Allowed standalone flags: --assess, --verbose, -a, -v, --help, -h
+- Requires --assess, -a.
+- Allowed standalone flags: --assess, --verbose, -a, -v, --help, -h
 - Allowed valued flags: --context, --type, --verbose, -t
 
 **Examples:**
