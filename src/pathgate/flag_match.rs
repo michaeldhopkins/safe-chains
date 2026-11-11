@@ -133,5 +133,34 @@ mod tests {
             prop_assert_eq!(match_flag(&flags, &separate, 1, &valued), Some((Role::Write, None, 1)));
             prop_assert_eq!(match_flag(&flags, &clustered, 1, &valued), Some((Role::Write, None, 1)));
         }
+
+        #[test]
+        fn a_long_flag_the_map_does_not_name_never_matches_a_short_letter_inside_it(
+            letter in "[a-z]",
+            before in "[a-z]{0,3}",
+            after in "[a-z]{0,3}",
+            value in "[a-z0-9./~][a-z0-9./~-]{0,8}",
+        ) {
+            let short = format!("-{letter}");
+            let long = format!("--{before}{letter}{after}");
+            let flags = HashMap::from([(short, Role::Write)]);
+            let valued = |_: &str| false;
+            let spelled_long = toks(&["cmd", &long, &value]);
+            let dash = toks(&["cmd", "-"]);
+            prop_assert_eq!(match_flag(&flags, &spelled_long, 1, &valued), None);
+            prop_assert_eq!(match_flag(&flags, &dash, 1, &valued), None);
+        }
+
+        #[test]
+        fn only_a_short_flag_is_read_out_of_a_cluster(
+            name in "[a-z]{2,6}",
+            booleans in "[A-Z]{1,3}",
+            value in "[a-z0-9./~][a-z0-9./~-]{0,8}",
+        ) {
+            let flags = HashMap::from([(format!("--{name}"), Role::Write)]);
+            let valued = |_: &str| false;
+            let clustered = toks(&["cmd", &format!("-{booleans}-{name}"), &value]);
+            prop_assert_eq!(match_flag(&flags, &clustered, 1, &valued), None);
+        }
     }
 }
