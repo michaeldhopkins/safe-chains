@@ -40,10 +40,14 @@ mod tests {
     fn a_plain_variable_is_set_globally_and_an_audited_one_locally() {
         for cmd in [
             "mise set -g FOO=1", "mise set --global FOO=bar", "mise set -E staging -g FOO=1", "mise set BASH_ENV=./x.sh",
-            "mise set RUSTC_WRAPPER=./w",
+            "mise set GIT_PAGER=cat",
         ] {
             assert!(is_safe_command(cmd), "{cmd} should be approved");
         }
+        assert!(
+            !is_safe_command("mise set RUSTC_WRAPPER=./w"),
+            "a program named by a relative path is approved only where a rule names it"
+        );
     }
 
     proptest::proptest! {

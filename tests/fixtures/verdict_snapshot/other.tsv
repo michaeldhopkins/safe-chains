@@ -26,10 +26,10 @@ ${cmd} log	denied
 (rm -rf /)	denied
 (x=1)	inert
 (x=1; ls)	inert
-./bin/rails db:migrate	safe-write
-./vendor/bin/pest --no-progress	safe-write
-./vendor/bin/phpstan analyse --no-progress	safe-write
-./vendor/bin/phpunit --testsuite Unit	safe-write
+./bin/rails db:migrate	denied
+./vendor/bin/pest --no-progress	denied
+./vendor/bin/phpstan analyse --no-progress	denied
+./vendor/bin/phpunit --testsuite Unit	denied
 /bin/chmod +s x	denied
 /usr/bin/env	denied
 /usr/bin/open x.command	denied

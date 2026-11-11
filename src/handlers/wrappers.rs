@@ -428,14 +428,10 @@ mod tests {
                 assert_eq!(crate::command_verdict(&denied_cmd), Verdict::Denied, "{denied_cmd}");
             }
         }
-        for script in ["./heavy-slot.sh", "scripts/heavy-slot.sh"] {
-            let cmd = format!("{script} run -- git status");
-            let verdict = crate::command_verdict(&cmd);
-            assert_eq!(verdict, crate::command_verdict(&format!("bash {cmd}")), "{cmd}");
-            assert_eq!(verdict, Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd}");
-        }
         for untrusted_path in [
+            "./heavy-slot.sh".to_string(),
             "../heavy-slot.sh".to_string(),
+            "scripts/heavy-slot.sh".to_string(),
             "/tmp/heavy-slot.sh".to_string(),
             "/var/tmp/heavy-slot.sh".to_string(),
             tilde("/heavy-slot.sh"),

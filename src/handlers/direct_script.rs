@@ -20,7 +20,11 @@ pub(crate) fn judged(tokens: &[Token], judge: impl Fn(&[Token]) -> Verdict) -> V
     let Some(first) = tokens.first().filter(|t| is_relative_command_path(t.as_str())) else {
         return judge(tokens);
     };
-    let mut verdict = judge(&as_interpreter(tokens));
+    let mut verdict = judge(tokens);
+    if verdict == Verdict::Denied {
+        return Verdict::Denied;
+    }
+    verdict = verdict.combine(judge(&as_interpreter(tokens)));
     let mut named = tokens.to_vec();
     for spelling in spellings(first.command_name()) {
         named[0] = Token::from_raw(spelling);
@@ -134,24 +138,6 @@ mod tests {
         .clone()
     }
 
-    fn pair(path: &str, arg: &str) -> (String, String) {
-        (format!("{path}{arg}"), format!("bash {path}{arg}"))
-    }
-
-    fn assert_level(direct: &str, via: &str, level_name: &str) {
-        let (ceiling, engine) = crate::level_ceiling(level_name).expect("level");
-        let d = crate::command_verdict_ceilinged(direct, ceiling, engine);
-        let b = crate::command_verdict_ceilinged(via, ceiling, engine);
-        assert_eq!(d, b, "{direct} at {level_name}");
-        for target in crate::targets::registry() {
-            for format in target.hook_formats() {
-                let left = crate::targets::respond(format, direct, d).map(|r| r.exit_code);
-                let right = crate::targets::respond(format, via, b).map(|r| r.exit_code);
-                assert_eq!(left, right, "{}: {direct} at {level_name}", target.name());
-            }
-        }
-    }
-
     fn unknown_folder(command: &str) -> (Verdict, Vec<crate::pathctx::folder::Note>) {
         let _ctx = crate::pathctx::enter(PathCtx {
             cwd: Some(crate::targets::UNKNOWN_WORKDIR.to_string()),
@@ -163,57 +149,44 @@ mod tests {
         (verdict, crate::pathctx::folder::notes())
     }
 
-    fn spelled(path: &str) -> Option<String> {
-        let name = path.rsplit('/').next().unwrap_or(path);
-        let tokens = [crate::parse::Token::from_raw(name.to_string())];
-        (super::is_relative_command_path(path) && crate::handlers::names_a_command(&tokens)).then(|| name.to_string())
-    }
-
-    fn assert_no_better_than_its_name(path: &str, arg: &str, name: &str) {
-        let (direct, via) = pair(path, arg);
-        let bare = format!("{name}{arg}");
+    /// A program named by a path that no rule names is its own program and is refused, on every
+    /// level and in every hook format, whatever a shell running the same file would be allowed.
+    fn assert_refused(path: &str, arg: &str) {
+        let _ctx = crate::pathctx::enter(project());
+        let direct = format!("{path}{arg}");
+        assert_eq!(crate::command_verdict(&direct), Verdict::Denied, "{direct}");
         for level in crate::engine::authoring::default_levels() {
             let (ceiling, engine) = crate::level_ceiling(&level.name).expect("level");
-            let d = crate::command_verdict_ceilinged(&direct, ceiling, engine);
-            let b = crate::command_verdict_ceilinged(&via, ceiling, engine);
-            let n = crate::command_verdict_ceilinged(&bare, ceiling, engine);
-            assert_eq!(d, b.combine(n), "{direct} at {}", level.name);
-        }
-    }
-
-    fn assert_same(path: &str, arg: &str) {
-        let _ctx = crate::pathctx::enter(project());
-        if let Some(name) = spelled(path) {
-            return assert_no_better_than_its_name(path, arg, &name);
-        }
-        let (direct, via) = pair(path, arg);
-        assert_eq!(crate::command_verdict(&direct), crate::command_verdict(&via), "{direct}");
-        let routed = super::is_relative_command_path(path);
-        for level in crate::engine::authoring::default_levels() {
-            let in_band = matches!(level.name.as_str(), "paranoid" | "reader" | "editor" | "developer");
-            if routed || in_band {
-                assert_level(&direct, &via, &level.name);
+            let verdict = crate::command_verdict_ceilinged(&direct, ceiling, engine);
+            assert_eq!(verdict, Verdict::Denied, "{direct} at {}", level.name);
+            for target in crate::targets::registry() {
+                for format in target.hook_formats() {
+                    let response = crate::targets::respond(format, &direct, verdict).map(|r| r.exit_code);
+                    let refused = crate::targets::respond(format, &direct, Verdict::Denied).map(|r| r.exit_code);
+                    assert_eq!(response, refused, "{}: {direct} at {}", target.name(), level.name);
+                }
             }
         }
-        if routed {
-            assert_eq!(unknown_folder(&direct), unknown_folder(&via), "{direct} in an unknown folder");
+        if super::is_relative_command_path(path) {
+            assert_eq!(unknown_folder(&direct).0, Verdict::Denied, "{direct} in an unknown folder");
         }
     }
 
     #[test]
-    fn every_corpus_path_matches_bash() {
+    fn every_corpus_path_is_refused() {
         for path in corpus() {
             for arg in ARGS {
-                assert_same(path, arg);
+                assert_refused(path, arg);
             }
         }
     }
 
     #[test]
-    fn project_scripts_are_approved() {
+    fn project_scripts_are_their_own_programs() {
+        let _ctx = crate::pathctx::enter(project());
         for cmd in ["deploy/tests/push_main_test.sh", "./deploy/tests/push_main_test.sh", "scripts/attest", "./bin/check.sh"] {
-            assert_eq!(crate::command_verdict(cmd), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd}");
-            assert_eq!(crate::command_verdict(cmd), crate::command_verdict(&format!("bash {cmd}")), "{cmd}");
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd}");
+            assert_eq!(crate::command_verdict(&format!("bash {cmd}")), Verdict::Allowed(SafetyLevel::SafeWrite), "bash {cmd}");
         }
     }
 
@@ -248,7 +221,7 @@ mod tests {
             "./cat src", "bin/git status", "./vendor/bin/phpunit --testsuite Unit", "scripts/run.sh", "./bin/cat foo",
             "target/debug/safe-chains config list", "scripts/install.sh", "./bin/Cat foo",
         ] {
-            assert!(crate::command_verdict(cmd).is_allowed(), "{cmd}");
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd}");
         }
     }
 
@@ -283,10 +256,7 @@ mod tests {
                 for dir in ["target/debug/deps/", "node_modules/.bin/", "./"] {
                     for arg in [" exec x", " config add x", " mcp", " -p hi"] {
                         let path = format!("{dir}{spelling}");
-                        let direct = crate::command_verdict(&format!("{path}{arg}"));
-                        let named = crate::command_verdict(&format!("{name}{arg}"));
-                        let script = crate::command_verdict(&format!("bash {path}{arg}"));
-                        assert_eq!(direct, script.combine(named), "{path}{arg}");
+                        assert_eq!(crate::command_verdict(&format!("{path}{arg}")), Verdict::Denied, "{path}{arg}");
                         checked += 1;
                     }
                 }
@@ -296,16 +266,11 @@ mod tests {
     }
 
     #[test]
-    fn a_vcs_hook_matches_bash() {
-        let cmd = ".git/hooks/post-checkout";
-        let verdict = crate::command_verdict(cmd);
-        assert_eq!(verdict, crate::command_verdict(&format!("bash {cmd}")));
-        assert_eq!(verdict, Verdict::Denied);
-        let spelled = ".git/hooks/pre-commit";
-        assert_eq!(
-            crate::command_verdict(spelled),
-            crate::command_verdict(&format!("bash {spelled}")).combine(crate::command_verdict("pre-commit"))
-        );
+    fn a_vcs_hook_is_refused_directly_and_through_a_shell() {
+        for cmd in [".git/hooks/post-checkout", ".git/hooks/pre-commit"] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd}");
+            assert_eq!(crate::command_verdict(&format!("bash {cmd}")), Verdict::Denied, "bash {cmd}");
+        }
     }
 
     #[test]
@@ -315,22 +280,22 @@ mod tests {
     }
 
     #[test]
-    fn arguments_after_the_script_follow_the_bash_rule() {
+    fn arguments_do_not_make_a_script_path_a_command() {
         let direct = crate::command_verdict("./bin/check.sh --no-progress extra");
         let via = crate::command_verdict("bash ./bin/check.sh --no-progress extra");
-        assert_eq!(direct, via);
-        assert_eq!(direct, Verdict::Allowed(SafetyLevel::SafeWrite));
+        assert_eq!(direct, Verdict::Denied);
+        assert_eq!(via, Verdict::Allowed(SafetyLevel::SafeWrite));
     }
 
     proptest! {
         #![proptest_config(ProptestConfig::with_cases(64))]
 
         #[test]
-        fn a_direct_worktree_script_matches_bash_on_every_level_and_target(
+        fn a_direct_path_is_refused_on_every_level_and_target(
             path in prop::sample::select(corpus()),
             arg in prop::sample::select(ARGS.to_vec()),
         ) {
-            assert_same(path, arg);
+            assert_refused(path, arg);
         }
 
         #[test]

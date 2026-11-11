@@ -506,7 +506,7 @@ biber -h	safe-write
 biber -q	safe-write
 biber -v	safe-write
 biber x	safe-write
-bin/rails db:create	safe-write
+bin/rails db:create	denied
 binhex	denied
 binhex --directory x	safe-write
 binhex --force	safe-write

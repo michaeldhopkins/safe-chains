@@ -336,7 +336,7 @@ fn an_entry_approves_no_more_than_the_command_shown() {
         ("CODEX exec x", "agent"),
         ("q chat", "agent"),
         ("/tmp/zzevil build", "PathSpelled"),
-        ("./zzevil.sh build", "AlreadyApproved"),
+        ("./zzevil.sh build", "PathSpelled"),
         ("zzmytool -o out.txt run", "SubAfterFlags"),
         ("zzmytool --config x.toml sync", "SubAfterFlags"),
         ("", "Unparseable"),

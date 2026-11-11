@@ -63,10 +63,11 @@ fn a_cd_into_installed_packages_or_a_frozen_folder_judges_what_runs_there() {
         "cd .git/hooks && mvn validate",
         "cd .git/hooks && task -l",
         "cd .git/hooks && ./pre-commit",
+        "cd src && ./a.sh",
     ] {
         assert!(!approved(command), "`{command}` was approved");
     }
-    for command in ["cd src && bash a.sh", "cd src && ./a.sh", "cd src && task -l", "bash src/a.sh"] {
+    for command in ["cd src && bash a.sh", "cd src && task -l", "bash src/a.sh"] {
         assert!(approved(command), "`{command}` should stay approved");
     }
 }

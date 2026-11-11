@@ -1350,7 +1350,7 @@ mise env -h	inert
 mise env x	denied
 mise exec	denied
 mise exec 'node[postinstall=touch pwned]' -- true	denied
-mise exec -- bin/rails db:create	safe-write
+mise exec -- bin/rails db:create	denied
 mise exec --jobs x	denied
 mise exec --quiet	denied
 mise exec --quiet --jobs x	denied
@@ -3924,6 +3924,8 @@ mvn test -Dtest=MyTest	safe-read
 mvn test -f /tmp/x/pom.xml	denied
 mvn test -f sub/pom.xml	safe-read
 mvn test -f ~/other/pom.xml	denied
+mvn test -f=/tmp/x/pom.xml	denied
+mvn test -f=sub/pom.xml	safe-read
 mvn test -gs /tmp/settings.xml	denied
 mvn test -l /etc/cron.d/x	denied
 mvn test -l target/mvn.log	safe-write
