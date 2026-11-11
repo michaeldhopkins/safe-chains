@@ -42,7 +42,7 @@
 //! refusal.
 
 use crate::parse::Token;
-use crate::pathgate::{Role, RoleSpec, Shape, walk};
+use crate::pathgate::{Role, RoleSpec, Shape, walk_for};
 
 const DIRECTIVES: &[&str] = &["import", "include"];
 const MODULE_FNS: &[&str] = &["modulemeta"];
@@ -102,7 +102,7 @@ fn words(tokens: &[Token]) -> Vec<&str> {
 }
 
 fn read_operands(tokens: &[Token]) -> bool {
-    walk(&RoleSpec::simple(Role::Read, Shape::Plain), tokens)
+    walk_for(&RoleSpec::simple(Role::Read, Shape::Plain), tokens, &|flag| crate::registry::policy::declares_standalone("jq", flag))
 }
 
 /// The words a tool reads as its filter: the first operand once every option has taken its

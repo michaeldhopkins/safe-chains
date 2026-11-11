@@ -2,7 +2,7 @@ use crate::parse::Token;
 use crate::policy::{FlagSet, FlagTolerance, UnknownTolerance, check_flags, consumes_next_value, count_positionals, takes_next_word};
 use crate::verdict::{SafetyLevel, Verdict};
 
-use super::types::{PassthroughSpec, TomlLevel, TomlPassthrough};
+use super::types::{DispatchKind, PassthroughSpec, TomlLevel, TomlPassthrough};
 
 #[derive(Debug, Clone)]
 pub struct OwnedPolicy {
@@ -37,6 +37,39 @@ impl OwnedPolicy {
             min_positional: None,
             tolerance: FlagTolerance::default(),
             passthrough: None,
+        }
+    }
+}
+
+/// Whether the command's policy lists `flag` as standalone in any of its scopes, so the flag takes
+/// a value only glued or after `=`. The path gate consumes the next word by the same rule the
+/// policy walker does (`policy::takes_next_word`). `cmd` is already canonicalized by the caller.
+pub(crate) fn declares_standalone(cmd: &str, flag: &str) -> bool {
+    super::CUSTOM_REGISTRY
+        .get(cmd)
+        .or_else(|| super::TOML_REGISTRY.get(cmd))
+        .is_some_and(|spec| spec.kind.declares_standalone(flag))
+}
+
+impl DispatchKind {
+    /// Whether any scope of this command lists `flag` as standalone.
+    pub(super) fn declares_standalone(&self, flag: &str) -> bool {
+        let lists = |flags: &[String]| flags.iter().any(|f| f == flag);
+        match self {
+            DispatchKind::Policy { policy, .. }
+            | DispatchKind::RequireAny { policy, .. }
+            | DispatchKind::WriteFlagged { policy, .. }
+            | DispatchKind::Executor { policy, .. } => lists(&policy.standalone),
+            DispatchKind::FirstArg { standalone, .. } | DispatchKind::Wrapper { standalone, .. } => lists(standalone),
+            DispatchKind::Branching { pre_standalone, subs, .. } => {
+                lists(pre_standalone) || subs.iter().any(|sub| sub.kind.declares_standalone(flag))
+            }
+            DispatchKind::VerbChain(spec) => lists(&spec.main_standalone),
+            DispatchKind::Custom { subs, handler_policies, .. } => {
+                subs.iter().any(|sub| sub.kind.declares_standalone(flag))
+                    || handler_policies.values().any(|policy| lists(&policy.standalone))
+            }
+            DispatchKind::DelegateAfterSeparator(_) | DispatchKind::DelegateSkip { .. } => false,
         }
     }
 }

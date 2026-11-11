@@ -1048,8 +1048,6 @@ rsync	--password-file
 rsync	--port
 rsync	--protocol
 rsync	--read-batch
-rsync	--remote-option
-rsync	--rsh
 rsync	--rsync-path
 rsync	--secret-file
 rsync	--skip-compress
@@ -1060,7 +1058,6 @@ rsync	--stop-fmt
 rsync	--suffix
 rsync	--temp-dir
 rsync	--timeout
-rsync	-e
 rsync	-f
 rsync	-T
 scalac	-encoding

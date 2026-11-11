@@ -13,7 +13,7 @@ pub(crate) use flag_sets::{command_flag_sets, command_valued_flags, fallback_fla
 mod glob_flags;
 mod operands;
 mod passthrough_gate;
-mod policy;
+pub(crate) mod policy;
 pub(crate) mod types;
 
 #[cfg(test)]

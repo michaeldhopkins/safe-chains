@@ -620,7 +620,6 @@ rollup	--amd.basePath	untriaged	-	-	-
 rollup	--assetFileNames	untriaged	-	-	-	
 rollup	--chunkFileNames	untriaged	-	-	-	
 rollup	--entryFileNames	untriaged	-	-	-	
-rspec	--profile	untriaged	-	-	-	
 rufo	--filename	untriaged	-	-	-	
 rvm install	--with-openssl-dir	untriaged	-	-	-	
 rvm install	--with-readline-dir	untriaged	-	-	-	

@@ -6943,6 +6943,89 @@ fn every_declared_path_flag_actually_gates() {
     );
 }
 
+/// INVARIANT: a flag written before a gated path flag never lifts the gate. For every command with
+/// path-gated flags, every other flag the command declares (standalone, optional-valued, valued, or
+/// gated with the `ignore` role) is placed before each gated flag, in both the space and the `=`
+/// spelling of the gated value. The gate must still deny, because the path-gate walker and the
+/// policy walker read the same words the same way: a word that spells a flag is never the value of
+/// the flag before it, and a flag that may stand alone takes a value only when it is glued.
+#[test]
+fn a_flag_before_a_gated_path_flag_never_lifts_the_gate() {
+    use super::types::TomlFile;
+    use crate::pathgate::Role;
+
+    fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+        for e in std::fs::read_dir(dir).unwrap() {
+            let p = e.unwrap().path();
+            if p.is_dir() {
+                toml_files(&p, out);
+            } else if p.extension().is_some_and(|x| x == "toml") {
+                out.push(p);
+            }
+        }
+    }
+
+    let mut gates: std::collections::BTreeMap<String, Vec<(String, Role)>> = std::collections::BTreeMap::new();
+    for (cmd, flag, role) in crate::pathgate::central_flag_gates() {
+        gates.entry(cmd).or_default().push((flag, role));
+    }
+    let mut leading: std::collections::BTreeMap<String, Vec<String>> = std::collections::BTreeMap::new();
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+    let mut files = Vec::new();
+    toml_files(&root, &mut files);
+    for file in &files {
+        let src = std::fs::read_to_string(file).unwrap();
+        let parsed: TomlFile = toml::from_str(&src).unwrap();
+        for cmd in &parsed.command {
+            if let Some(pg) = &cmd.path_gate {
+                for (f, r) in pg.flag_roles() {
+                    gates.entry(cmd.name.clone()).or_default().push((f.to_string(), r));
+                }
+            }
+            let flags = leading.entry(cmd.name.clone()).or_default();
+            flags.extend(cmd.standalone.iter().chain(&cmd.optional_valued).chain(&cmd.valued).cloned());
+        }
+    }
+
+    let mut failures = Vec::new();
+    let mut probed = 0usize;
+    for (cmd, flags) in &gates {
+        let mut before: Vec<String> = leading.get(cmd).cloned().unwrap_or_default();
+        before.extend(flags.iter().filter(|(_, r)| *r == Role::Ignore).map(|(f, _)| f.clone()));
+        before.sort();
+        before.dedup();
+        for (gated, role) in flags {
+            if !gated.starts_with('-') {
+                continue;
+            }
+            let hot = match role {
+                Role::Write => "/etc/sc-probe-target",
+                Role::Read | Role::ReadTree => "~/.ssh/id_rsa",
+                Role::Exec | Role::Plugin => "/tmp/sc-probe/Cargo.toml",
+                Role::RemoteShell => "/tmp/sc-probe/ssh",
+                Role::Ignore => continue,
+            };
+            let tokens = |words: &[&str]| -> Vec<crate::parse::Token> { words.iter().map(|w| crate::parse::Token::from_test(w)).collect() };
+            let glued = format!("{gated}={hot}");
+            if !crate::pathgate::should_deny(cmd, &tokens(&[cmd, gated, hot]))
+                || !crate::pathgate::should_deny(cmd, &tokens(&[cmd, &glued]))
+            {
+                continue;
+            }
+            for first in &before {
+                probed += 1;
+                for form in [vec![cmd.as_str(), first, gated, hot], vec![cmd.as_str(), first, &glued]] {
+                    if !crate::pathgate::should_deny(cmd, &tokens(&form)) {
+                        failures.push(format!("  {}", form.join(" ")));
+                    }
+                }
+            }
+        }
+    }
+    assert!(probed > 1000, "the sweep covered only {probed} flag pairs");
+    assert!(failures.is_empty(), "a leading flag lifted a path gate:\n{}", failures.join("\n"));
+}
+
 /// SWEEP DRIVER + regression ratchet for the ambiguous-output-flag WRITE hole. A valued flag like
 /// `-o`/`--output`/`-d`/`--write` that is a WRITE PATH (`asciidoctor -o`, `dot -o`, `gs -o`) but is
 /// NOT a declared path-gate lets an auto-approved command overwrite `~/.ssh/authorized_keys` /

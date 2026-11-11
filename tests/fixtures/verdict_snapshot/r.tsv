@@ -5357,10 +5357,8 @@ rsync --read-batch	safe-write
 rsync --read-batch x	safe-write
 rsync --recursive	safe-write
 rsync --relative	safe-write
-rsync --remote-option	denied
 rsync --remote-option x	denied
 rsync --remove-source-files	safe-write
-rsync --rsh	denied
 rsync --rsh sh x:foo dst/	denied
 rsync --rsh x	denied
 rsync --rsh='ssh -p 22 -o BatchMode=yes' x:foo dst/	safe-write
@@ -5482,7 +5480,6 @@ rsync -avessh x:foo dst/	safe-write
 rsync -b	safe-write
 rsync -c	safe-write
 rsync -d	safe-write
-rsync -e	denied
 rsync -e '/tmp/x/tool -p 22' x:foo dst/	denied
 rsync -e '/usr/bin/ssh -l x' x:foo dst/	safe-write
 rsync -e 'ssh -o ProxyCommand=id' x:foo dst/	denied

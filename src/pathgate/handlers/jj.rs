@@ -10,7 +10,7 @@
 //! the same repository by walking up.
 
 use crate::parse::Token;
-use crate::pathgate::{Role, RoleSpec, Shape, walk};
+use crate::pathgate::{Role, RoleSpec, Shape, walk_for};
 use std::collections::HashMap;
 
 const STANDALONE_GLOBALS: &[&str] = &["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"];
@@ -47,7 +47,7 @@ pub(super) fn jj_repository(tokens: &[Token]) -> bool {
         .collect();
     let spec = RoleSpec { positional: Role::Ignore, shape: Shape::Plain, flags, handler: None, write_when: Vec::new(), when: Vec::new() };
     let moved = moved_from_root();
-    walk(&spec, tokens)
+    walk_for(&spec, tokens, &|flag| crate::registry::policy::declares_standalone("jj", flag))
         || tokens.iter().skip(1).map(Token::as_str).take_while(|t| *t != "--").any(|t| t.starts_with("-R="))
         || (judges_here(moved) && crate::pathgate::judge(role, ".") == crate::verdict::Verdict::Denied)
         || (role == Role::Write && writes_a_trust_root(tokens, moved))
@@ -74,7 +74,9 @@ pub(super) fn jj_destination(tokens: &[Token]) -> bool {
         write_when: Vec::new(),
         when: Vec::new(),
     };
-    tokens.iter().enumerate().skip(1).any(|(i, t)| t.as_str() == creates && walk(&spec, &tokens[i..]))
+    tokens.iter().enumerate().skip(1).any(|(i, t)| {
+        t.as_str() == creates && walk_for(&spec, &tokens[i..], &|flag| crate::registry::policy::declares_standalone("jj", flag))
+    })
 }
 
 fn moved_from_root() -> bool {

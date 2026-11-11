@@ -163,7 +163,39 @@ const CASES: &[&str] = &[
     "gotestsum --packages {d}",
     "npm ci --ignore-scripts --prefix {d}",
     "npm ci --ignore-scripts --prefix={d}",
+    "make -n -j -f {d}/Makefile",
+    "make -n -j --directory={d}",
+    "make -n --jobs -C{d}",
+    "make -nj -f {d}/Makefile",
+    "rspec --bisect {d}/x_spec.rb",
+    "rspec --fail-fast {d}/x_spec.rb",
+    "rspec -p -r{d}/e.rb",
+    "rspec --profile --require {d}/e.rb",
+    "gotestsum --rerun-fails --packages {d}",
 ];
+
+#[test]
+fn a_flag_without_a_value_does_not_swallow_the_flag_naming_the_code() {
+    let home = std::env::var("HOME").expect("HOME");
+    for command in [
+        format!("rspec --fail-fast {home}/Downloads/evil_spec.rb"),
+        format!("rspec --bisect {home}/Downloads/evil_spec.rb"),
+        format!("make -n -j -f {home}/Downloads/Makefile"),
+    ] {
+        assert!(!approved_in_project(&command), "{command}");
+    }
+    for command in [
+        "make -n -j 4",
+        "make -n -j4",
+        "make -n --jobs=4 -f Makefile",
+        "rspec --bisect spec/x_spec.rb",
+        "rspec --fail-fast spec/x_spec.rb",
+        "rspec -p spec/x_spec.rb",
+        "gotestsum --rerun-fails --rerun-fails-report ./rerun.txt",
+    ] {
+        assert!(approved_in_project(command), "{command}");
+    }
+}
 
 #[test]
 fn a_named_entry_is_the_path_after_the_equals_when_that_comes_first() {
@@ -251,7 +283,7 @@ fn a_valued_flag_that_is_not_a_path_still_takes_any_value() {
         "rollup -c",
         "rollup -c -w",
         "rollup -i src/main.js -o dist/out.js -f es -p node-resolve",
-        "coverage run --source /tmp/y -m pytest",
+        "coverage run --source=/tmp/y -m pytest",
         "dotnet build -c Release",
         "dotnet test --filter Foo --logger trx",
         "dotnet test --results-directory ./out",

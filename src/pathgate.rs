@@ -317,24 +317,24 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
 }
 
 fn deny_in_place(cmd: &str, tokens: &[Token]) -> bool {
-    let gates = &*GATES;
     // A command's path-gate can live centrally in `pathgates.toml` (a `[roles.X]` block or the
     // flat read/write lists) AND/OR co-located in its own `[command.path_gate]`. Consult BOTH and
     // deny if EITHER fires — the gate only ever adds denials, and a command with a central
     // `[roles.X]` (its positionals) plus a co-located flag gate must honor both, or the latter is
     // silently shadowed (e.g. `qpdf`'s `last_write` positionals + its `--password-file` read).
-    let central = if let Some(spec) = gates.roles.get(cmd) {
-        apply(spec, tokens)
-    } else if gates.read.contains(cmd) {
-        walk(&RoleSpec::simple(Role::Read, Shape::Plain), tokens)
-    } else if gates.read_tree_after_first.contains(cmd) {
-        walk(&RoleSpec::simple(Role::ReadTree, Shape::SkipFirst), tokens)
-    } else if gates.write.contains(cmd) {
-        walk(&RoleSpec::simple(Role::Write, Shape::Plain), tokens)
+    let standalone = |flag: &str| crate::registry::policy::declares_standalone(cmd, flag);
+    let central = if let Some(spec) = GATES.roles.get(cmd) {
+        apply_for(spec, tokens, &standalone)
+    } else if GATES.read.contains(cmd) {
+        walk_for(&RoleSpec::simple(Role::Read, Shape::Plain), tokens, &standalone)
+    } else if GATES.read_tree_after_first.contains(cmd) {
+        walk_for(&RoleSpec::simple(Role::ReadTree, Shape::SkipFirst), tokens, &standalone)
+    } else if GATES.write.contains(cmd) {
+        walk_for(&RoleSpec::simple(Role::Write, Shape::Plain), tokens, &standalone)
     } else {
         false
     };
-    let own = crate::registry::command_path_gate(cmd).is_some_and(|spec| apply(spec, tokens));
+    let own = crate::registry::command_path_gate(cmd).is_some_and(|spec| apply_for(spec, tokens, &standalone));
     // SUB-SCOPED gate, spelled `[roles."smbutil statshares"]`. A flag's role AND ARITY can differ
     // per subcommand, and a command-wide gate cannot say so: `smbutil -f` is a mounted-share path
     // on `statshares` but a BOOLEAN on `view`, so gating it command-wide made
@@ -356,15 +356,20 @@ fn deny_in_place(cmd: &str, tokens: &[Token]) -> bool {
     // only ever add a denial.
     let sub = SUB_SCOPED.contains(cmd)
         && tokens.iter().enumerate().skip(1).any(|(i, t)| {
-            let word = t.as_str();
-            !word.starts_with('-') && gates.roles.get(&format!("{cmd} {word}")).is_some_and(|spec| apply(spec, &tokens[i..]))
+            let scoped = (!t.as_str().starts_with('-')).then(|| GATES.roles.get(&format!("{cmd} {}", t.as_str()))).flatten();
+            scoped.is_some_and(|spec| apply_for(spec, &tokens[i..], &standalone))
         });
     central || own || sub
 }
 
 /// Gate `tokens` against `spec`: an operation-aware `handler` (if declared) replaces the
 /// declarative walk, otherwise the positional/shape/flags walk runs.
+#[cfg(test)]
 fn apply(spec: &RoleSpec, tokens: &[Token]) -> bool {
+    apply_for(spec, tokens, &|_| false)
+}
+
+fn apply_for(spec: &RoleSpec, tokens: &[Token], standalone: &dyn Fn(&str) -> bool) -> bool {
     match &spec.handler {
         // A handler used to REPLACE the walk, which silently discarded the spec's flag map. No spec
         // declares both today, so nothing was mis-gated — but it is a trap laid for whoever needs
@@ -376,8 +381,8 @@ fn apply(spec: &RoleSpec, tokens: &[Token]) -> bool {
         // flag map, `walk` gates every path argument by `spec.positional`, so running it
         // unconditionally would ADD denials to the handler-only specs (`ar`, `textutil`) that rely
         // on their handler deciding roles per operation.
-        Some(name) => handlers::dispatch(name, tokens) || (!spec.flags.is_empty() && walk(spec, tokens)),
-        None => walk(spec, tokens),
+        Some(name) => handlers::dispatch(name, tokens) || (!spec.flags.is_empty() && walk_for(spec, tokens, standalone)),
+        None => walk_for(spec, tokens, standalone),
     }
 }
 
@@ -430,7 +435,14 @@ fn clause_holds(clause: &WhenClause, tokens: &[Token]) -> bool {
 
 /// Walk the arguments once: gate each mapped flag's value by its role, then assign roles to the
 /// bare positionals via the positional policy. Any gated path at a sensitive locus → deny.
+#[cfg(test)]
 fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
+    walk_for(spec, tokens, &|_| false)
+}
+
+/// `walk` for a command whose policy says which flags stand alone: such a flag takes a value only
+/// glued or after `=`, as `policy::takes_next_word` reads it, so both walkers consume the same words.
+fn walk_for(spec: &RoleSpec, tokens: &[Token], standalone: &dyn Fn(&str) -> bool) -> bool {
     // `write_when`: a mode flag promotes this invocation's positionals from their declared role to
     // WRITE. Computed once over the whole token list, because the flag may appear after the paths
     // (`ansible-lint site.yml --fix`) as readily as before them.
@@ -493,7 +505,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             positionals.extend(tokens[i + 1..].iter().map(Token::as_str));
             break;
         }
-        if let Some((role, value, consumed)) = match_flag(flags, tokens, i) {
+        if let Some((role, value, consumed)) = match_flag(flags, tokens, i, standalone) {
             // A DECLARED flag's value skips the pre-filter and is always judged. The declaration
             // already says this token is a path operand of this role, so asking "does it look like
             // a path?" second-guesses it — and every miss in this gate has been a value the filter
@@ -504,7 +516,7 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             //
             // The pre-filter still guards POSITIONALS below, where it earns its place: there the
             // question really is whether a bare token is an operand at all.
-            if judge(role, value) == Verdict::Denied {
+            if value.is_some_and(|value| judge(role, value) == Verdict::Denied) {
                 return true;
             }
             i += consumed;
