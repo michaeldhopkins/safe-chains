@@ -17,6 +17,13 @@ fn a_mise_setting_that_loads_a_file_is_refused() {
 }
 
 #[test]
+fn a_long_token_of_three_characters_is_a_search_pattern_not_an_option_prefix() {
+    for command in ["grep --d x README.md", "grep --f x README.md", "grep --x x README.md", "grep --- x README.md"] {
+        assert!(approved(command), "`{command}` was refused");
+    }
+}
+
+#[test]
 fn every_prefix_of_a_grep_option_that_reads_a_file_or_follows_links_is_judged_as_the_option() {
     for option in ["--file=~/.aws/credentials", "--dereference-recursive"] {
         let (name, value) = option.split_once('=').map_or((option, ""), |(n, v)| (n, v));
