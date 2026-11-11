@@ -96,7 +96,7 @@ fn token_verdict(tokens: &[Token], i: usize) -> Option<(Verdict, usize)> {
     {
         return Some((verdict, 2));
     }
-    let (flag, value) = t.split_once('=').filter(|(flag, _)| flag.starts_with("--"))?;
+    let (flag, value) = t.split_once('=')?;
     valued_verdict(flag, value).map(|verdict| (verdict, 1))
 }
 
@@ -186,6 +186,7 @@ mod tests {
         mvn_phase_then_listed_goal: "mvn test dependency:tree",
         mvn_project_pom: "mvn test -f sub/pom.xml",
         mvn_project_pom_equals: "mvn test --file=sub/pom.xml",
+        mvn_project_pom_short_equals: "mvn test -f=sub/pom.xml",
         mvn_project_settings: "mvn test -s .mvn/settings.xml",
         mvn_project_log: "mvn compile -l build.log",
         mvn_define_space: "mvn test -D skipTests",
@@ -206,6 +207,7 @@ mod tests {
         mvn_foreign_pom_denied: "mvn test -f /tmp/x/pom.xml",
         mvn_foreign_pom_long_denied: "mvn test --file /tmp/x/pom.xml",
         mvn_foreign_pom_equals_denied: "mvn test --file=/tmp/x/pom.xml",
+        mvn_foreign_pom_short_equals_denied: "mvn test -f=/tmp/x/pom.xml",
         mvn_home_pom_denied: "mvn test -f ~/other/pom.xml",
         mvn_foreign_settings_denied: "mvn test -s /tmp/settings.xml",
         mvn_foreign_settings_glued_denied: "mvn test -s/tmp/settings.xml",
@@ -418,9 +420,7 @@ mod tests {
                 ]),
             ) {
                 let spaced = is_safe_mvn(&tokens(&["mvn", "test", flag, value]));
-                if flag.starts_with("--") {
-                    prop_assert_eq!(is_safe_mvn(&tokens(&["mvn", "test", &format!("{flag}={value}")])), spaced);
-                }
+                prop_assert_eq!(is_safe_mvn(&tokens(&["mvn", "test", &format!("{flag}={value}")])), spaced);
                 let judged = if MVN_LOG_FILES.contains(flag) && super::super::names_build_input(value) {
                     Verdict::Denied
                 } else if MVN_LOG_FILES.contains(flag) {
