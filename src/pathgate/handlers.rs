@@ -39,8 +39,6 @@ pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         "xattr_mode" => xattr_mode(tokens),
         "xcodebuild_settings" => xcodebuild_settings(tokens),
         "yq_program" => jq::yq_program(tokens),
-        // Unreachable in practice (guarded by pathgate_handler_names_resolve). Fail CLOSED on a
-        // misconfigured name so a typo can never silently ungate a command.
         _ => true,
     }
 }

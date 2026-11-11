@@ -5,18 +5,18 @@ check_baseline_lints = true
 fuzz_min_targets = 8
 
 [rust_pinned]
-"src/cst/check.rs" = 757
+"src/cst/check.rs" = 749
 "src/cst/parse.rs" = 1008
 "src/engine/facet.rs" = 686
-"src/engine/resolve/locus.rs" = 599
-"src/engine/resolve/regions.rs" = 932
-"src/engine/resolve.rs" = 1669
-"src/pathgate.rs" = 553
+"src/engine/resolve/locus.rs" = 562
+"src/engine/resolve/regions.rs" = 873
+"src/engine/resolve.rs" = 1661
+"src/pathgate.rs" = 504
 "src/pathgate/handlers.rs" = 501
-"src/registry/build.rs" = 1354
-"src/registry/dispatch.rs" = 529
+"src/registry/build.rs" = 915
+"src/registry/dispatch.rs" = 463
 "src/registry/mod.rs" = 669
-"src/registry/types.rs" = 1045
+"src/registry/types.rs" = 588
 
 [pinned_thresholds]
 "cognitive-complexity-threshold" = 30

@@ -93,9 +93,6 @@ fn describe_behavior(b: &crate::registry::types::BehaviorSpec) -> String {
     };
     let mut lines = vec![summary];
 
-    // A hook parses its own flag grammar (grep/dd/tar/sed), so the behavior config carries no
-    // flag lists — the examples below show real invocations. A declarative command lists every
-    // flag it accepts, reconstructed from the behavior grammar (short bytes → `-x`, longs as-is).
     if b.hook.is_some() {
         lines.push("- Flag handling follows the command's own grammar (see examples).".to_string());
     } else {
@@ -113,7 +110,6 @@ fn describe_behavior(b: &crate::registry::types::BehaviorSpec) -> String {
         }
     }
 
-    // Flags that widen the effect to a whole directory tree (rm -r, cp -r/-R/-a).
     let mut recursive: Vec<String> = b.unbounded_flags.clone();
     if let Some(t) = &b.transfer {
         recursive.extend(t.recursive_flags.iter().cloned());
