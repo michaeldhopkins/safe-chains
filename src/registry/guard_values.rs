@@ -8,7 +8,8 @@ use super::types::DispatchKind;
 fn require_any_sites(prefix: &[String], kind: &DispatchKind, out: &mut Vec<(Vec<String>, Vec<String>, Vec<String>)>) {
     match kind {
         DispatchKind::RequireAny { require_any, policy, .. } => {
-            out.push((prefix.to_vec(), require_any.clone(), policy.valued.clone()));
+            let valued = policy.valued.iter().filter(|v| !policy.standalone.contains(v)).cloned().collect();
+            out.push((prefix.to_vec(), require_any.clone(), valued));
         }
         DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => {
             for sub in subs {
