@@ -83,7 +83,7 @@ fn a_tool_that_runs_the_folders_code_keeps_its_verdict_inside_the_project() {
         let line = format!("cd src && {command}");
         assert!(approved(&line), "`{line}` should stay approved");
     }
-    assert!(approved("cd /tmp/x && mvn --version"), "the version query runs no folder code");
+    assert!(!approved("cd /tmp/x && mvn --version"), "a folder-code tool is judged by its folder, whatever it is asked");
 }
 
 /// make parses the makefile, `$(shell …)` included, even under `-n`; Bundler evaluates the Gemfile
@@ -130,7 +130,7 @@ fn a_build_tool_that_evaluates_the_folders_files_keeps_its_verdict_inside_the_pr
         assert!(approved(&line), "`{line}` should stay approved");
     }
     for command in ["cd /tmp/x && gradle --version", "cd /tmp/x && gradle --help"] {
-        assert!(approved(command), "`{command}` runs no build script");
+        assert!(!approved(command), "`{command}` was approved: the rule reads the folder, not the flags");
     }
 }
 

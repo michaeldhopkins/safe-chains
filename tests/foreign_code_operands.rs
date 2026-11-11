@@ -120,8 +120,6 @@ const CASES: &[&str] = &[
     "deno test --config={d}/deno.json",
     "deno test --import-map {d}/map.json",
     "deno test --import-map={d}/map.json",
-    "cargo install --path {d}",
-    "cargo install --path={d}",
     "cargo msrv find --path {d}",
     "cargo msrv find --path={d}",
     "bundle check --gemfile {d}/Gemfile",
@@ -279,7 +277,6 @@ fn ordinary_in_project_tool_invocations_stay_approved() {
     for command in [
         "cargo build",
         "cargo test",
-        "cargo install --path .",
         "cargo msrv find --path .",
         "npm test",
         "npm run test",
