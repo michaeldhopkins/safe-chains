@@ -154,12 +154,15 @@ retire that function. The same holds for `bash -n FILE`, whose read is gated in 
 
 ## A PATH prefix runs a program from outside the project
 
-`PATH=/tmp ls` and `PATH=/tmp:$PATH bash -c ls` are approved: the command name is resolved through
-the assigned PATH, so the program that runs can come from any folder. PATH is not in `envvars.toml`
-because no existing shape fits it (each element is a directory the shell searches for every later
-command name, not a path supplying one piece of code). An `exec-path` list shape with the executor
-locus per element would cover it; it needs measuring against the PATH values agents set in practice
-(`PATH=./node_modules/.bin:$PATH`, a toolchain's bin directory) before it can refuse anything.
+Measured with `a_definition_does_not_cross_commands_and_a_tmp_path_is_refused`. `PATH=/tmp ls` and
+`PATH=/tmp:$PATH bash -c ls` are refused. Each directory on `PATH` is judged on its own
+(`src/envvars/command_search.rs`): `$PATH` and a trusted command directory stay, and any other
+directory is refused. `unset PATH; ls` is refused too
+(`rebinding_path_without_an_assignment_is_refused`).
+
+This section used to say those two spellings were approved and that `PATH` had no shape. The
+command-search shape now covers an assignment. A relative element such as `./node_modules/.bin` is
+refused as well (`a_foreign_search_folder_anywhere_in_path_is_refused`).
 
 ## `cargo run -p <member>` is judged by the member's name, not its manifest
 
@@ -204,6 +207,9 @@ approximate). Revisit only if a tool turns up with an open-ended short-glued val
 | ~~`$(( ))` containing a substitution~~ — **DONE and guarded**; no hang, sub-second, `arithmetic_with_a_substitution_is_judged_by_its_inner_command` | "Three reported prompts", A |
 | A recursive searcher cannot tell a file from a tree, so it refuses both above the workspace (accepted false deny; revisit if the shape generalises) | "A recursive searcher cannot tell…" |
 | `cpio -o` reads its file list from stdin, and the list is unknowable | "`cpio -o` archives a file list…" |
+| A function defined in one command is not visible to the next | "A function defined in one command is not visible to the next" |
+| An alias that already exists in the shell is not seen | "An alias that already exists in the shell is not seen" |
+| `unset HOME` does not relocate config the way `HOME=/tmp` does | "`unset HOME` does not relocate config" |
 
 **Tier 3 — dispatch and gate correctness.**
 
@@ -256,6 +262,7 @@ there is deliberate.
 |---|---|
 | `codesign -s` stays refused. Unchained `install_name_tool -id` and `codesign -dv` are already approved | "`codesign -s` stays refused" |
 | `cargo fmt -- FILE` and a bare `jj squash` stay refused. `jj squash -m` is already approved. `rustfmt` has no entry | "`cargo fmt -- FILE` and a bare `jj squash` stay refused" |
+| A `/tmp` prefix on `PATH` is refused | "A PATH prefix runs a program from outside the project" |
 
 ## `codesign -s` stays refused
 
@@ -279,6 +286,32 @@ true; the new examples and the rustfmt test record them.
 - `rustfmt src/lib.rs` and `rustfmt --edition 2024 src/lib.rs` are refused. The registry has no `rustfmt` command. Formatting goes through `cargo fmt`.
 
 Not scheduled.
+
+## A function defined in one command is not visible to the next
+
+Measured with `a_definition_does_not_cross_commands_and_a_tmp_path_is_refused`, inside a project.
+
+- `ls(){ rm -rf /; }; ls` is refused. On one line the call runs the body, not the real `ls`.
+- `ls(){ rm -rf /; }` with no call is approved. A definition is inert until something calls it.
+- A later command `ls` is approved as the real `ls`. Each command starts with no function carried over (`forget_poisoned_functions`).
+
+The open hole is the gap between those two commands. An approved definition can install a body that the next approved `ls` never sees.
+
+## An alias that already exists in the shell is not seen
+
+Same measurement.
+
+- `alias ls='rm -rf /'` is refused. A definition on the line rebinds the name.
+- `ls` on its own is approved. safe-chains never starts the user's shell, so an alias that is already defined there is invisible and the name is judged as the real command.
+
+`alias -g` on the same line is refused with the other definition flags (`an_alias_definition_is_refused_and_a_listing_is_not`). The hole is an alias that arrived before this command.
+
+## `unset HOME` does not relocate config
+
+Same measurement.
+
+- `HOME=/tmp git log` is refused. Assigning `HOME` to a scratch directory moves where git reads config.
+- `unset HOME` is approved, and so is `unset HOME; git log`. Unsetting `HOME` is not treated as that move. After `unset HOME`, bash expands `~` from the password database, so it is still the user's home, but zsh expands it to nothing, so `~/x` becomes `/x`. `unset HOME; ls ~` is approved.
 
 ## When the engine needs a facet term that does not exist
 

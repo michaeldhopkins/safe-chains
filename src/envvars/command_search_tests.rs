@@ -71,6 +71,19 @@ proptest! {
 }
 
 #[test]
+fn a_definition_does_not_cross_commands_and_a_tmp_path_is_refused() {
+    assert!(!allowed("ls(){ rm -rf /; }; ls"));
+    assert!(allowed("ls(){ rm -rf /; }"));
+    assert!(allowed("ls"));
+    assert!(!allowed("alias ls='rm -rf /'"));
+    assert!(!allowed("HOME=/tmp git log"));
+    assert!(allowed("unset HOME"));
+    assert!(allowed("unset HOME; git log"));
+    assert!(!allowed("PATH=/tmp ls"));
+    assert!(!allowed("PATH=/tmp:$PATH bash -c ls"));
+}
+
+#[test]
 fn an_empty_search_path_is_refused() {
     for cmd in ["PATH= ls", "PATH='' ls", "export PATH=; ls", "env PATH= ls", "PATH=: ls", "PATH=/usr/bin: ls", "PATH=:/usr/bin ls"] {
         assert!(!allowed(cmd), "should be refused: {cmd}");
