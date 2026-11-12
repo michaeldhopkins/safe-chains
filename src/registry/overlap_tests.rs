@@ -312,3 +312,23 @@ fn a_branching_command_declares_its_pre_flags_and_its_subcommands_flags_standalo
     }
     assert!(checked > 100, "only {checked} branching flags checked — the registry walk is broken");
 }
+
+/// A flag a `Custom` command's handler policy lists standalone is standalone for the path gate
+/// whether or not a TOML subcommand lists it too, and so is a flag only a subcommand lists.
+#[test]
+fn a_custom_command_declares_its_handler_flags_and_its_subcommands_flags_standalone() {
+    let mut checked = 0;
+    for spec in super::TOML_REGISTRY.values().chain(super::CUSTOM_REGISTRY.values()) {
+        let DispatchKind::Custom { subs, handler_policies, .. } = &spec.kind else { continue };
+        let sub_flags = subs.iter().filter_map(|sub| match &sub.kind {
+            DispatchKind::Policy { policy, .. } => Some(policy.standalone.as_slice()),
+            _ => None,
+        });
+        let handler_flags = handler_policies.values().map(|policy| policy.standalone.as_slice());
+        for flag in handler_flags.flatten().chain(sub_flags.flatten()) {
+            assert!(spec.kind.declares_standalone(flag), "{}: {flag} is listed standalone but not declared so", spec.name);
+            checked += 1;
+        }
+    }
+    assert!(checked > 20, "only {checked} custom flags checked — the registry walk is broken");
+}
