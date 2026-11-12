@@ -92,6 +92,7 @@ examples_denied = [
   "cargo fmt --manifest-path /tmp/other/Cargo.toml",
   "cargo fmt --manifest-path ~/other/Cargo.toml",
   "cargo fmt -- /tmp/evil.rs",
+  "cargo fmt -- src/lib.rs",
   "cargo fmt --all -- --emit files",
   "cargo fmt -p foo -- --backup",
   "cargo fmt -- --check /tmp/evil.rs",

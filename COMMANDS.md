@@ -7832,6 +7832,7 @@ Aliases: `iperf`
 - `jj status --no-pager`
 - `jj op show`
 - `jj op show @`
+- `jj squash -m x`
 
 ### `jjpr`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/jjpr">https://github.com/michaeldhopkins/jjpr</a></p>

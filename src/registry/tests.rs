@@ -3798,6 +3798,13 @@ fn toml_examples_match_dispatch() {
     assert!(failures.is_empty(), "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
 }
 
+#[test]
+fn rustfmt_has_no_entry_and_is_not_approved() {
+    assert!(!TOML_REGISTRY.contains_key("rustfmt"), "rustfmt gained an entry; re-measure the fmt record in TODO.md");
+    assert!(!crate::is_safe_command("rustfmt src/lib.rs"));
+    assert!(!crate::is_safe_command("rustfmt --edition 2024 src/lib.rs"));
+}
+
 /// A flag is researched FOR A COMMAND, never in general. The same spelling means opposite things
 /// on different commands — `--api-key` NAMES the key to read on `aws apigateway get-api-key`,
 /// but SUPPLIES the caller's credential on `neon`. So a flag may only be accepted where it was

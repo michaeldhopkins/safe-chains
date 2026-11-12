@@ -1072,6 +1072,7 @@ cargo fmt -- --check --edition 2024 --color never	safe-read
 cargo fmt -- --check /tmp/evil.rs	denied
 cargo fmt -- --check src/lib.rs	denied
 cargo fmt -- /tmp/evil.rs	denied
+cargo fmt -- src/lib.rs	denied
 cargo fmt --all	safe-write
 cargo fmt --all -- --check	safe-read
 cargo fmt --all -- --check --config make_backup=true	denied

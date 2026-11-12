@@ -4,8 +4,8 @@ description = "Git-compatible version control system (Jujutsu) with automatic wo
 url = "https://docs.jj-vcs.dev/latest/cli-reference/"
 researched_version = "jj 0.46.0 (CLI reference of 0.45.1 and the 0.46.0 changelog)"
 bare_flags = ["--help", "--version", "-h"]
-examples_safe = ["jj new", "jj describe -m x", "jj split -m x src/a.rs", "jj resolve --list", "jj -R ./sub new", "jj log -r @ --no-graph -T description", "jj diff --name-only -r @-", "jj status --no-pager", "jj op show", "jj op show @"]
-examples_denied = ["jj -R /etc new", "jj new -R /etc", "jj log -GR/etc", "jj log --bogus", "jj log --tool /tmp/x", "jj squash -i", "jj describe", "jj split -m x", "jj resolve", "jj fix", "jj git push", "jj config set --user ui.editor x", "jj op undo", "jj op show --tool meld"]
+examples_safe = ["jj new", "jj describe -m x", "jj split -m x src/a.rs", "jj resolve --list", "jj -R ./sub new", "jj log -r @ --no-graph -T description", "jj diff --name-only -r @-", "jj status --no-pager", "jj op show", "jj op show @", "jj squash -m x"]
+examples_denied = ["jj -R /etc new", "jj new -R /etc", "jj log -GR/etc", "jj log --bogus", "jj log --tool /tmp/x", "jj squash -i", "jj describe", "jj split -m x", "jj resolve", "jj fix", "jj git push", "jj config set --user ui.editor x", "jj op undo", "jj op show --tool meld", "jj squash"]
 # Flags that take a value in every jj subcommand that has them (checked against
 # `jj util markdown-help` for jj 0.45.1). Spellings that are a value flag in one sub and a switch
 # in another (`-s`, `-b`, `-B`, `-n`, `-p`, `-t`) are left out.

@@ -251,6 +251,7 @@
 - `jj status --no-pager`
 - `jj op show`
 - `jj op show @`
+- `jj squash -m x`
 
 ### `lore`
 <p class="cmd-url"><a href="https://epicgames.github.io/lore/">https://epicgames.github.io/lore/</a></p>

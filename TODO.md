@@ -255,6 +255,7 @@ there is deliberate.
 | item | section |
 |---|---|
 | `codesign -s` stays refused. Unchained `install_name_tool -id` and `codesign -dv` are already approved | "`codesign -s` stays refused" |
+| `cargo fmt -- FILE` and a bare `jj squash` stay refused. `jj squash -m` is already approved. `rustfmt` has no entry | "`cargo fmt -- FILE` and a bare `jj squash` stay refused" |
 
 ## `codesign -s` stays refused
 
@@ -266,6 +267,18 @@ Measured with `cargo test --lib toml_examples_match_dispatch`. The verdicts were
 - `install_name_tool -id libfoo.dylib libfoo.dylib && codesign -s - MyApp.app && codesign -dv MyApp.app` is refused. The refusal is the `-s` sign. The install-name edit and the display, each on its own line, are the two approved forms above.
 
 Not scheduled. The sign flag stays out.
+
+## `cargo fmt -- FILE` and a bare `jj squash` stay refused
+
+Measured with `cargo test --lib registry::tests::toml_examples_match_dispatch` and
+`cargo test --lib rustfmt_has_no_entry_and_is_not_approved`. The command verdicts were already
+true; the new examples and the rustfmt test record them.
+
+- `cargo fmt -- src/lib.rs` is refused. A path after `--` is handed to rustfmt as a file to rewrite. `cargo fmt` and `cargo fmt --check` stay approved, and so does `cargo fmt -- --check` with no file.
+- `jj squash` is refused. With no message flag it opens the editor. `jj squash -m x` is approved.
+- `rustfmt src/lib.rs` and `rustfmt --edition 2024 src/lib.rs` are refused. The registry has no `rustfmt` command. Formatting goes through `cargo fmt`.
+
+Not scheduled.
 
 ## When the engine needs a facet term that does not exist
 
