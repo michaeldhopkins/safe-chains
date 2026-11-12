@@ -75,7 +75,13 @@ fuzz_target!(|data: &[u8]| {
         if judged != Verdict::Denied {
             continue;
         }
-        let tokens: Vec<_> = [*cmd, *flag, value].iter().map(|s| safe_chains::parse::Token::from_raw(s.to_string())).collect();
+        // An option-like word after the flag is not its value: the policy walker reads it as a flag
+        // of its own and refuses the valued flag left without one, and the gate consumes it the same
+        // way. Such a value reaches the flag only after `=`, so that is the spelling to check.
+        let option_like = value.len() > 1 && value.starts_with('-') && !value.as_bytes()[1].is_ascii_digit();
+        let glued = format!("{flag}={value}");
+        let words: Vec<&str> = if option_like { vec![cmd, &glued] } else { vec![cmd, flag, value] };
+        let tokens: Vec<_> = words.iter().map(|s| safe_chains::parse::Token::from_raw(s.to_string())).collect();
         assert!(
             safe_chains::pathgate::should_deny(cmd, &tokens),
             "the pre-filter skipped a value its own gate would refuse: {cmd} {flag} {value:?}",

@@ -573,3 +573,19 @@ fn rollup_watch_mode_cannot_name_a_command_to_run() {
         }
     }
 }
+
+/// A gated flag followed by an option-like word takes no value, as the policy reads it, so the
+/// gate does not judge that word as the flag's path. The command as a whole must still ask: the
+/// policy refuses a valued flag left without its value. Found by the gate_prefilter fuzz target.
+#[test]
+fn a_gated_flag_followed_by_an_option_like_word_is_never_approved() {
+    for command in [
+        "borg --rsh '--output-dir=/**/******./..' list",
+        "cargo build --target-dir '--output-dir=/**/******./..'",
+        "cargo build --target-dir --x=/etc",
+        "asciidoctor -o --x=/etc a.adoc",
+        "rsync -e --x=/etc a b",
+    ] {
+        assert!(!approved_in_project(command), "{command}");
+    }
+}
