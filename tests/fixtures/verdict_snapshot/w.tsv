@@ -2069,12 +2069,17 @@ workon attach -h	safe-write
 workon attach ws-abc123	safe-write
 workon attach x	safe-write
 workon create	safe-write
+workon create --base default@- extra	denied
+workon create --base x	safe-write
 workon create --config x	safe-write
 workon create --help	safe-write
-workon create --help --config x	safe-write
+workon create --help --base x	safe-write
 workon create --help --json	safe-write
 workon create --help x	denied
 workon create --json	safe-write
+workon create --mux	denied
+workon create --name feat	safe-write
+workon create --name feat --base default@-	safe-write
 workon create --name feat -c layout	safe-write
 workon create --name x	safe-write
 workon create --skip-copy-ignored	safe-write
@@ -2090,6 +2095,7 @@ workon destroy --no-save	denied
 workon destroy -h	safe-write
 workon destroy /path/to/ws	safe-write
 workon destroy x	safe-write
+workon exec echo hi	denied
 workon frobnicate	denied
 workon list	inert
 workon list --help	inert

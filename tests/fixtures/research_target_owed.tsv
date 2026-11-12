@@ -1490,7 +1490,6 @@ whoami	description,examples,version
 whois	examples,version
 wkhtmltopdf	examples,no-overlap,no-tolerance
 word-list-compress	description,examples
-workon	examples
 wrangler	examples,version
 wrjpgcom	description,examples
 wrk	examples

@@ -2158,12 +2158,18 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/workon">https://github.com/michaeldhopkins/workon</a></p>
 
 - **attach**: Flags: --help, -h. Valued: --config, -c
-- **create**: Flags: --help, --json, --skip-copy-ignored, -h. Valued: --config, --name, -c
+- **create**: Flags: --help, --json, --skip-copy-ignored, -h. Valued: --base, --config, --name, -c
 - **destroy**: Flags: --help, --json, -h
 - **list**: Flags: --help, --json, -h
 - **path**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
+
+**Examples:**
+
+- `workon list`
+- `workon create --name feat`
+- `workon create --name feat --base default@-`
 
 ### `xip`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xip.1.html">https://keith.github.io/xcode-man-pages/xip.1.html</a></p>
