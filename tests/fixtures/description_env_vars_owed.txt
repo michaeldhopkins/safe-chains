@@ -1,8 +1,8 @@
 api/newman.toml	COLLECTION_FILE
 c/indent.toml	SIMPLE_BACKUP_SUFFIX
-c/macho-write.toml	LC_ID_DYLIB
-c/macho-write.toml	LC_LOAD_DYLIB
-c/macho-write.toml	LC_RPATH
+c/install-name-tool.toml	LC_ID_DYLIB
+c/install-name-tool.toml	LC_LOAD_DYLIB
+c/install-name-tool.toml	LC_RPATH
 c/macho-write.toml	SG_NORELOC
 cloud/linode-cli.toml	LINODE_CLI_TOKEN
 crypto/gnutls.toml	GNUTLS_PIN

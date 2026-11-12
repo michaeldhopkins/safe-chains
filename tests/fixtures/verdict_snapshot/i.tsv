@@ -1024,6 +1024,8 @@ install_name_tool --version	denied
 install_name_tool -add_rpath x	safe-write
 install_name_tool -change x	safe-write
 install_name_tool -delete_rpath x	safe-write
+install_name_tool -id libfoo.dylib libfoo.dylib	safe-write
+install_name_tool -id libfoo.dylib libfoo.dylib && codesign -s - MyApp.app && codesign -dv MyApp.app	denied
 install_name_tool -id x	safe-write
 install_name_tool -rpath x	safe-write
 install_name_tool x	safe-write

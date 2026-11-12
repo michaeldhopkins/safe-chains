@@ -7427,6 +7427,10 @@ Aliases: `hf`
 
 - Allowed valued flags: -add_rpath, -change, -delete_rpath, -id, -rpath
 
+**Examples:**
+
+- `install_name_tool -id libfoo.dylib libfoo.dylib`
+
 ### `instmodsh`
 <p class="cmd-url"><a href="https://metacpan.org/pod/instmodsh">https://metacpan.org/pod/instmodsh</a></p>
 

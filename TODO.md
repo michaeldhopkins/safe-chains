@@ -252,6 +252,21 @@ nobody writes, and the failure is a prompt. Recorded in the doc comment on
 `opt_time_keyword_before_compound`, with a test pinning the ordering so a change
 there is deliberate.
 
+| item | section |
+|---|---|
+| `codesign -s` stays refused. Unchained `install_name_tool -id` and `codesign -dv` are already approved | "`codesign -s` stays refused" |
+
+## `codesign -s` stays refused
+
+Measured with `cargo test --lib toml_examples_match_dispatch`. The verdicts were already true; writing them into `examples_safe` and `examples_denied` did not change one.
+
+- `codesign -s ident MyApp.app` and `codesign --sign ident MyApp.app` are refused. Signing stays out of the entry.
+- `codesign -dv MyApp.app` is approved. Display and verify are the mode the entry requires.
+- `install_name_tool -id libfoo.dylib libfoo.dylib` is approved. It rewrites that binary's install name in place.
+- `install_name_tool -id libfoo.dylib libfoo.dylib && codesign -s - MyApp.app && codesign -dv MyApp.app` is refused. The refusal is the `-s` sign. The install-name edit and the display, each on its own line, are the two approved forms above.
+
+Not scheduled. The sign flag stays out.
+
 ## When the engine needs a facet term that does not exist
 
 Every term added in August 2026 was discovered by implementing and hitting a gap,

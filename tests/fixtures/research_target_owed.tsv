@@ -577,7 +577,7 @@ influx	examples,no-tolerance,profiled
 influxd	examples,no-tolerance,profiled
 initdb	description,examples
 inso	description,examples,no-tolerance,profiled
-install_name_tool	description,examples
+install_name_tool	description
 instmodsh	description,examples
 ionic	description,examples,no-tolerance,profiled
 ioreg	examples,version
