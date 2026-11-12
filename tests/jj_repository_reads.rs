@@ -36,6 +36,7 @@ const OBSERVING: &[(&str, &str)] = &[
     ("file show", "file show f"),
     ("git remote list", "git remote list"),
     ("op log", "op log"),
+    ("op show", "op show"),
     ("tag list", "tag list"),
     ("workspace list", "workspace list"),
     ("workspace root", "workspace root"),

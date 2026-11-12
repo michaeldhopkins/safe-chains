@@ -34,6 +34,7 @@ const OBSERVING_SUBS: &[&[&str]] = &[
     &["file", "show"],
     &["git", "remote", "list"],
     &["op", "log"],
+    &["op", "show"],
     &["tag", "list"],
     &["workspace", "list"],
     &["workspace", "root"],

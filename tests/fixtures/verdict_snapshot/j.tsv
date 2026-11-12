@@ -1513,6 +1513,44 @@ jj op log -n x	inert
 jj op log -p	inert
 jj op log -s	inert
 jj op log x	inert
+jj op show	inert
+jj op show --at-op x	inert
+jj op show --at-operation x	inert
+jj op show --color x	inert
+jj op show --color-words	inert
+jj op show --color-words --at-op x	inert
+jj op show --color-words --debug	inert
+jj op show --color-words x	inert
+jj op show --context x	inert
+jj op show --debug	inert
+jj op show --git	inert
+jj op show --help	inert
+jj op show --ignore-all-space	inert
+jj op show --ignore-immutable	inert
+jj op show --ignore-space-change	inert
+jj op show --ignore-working-copy	inert
+jj op show --name-only	inert
+jj op show --no-graph	inert
+jj op show --no-op-diff	inert
+jj op show --no-pager	inert
+jj op show --patch	inert
+jj op show --quiet	inert
+jj op show --repository x	inert
+jj op show --show-changes-in x	inert
+jj op show --stat	inert
+jj op show --summary	inert
+jj op show --template x	inert
+jj op show --tool meld	denied
+jj op show --types	inert
+jj op show -G	inert
+jj op show -R x	inert
+jj op show -T x	inert
+jj op show -h	inert
+jj op show -p	inert
+jj op show -s	inert
+jj op show @	inert
+jj op show x	inert
+jj op undo	denied
 jj op x	denied
 jj parallelize	safe-write
 jj parallelize --at-op x	safe-write

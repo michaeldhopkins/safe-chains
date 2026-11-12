@@ -33,9 +33,9 @@ const NEVER_OPENS_A_PROGRAM: &[&str] = &[
     "abandon", "absorb", "backout", "bookmark", "bookmark create", "bookmark delete", "bookmark forget", "bookmark list", "bookmark move",
     "bookmark rename", "bookmark set", "bookmark track", "bookmark untrack", "cat", "config", "config get", "config list", "config path",
     "diff", "duplicate", "edit", "file", "file list", "file show", "git", "git fetch", "git import", "git init", "git remote",
-    "git remote list", "help", "log", "new", "op", "op log", "parallelize", "rebase", "restore", "root", "show", "simplify-parents", "st",
-    "status", "tag", "tag list", "undo", "version", "workspace", "workspace add", "workspace forget", "workspace list", "workspace rename",
-    "workspace root", "workspace update-stale",
+    "git remote list", "help", "log", "new", "op", "op log", "op show", "parallelize", "rebase", "restore", "root", "show",
+    "simplify-parents", "st", "status", "tag", "tag list", "undo", "version", "workspace", "workspace add", "workspace forget",
+    "workspace list", "workspace rename", "workspace root", "workspace update-stale",
 ];
 
 const OPENS_ONE_UNLESS_GATED: &[&str] = &["commit", "describe", "resolve", "split", "squash"];

@@ -213,6 +213,7 @@
 - **log**: Flags: --color-words, --count, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-graph, --no-pager, --patch, --quiet, --reversed, --stat, --summary, --types, -G, -h, -p, -s. Valued: --at-op, --at-operation, --color, --context, --limit, --repository, --revision, --revisions, --template, -n, -r, -R, -T
 - **new**: Flags: --debug, --edit, --help, --ignore-immutable, --ignore-working-copy, --no-edit, --no-pager, --quiet, -h. Valued: --after, --at-op, --at-operation, --before, --color, --insert-after, --insert-before, --message, --repository, -A, -B, -d, -m, -o, -r, -R
 - **op log**: Flags: --color-words, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-graph, --no-pager, --op-diff, --patch, --quiet, --reversed, --stat, --summary, --types, -d, -G, -h, -p, -s. Valued: --at-op, --at-operation, --color, --context, --limit, --repository, --show-changes-in, --template, -n, -R, -T
+- **op show**: Flags: --color-words, --debug, --git, --help, --ignore-all-space, --ignore-immutable, --ignore-space-change, --ignore-working-copy, --name-only, --no-graph, --no-op-diff, --no-pager, --patch, --quiet, --stat, --summary, --types, -G, -h, -p, -s. Valued: --at-op, --at-operation, --color, --context, --repository, --show-changes-in, --template, -R, -T
 - **op**: Flags: --debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose. Valued: --at-op, --at-operation, --color, --repository, -R
 - **parallelize**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, -h. Valued: --at-op, --at-operation, --color, --repository, -r, -R
 - **rebase**: Flags: --debug, --help, --ignore-immutable, --ignore-working-copy, --keep-divergent, --no-pager, --quiet, --simplify-parents, --skip-emptied, -h. Valued: --after, --at-op, --at-operation, --before, --branch, --color, --destination, --insert-after, --insert-before, --onto, --repository, --revision, --revisions, --source, -A, -b, -B, -d, -o, -r, -R, -s
@@ -248,6 +249,8 @@
 - `jj log -r @ --no-graph -T description`
 - `jj diff --name-only -r @-`
 - `jj status --no-pager`
+- `jj op show`
+- `jj op show @`
 
 ### `lore`
 <p class="cmd-url"><a href="https://epicgames.github.io/lore/">https://epicgames.github.io/lore/</a></p>

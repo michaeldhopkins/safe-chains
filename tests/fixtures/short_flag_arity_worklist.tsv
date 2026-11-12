@@ -183,6 +183,7 @@ jj diff	-s
 jj log	-s
 jj op log	-d
 jj op log	-s
+jj op show	-s
 jj show	-b
 jj show	-s
 jj squash	-k

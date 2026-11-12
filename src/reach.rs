@@ -340,7 +340,7 @@ pub(crate) mod tests {
         body(&home)
     }
 
-    const OBSERVING: &[&str] = &["log", "diff", "show", "status", "st", "bookmark list", "op log", "file list", "tag list"];
+    const OBSERVING: &[&str] = &["log", "diff", "show", "status", "st", "bookmark list", "op log", "op show", "file list", "tag list"];
     const MUTATING: &[&str] = &["new", "describe -m x", "abandon", "bookmark set main", "git fetch", "workspace update-stale"];
 
     proptest! {
