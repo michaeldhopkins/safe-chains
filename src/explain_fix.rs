@@ -67,12 +67,14 @@ pub enum Because {
 /// parse.
 pub fn in_segment_scope<T>(command: &str, mut per_segment: impl FnMut(usize, &str) -> T) -> Option<Vec<T>> {
     let script = crate::cst::parse(command)?;
-    let mut index = 0;
-    Some(crate::cst::check::walk_with_scope(&script, |stmt| {
-        let fix = per_segment(index, &stmt.pipeline.to_string());
-        index += 1;
-        fix
-    }))
+    Some(crate::cst::check::walk_with_scope(
+        &script,
+        |stmt| {
+            let index = script.0.iter().position(|s| std::ptr::eq(s, stmt)).unwrap_or_default();
+            per_segment(index, &stmt.pipeline.to_string())
+        },
+        |first, _later| first,
+    ))
 }
 
 /// The fix for one refused command (a segment of a chain, or the whole command).

@@ -78,7 +78,7 @@ fn explain_inner(input: &str) -> Explanation {
     // definitions), so each segment is judged in the context of the ones before it. Without this the
     // per-segment view — and the hook's coverage fallback built on it — would re-allow a call whose
     // definition shadows a builtin (`ls(){ rm; }; ls`) that the whole-command verdict denies.
-    let segments: Vec<SegmentReport> = super::check::walk_with_scope(&script, segment_report);
+    let segments: Vec<SegmentReport> = super::check::walk_with_scope(&script, segment_report, worst_segment);
     // The scope walk exceeded its uncertain-binding budget (too much shell state to track), or a
     // name it read as a number took something else later in the line, so the command is refused —
     // the same fail-closed call `command_verdict` makes, so the explanation can never describe a
@@ -98,6 +98,11 @@ fn explain_inner(input: &str) -> Explanation {
     let stateful = segments.len() >= 2 && script.0.iter().any(establishes_shell_state);
 
     Explanation { overall, segments, parsed: true, stateful }
+}
+
+fn worst_segment(first: SegmentReport, second: SegmentReport) -> SegmentReport {
+    let culprit = if first.verdict.is_allowed() { second.culprit } else { first.culprit };
+    SegmentReport { text: first.text, verdict: first.verdict.combine(second.verdict), culprit }
 }
 
 fn segment_report(stmt: &Stmt) -> SegmentReport {
@@ -199,10 +204,14 @@ fn first_denied_simple_in(script: &Script) -> Option<Vec<String>> {
 /// `describe` applied to the first command in `script` denied in the scope the statements before
 /// it leave, so a call to a function defined earlier in the body is judged as the function.
 fn first_denied_in<T>(script: &Script, describe: fn(&Cmd) -> Option<T>) -> Option<T> {
-    super::check::walk_with_scope(script, |stmt| stmt.pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(describe))
-        .into_iter()
-        .flatten()
-        .next()
+    super::check::walk_with_scope(
+        script,
+        |stmt| stmt.pipeline.commands.iter().find(|c| !cmd_verdict(c).is_allowed()).and_then(describe),
+        Option::or,
+    )
+    .into_iter()
+    .flatten()
+    .next()
 }
 
 /// The first command inside `script` that is denied on its own, by name.

@@ -68,11 +68,15 @@ fn collect_part_subs(part: &cst::WordPart, out: &mut Vec<Operand>) {
 }
 
 fn collect_script_words(script: &cst::Script, out: &mut Vec<Operand>) {
-    cst::check::walk_with_scope(script, |stmt| {
-        for cmd in &stmt.pipeline.commands {
-            collect_cmd_words(cmd, out);
-        }
-    });
+    cst::check::walk_with_scope(
+        script,
+        |stmt| {
+            for cmd in &stmt.pipeline.commands {
+                collect_cmd_words(cmd, out);
+            }
+        },
+        |(), ()| (),
+    );
 }
 
 /// A redirect TARGET is a path the command opens, so it is a reach and must be reported —

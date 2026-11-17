@@ -51,6 +51,15 @@ pub(super) fn cd_target(pipeline: &Pipeline) -> Option<(String, bool)> {
     (!searches_cdpath(&target, prefixed || cdpath_in_scope())).then_some((target, physical))
 }
 
+pub(super) fn moves_cwd(simple: &super::SimpleCmd) -> bool {
+    let mut words = simple.words.iter().map(super::Word::eval);
+    let mut first = words.next();
+    if first.as_deref() == Some("time") {
+        first = words.find(|word| !word.starts_with('-'));
+    }
+    first.is_some_and(|word| matches!(word.as_str(), "cd" | "pushd" | "popd"))
+}
+
 fn cdpath_in_scope() -> bool {
     crate::pathctx::expand_vars("$CDPATH", false) != "$CDPATH"
         || crate::pathctx::expand_vars("$cdpath", false) != "$cdpath"

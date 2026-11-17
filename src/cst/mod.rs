@@ -9,6 +9,7 @@ pub(crate) mod check;
 mod classify_budget;
 #[cfg(test)]
 mod classify_budget_tests;
+mod cwd_flow;
 mod display;
 mod echoed;
 pub(crate) mod escape;

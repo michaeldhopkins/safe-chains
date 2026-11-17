@@ -1,5 +1,6 @@
 pub(super) use super::classify_budget::ClassifyGuard;
 pub(crate) use super::classify_budget::charge_classify_work;
+use super::cwd_flow::{Cwd, CwdFlow, statement_flow};
 pub(crate) use super::functions::names_a_function;
 use super::functions::{FuncScope, define_function};
 pub(super) use super::functions::{forget_poisoned_functions, lookup_function, poison_function};
@@ -30,7 +31,7 @@ pub fn is_safe_command(input: &str) -> bool {
 }
 
 pub(super) fn script_verdict(script: &Script) -> Verdict {
-    walk_with_scope(script, |stmt| pipeline_verdict(&stmt.pipeline))
+    walk_with_scope(script, |stmt| pipeline_verdict(&stmt.pipeline), Verdict::combine)
         .into_iter()
         .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
 }
@@ -40,34 +41,33 @@ pub(super) fn script_verdict(script: &Script) -> Verdict {
 ///
 /// The scope is: the running `cwd` (HP-19 — a later relative path resolves against a prior `cd`),
 /// plus `VAR=value` bindings and function definitions from EARLIER statements (bash semantics;
-/// released when this returns). Fail-open on cwd: an unresolvable `cd` leaves it unchanged.
+/// released when this returns).
+///
+/// A `cd` can fail, so what may run without it having taken effect is judged from each possible folder; `merge` folds the results.
 ///
 /// Shared by `script_verdict` AND the explainer so both see the SAME scope. This is load-bearing for
 /// security: a definition that shadows a builtin (`ls(){ rm -rf /; }; ls`) must deny in BOTH — if the
 /// per-segment explain classified the `ls` call without the definition in scope, the hook's coverage
 /// fallback (which uses the explainer) would re-allow the very thing the whole-command verdict denied.
-pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt) -> T) -> Vec<T> {
+pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt) -> T, merge: impl Fn(T, T) -> T) -> Vec<T> {
     let (_walk, _dot_names) = (ScopeWalk::enter(), super::opaque::glob::enter_dot_names(script));
     let _pager = super::pager_set::enter_pager_set(script);
-    let mut running = crate::pathctx::cwd();
+    let mut flow = CwdFlow::begin(crate::pathctx::cwd());
+    let (mut previous, mut ran_in): (Option<ListOp>, Vec<Cwd>) = (None, Vec::new());
     let (mut _vars, mut _funcs): (Vec<crate::pathctx::VarGuard>, Vec<FuncScope>) = (Vec::new(), Vec::new());
     let mut out = Vec::with_capacity(script.0.len());
     for stmt in &script.0 {
-        // Held across the `cd` update: `$(pwd)` is claimed from the directory the shell is in now,
-        // not the one it started in. Dropping the guard first tagged `cd /tmp/y && cd $(pwd)` as
-        // the project.
-        let _cwd = crate::pathctx::enter_cwd(running.clone());
-        out.push(per_stmt(stmt));
+        let starts = flow.start(previous, &ran_in);
+        let results = starts.iter().map(|cwd| {
+            let _cwd = crate::pathctx::enter_cwd(cwd.clone());
+            per_stmt(stmt)
+        });
+        out.extend(results.reduce(&merge));
         let effects = if scope_budget_spent() { ShellEffects::default() } else { shell_effects(&stmt.pipeline) };
-        let next = super::cd::cd_target(&stmt.pipeline).and_then(|(t, p)| crate::pathctx::join_cwd_mode(running.as_deref(), &t, p));
-        if next.is_some() {
-            running = next;
-        } else if effects.cwd {
-            // The shell may have moved somewhere we cannot name — a `cd` inside a compound or a
-            // called function, or a bare `cd`/`cd -`. Keeping the old cwd would judge later
-            // relative paths against a directory the shell has left.
-            running = Some(crate::pathctx::UNRESOLVED_CWD.to_string());
-        }
+        flow = flow.then(previous, statement_flow(stmt, &effects, &starts));
+        previous = stmt.op;
+        let _cwd = crate::pathctx::enter_cwd(starts.first().cloned().flatten());
+        ran_in = starts;
         for (name, value) in statement_assignments(&stmt.pipeline) {
             _vars.push(crate::pathctx::enter_var(name, value));
         }
@@ -145,7 +145,7 @@ fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut Shell
                 return; // a bare `VAR=x` — handled precisely by `statement_assignments`
             };
             out.vars.extend(super::opaque::declared_names(s));
-            if matches!(name.as_str(), "cd" | "pushd" | "popd") {
+            if super::cd::moves_cwd(s) {
                 out.cwd = true;
                 return;
             }
