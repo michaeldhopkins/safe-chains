@@ -93,9 +93,7 @@ impl Walk {
                     self.parts(&inner.0, true);
                 }
                 WordPart::CmdSub(script) => self.substitution(Some(script), quoted, part),
-                WordPart::Backtick(raw) => {
-                    self.substitution(crate::cst::parse(&crate::cst::escape::backtick_command(raw)).as_ref(), quoted, part)
-                }
+                WordPart::Backtick(raw) => self.substitution(crate::cst::escape::parse_backtick(raw).as_deref(), quoted, part),
                 WordPart::Arith(body) if nonnegative_constant(body) => self.known(&spelled(part)),
                 WordPart::Arith(_) => self.opaque(Lead::Number, Facts::when(SPLIT, self.resplits(quoted)), &spelled(part)),
                 WordPart::ProcSub(_) => self.known(&spelled(part)),

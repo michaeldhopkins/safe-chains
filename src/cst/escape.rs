@@ -6,8 +6,10 @@
 //! `$X\<nl>Y`, `&\<nl>&` or `<\<nl><` changes what the line means. The parser models only the
 //! joins of plain text and the ones beside whitespace; each continuation it removes is judged
 //! where it stands in the input, and any other refuses the whole parse.
-use super::WordPart;
+use super::{Script, WordPart};
 use std::cell::{Cell, RefCell};
+use std::collections::HashMap;
+use std::rc::Rc;
 use winnow::ModalResult;
 use winnow::combinator::{alt, preceded};
 use winnow::error::{ContextError, ErrMode};
@@ -17,6 +19,38 @@ use winnow::token::{any, take_while};
 thread_local! {
     static INPUT: RefCell<(usize, String)> = const { RefCell::new((0, String::new())) };
     static REFUSED: Cell<bool> = const { Cell::new(false) };
+    static BACKTICKS: RefCell<HashMap<String, Option<Rc<Script>>>> = RefCell::new(HashMap::new());
+}
+
+pub(super) fn clear_backtick_cache() {
+    BACKTICKS.with(|c| c.borrow_mut().clear());
+}
+
+pub(crate) fn parse_backtick(raw: &str) -> Option<Rc<Script>> {
+    if !super::classify_budget::active() {
+        return super::parse(&backtick_command(raw)).map(Rc::new);
+    }
+    if let Some(cached) = BACKTICKS.with(|c| c.borrow().get(raw).cloned()) {
+        return cached;
+    }
+    if BACKTICKS.with(|c| c.borrow().len()) == super::classify_budget::MAX_CLASSIFY_WORK as usize {
+        return None;
+    }
+    let parsed = super::parse(&backtick_command(raw)).map(Rc::new);
+    BACKTICKS.with(|c| {
+        c.borrow_mut().insert(raw.to_string(), parsed.clone());
+    });
+    parsed
+}
+
+pub(crate) fn backtick_verdict(raw: &str) -> crate::verdict::Verdict {
+    let Some(_guard) = super::classify_budget::ClassifyGuard::enter(raw.len()) else {
+        return crate::verdict::Verdict::Denied;
+    };
+    let Some(script) = parse_backtick(raw) else {
+        return crate::verdict::Verdict::Denied;
+    };
+    crate::allowlist::outside_rules(|| super::check::script_verdict(&script))
 }
 
 /// Start judging the continuations of a parse of `input`, which every slice the parser sees

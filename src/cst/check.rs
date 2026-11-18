@@ -450,7 +450,7 @@ pub(crate) fn is_safe_cmd(cmd: &Cmd) -> bool {
 fn part_sub_verdict(part: &WordPart) -> Verdict {
     match part {
         WordPart::CmdSub(inner) | WordPart::ProcSub(inner) => crate::allowlist::outside_rules(|| script_verdict(inner)),
-        WordPart::Backtick(raw) => command_verdict(&super::escape::backtick_command(raw)),
+        WordPart::Backtick(raw) => super::escape::backtick_verdict(raw),
         WordPart::DQuote(inner) => word_sub_verdict(inner),
         // Arithmetic is inert, but a `$( )` inside it runs — judged, not skipped.
         WordPart::Arith(inner) => word_sub_verdict(inner),
@@ -576,7 +576,7 @@ fn arg_is_eval_safe(word: &Word) -> bool {
                 found_safe = true;
             }
             WordPart::Backtick(raw) => {
-                let Some(script) = parse(&super::escape::backtick_command(raw)) else {
+                let Some(script) = super::escape::parse_backtick(raw) else {
                     return false;
                 };
                 if !script_yields_eval_safe(&script) {

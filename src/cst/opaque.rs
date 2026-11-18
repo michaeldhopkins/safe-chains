@@ -344,13 +344,12 @@ pub(super) fn smuggles_a_flag(cmd: &SimpleCmd) -> bool {
 /// `export NAME=$X`: bash reads an assignment given to a declaration builtin as an assignment, so
 /// it is neither split nor globbed, and it is no flag whatever `$X` holds.
 fn declares(cmd: &SimpleCmd, word: &super::Word) -> bool {
-    let builtin = cmd.words.first().map(super::Word::eval);
     let Some(WordPart::Lit(head)) = word.0.first() else { return false };
     let name = head.split('=').next().unwrap_or_default();
-    matches!(builtin.as_deref(), Some("export" | "declare" | "typeset" | "local" | "readonly"))
-        && head.contains('=')
+    head.contains('=')
         && name.starts_with(|c: char| c.is_ascii_alphabetic() || c == '_')
         && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+        && matches!(cmd.words.first().map(super::Word::eval).as_deref(), Some("export" | "declare" | "typeset" | "local" | "readonly"))
 }
 
 /// The words `word` certainly becomes, when no part of it is unknown: its literal text with every

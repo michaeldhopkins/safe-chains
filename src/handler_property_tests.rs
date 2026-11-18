@@ -402,6 +402,54 @@ fn classifier_terminates_on_adversarial_input() {
     );
 }
 
+#[test]
+fn backtick_classification_scales_linearly_with_input_size() {
+    let _ = command_verdict("ls");
+    let measure = |input: &str| -> std::time::Duration {
+        (0..5)
+            .map(|_| {
+                let start = std::time::Instant::now();
+                assert!(!command_verdict(input).is_allowed());
+                let explained = crate::cst::explain(input);
+                assert!(!explained.is_allowed());
+                let _ = explained.render();
+                start.elapsed()
+            })
+            .min()
+            .unwrap_or_default()
+    };
+    let sizes = [10_000usize, 25_000, 50_000, 100_000];
+    let mut bare_times = Vec::with_capacity(sizes.len());
+    let mut arg_times = Vec::with_capacity(sizes.len());
+    for &n in &sizes {
+        let plain = measure(&"a".repeat(n));
+        let bare = measure(&"`".repeat(n));
+        let with_args = measure(&format!("{}{}", "`echo`".repeat(n / 500), " a".repeat(n / 25)));
+        let cap = std::cmp::max(std::time::Duration::from_millis(100), plain * 20);
+        assert!(bare <= cap, "n={n}: bare backticks took {bare:?}, over {cap:?} (20x plain {plain:?})");
+        assert!(with_args <= cap, "n={n}: backtick command with args took {with_args:?}, over {cap:?} (20x plain {plain:?})");
+        bare_times.push(bare);
+        arg_times.push(with_args);
+    }
+    let floor = std::time::Duration::from_millis(10);
+    let bare_base = std::cmp::max(bare_times[1], floor);
+    let arg_base = std::cmp::max(arg_times[1], floor);
+    assert!(
+        bare_times[3] <= bare_base * 8,
+        "bare backticks grew super-linearly from 25k ({:?}) to 100k ({:?}): {:?}",
+        bare_times[1],
+        bare_times[3],
+        bare_times
+    );
+    assert!(
+        arg_times[3] <= arg_base * 8,
+        "backtick command with args grew super-linearly from 25k ({:?}) to 100k ({:?}): {:?}",
+        arg_times[1],
+        arg_times[3],
+        arg_times
+    );
+}
+
 /// The same termination contract, enforced over the COMMITTED fuzz corpus (`fuzz/corpus/parse/seed-*`)
 /// rather than a hand-written list. The fuzzer finds real pathological inputs that nobody
 /// would think to write down — the `seed-slow-*` entries took 1.2s, 1.5s and 5.8s before brace-

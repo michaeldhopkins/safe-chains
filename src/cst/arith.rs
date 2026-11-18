@@ -130,7 +130,7 @@ fn read_text(word: &Word) -> (String, Verdict) {
             }
             WordPart::CmdSub(script) => text.push(if numeric_output(script) { '0' } else { UNKNOWN }),
             WordPart::Backtick(body) => {
-                let numeric = crate::cst::parse::parse(body).is_some_and(|script| numeric_output(&script));
+                let numeric = super::escape::parse_backtick(body).is_some_and(|script| numeric_output(&script));
                 text.push(if numeric { '0' } else { UNKNOWN });
             }
             WordPart::ProcSub(_) => text.push(UNKNOWN),

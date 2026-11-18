@@ -31,7 +31,7 @@ pub(super) const CLASSIFY_BYTES_PER_INPUT_BYTE: u64 = 64;
 /// the worst-case CUTOFF is also cheap in wall-clock terms — each unit is a full re-classification
 /// (parse + dispatch), so a high ceiling would let a crafted command burn hundreds of ms in the hook
 /// (and blow the debug-mode timing of `classifier_terminates_on_adversarial_input`).
-const MAX_CLASSIFY_WORK: u32 = 512;
+pub(super) const MAX_CLASSIFY_WORK: u32 = 512;
 
 /// RAII budget guard for the classifier recursion. `enter` resets the budget at the OUTERMOST call
 /// and charges one unit, plus the `input_len` bytes about to be parsed, per (re-)entry; `None` means
@@ -82,8 +82,13 @@ impl Drop for ClassifyGuard {
         if depth == 0 {
             CLASSIFY_WORK.with(|w| w.set(0));
             CLASSIFY_BYTES.with(|b| b.set(0));
+            super::escape::clear_backtick_cache();
         }
     }
+}
+
+pub(super) fn active() -> bool {
+    CLASSIFY_DEPTH.with(|d| d.get()) > 0
 }
 
 /// Charge `units` of extra work to the shared per-classification budget; `false` once it is spent

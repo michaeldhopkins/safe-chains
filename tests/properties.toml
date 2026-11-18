@@ -118,7 +118,10 @@ owed = [
 ]
 "src/cst/printed.rs" = ["src/cst/printed_tests.rs::a_printed_word_is_never_safer_through_xargs", "src/cst/printed_tests.rs::the_utility_is_never_replaced"]
 "src/cst/heredocs.rs" = ["src/cst/heredocs_tests.rs::commands_after_a_heredoc_on_its_line_are_judged_as_written", "src/cst/heredocs_tests.rs::an_expansion_in_a_body_never_approves_more_than_the_command"]
-"src/cst/escape.rs" = ["src/cst/escape_tests.rs::a_line_continuation_inside_a_word_never_changes_the_verdict"]
+"src/cst/escape.rs" = [
+  "src/cst/escape_tests.rs::a_line_continuation_inside_a_word_never_changes_the_verdict",
+  "src/cst/classify_budget_tests.rs::backtick_substitutions_never_parse_more_than_the_allowance",
+]
 "src/cst/opaque/declared.rs" = ["src/cst/opaque_tests.rs::a_rebound_variable_is_not_read_stale"]
 "src/cst/opaque/items.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/opaque/walk.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
@@ -139,7 +142,10 @@ owed = [
 "src/handlers/perl_load.rs" = ["src/cst/opaque_tests.rs::registry_commands_never_trust_an_unknown_word"]
 "src/cst/brace.rs" = ["src/cst/brace_bash_tests.rs::a_brace_word_is_exact_or_unresolved", "src/cst/brace_bash_tests.rs::a_sequence_brace_is_exact_or_unresolved"]
 "src/cst/budget.rs" = []
-"src/cst/classify_budget.rs" = ["src/cst/classify_budget_tests.rs::delegation_never_parses_more_than_the_allowance"]
+"src/cst/classify_budget.rs" = [
+  "src/cst/classify_budget_tests.rs::delegation_never_parses_more_than_the_allowance",
+  "src/cst/classify_budget_tests.rs::backtick_substitutions_never_parse_more_than_the_allowance",
+]
 "src/cst/scope_budget.rs" = ["src/cst/scope_budget.rs::sources_never_multiply_the_binding_set"]
 "src/cst/search_quote.rs" = ["src/cst/search_quote_tests.rs::a_dollar_the_shell_keeps_in_a_search_path_is_refused"]
 "src/cst/stdin_fed.rs" = ["src/cst/stdin_fed_tests.rs::an_editor_is_refused_exactly_when_its_standard_input_is_fed", "src/cst/stdin_fed_tests.rs::only_a_line_number_passes_as_a_plus_operand"]
