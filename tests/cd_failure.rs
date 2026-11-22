@@ -121,3 +121,31 @@ fn a_timed_cd_moves_the_shell_like_a_plain_one() {
         assert!(!machine.approves(command), "`{command}` was approved");
     }
 }
+
+#[test]
+fn a_timed_cd_is_tracked_like_a_plain_one_in_both_directions() {
+    let machine = Machine::new();
+    for command in [
+        "time cd sub && echo x > f",
+        "time -p cd sub && echo x > f",
+        "! time cd sub || echo x > f",
+        "time cd sub && ls || echo x > f",
+        &format!("time cd sub && {WRITE}"),
+        &format!("time -p cd ./q && (true || {WRITE})"),
+    ] {
+        assert!(machine.approves(command), "`{command}` should be judged like the untimed form");
+    }
+    for command in [
+        &format!("time cd ./q || {WRITE}"),
+        &format!("time -p cd ./q; {WRITE}"),
+        &format!("! time cd ./q && {WRITE}"),
+        &format!("time -p -- cd ./nope || {WRITE}"),
+        "time cd .. && echo x > ../../escape",
+        "time -p cd /etc && echo x > hosts",
+        "! time cd /etc || echo x > hosts",
+        "time cd sub && echo evil >> ../1/.zshrc",
+        "time cd ./q a || echo x > f; echo evil >> 1/.zshrc",
+    ] {
+        assert!(!machine.approves(command), "`{command}` was approved");
+    }
+}
