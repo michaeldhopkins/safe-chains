@@ -6,7 +6,7 @@ use proptest::prelude::*;
 
 use super::*;
 use crate::engine::facet::LocalLocus;
-use crate::engine::resolve::regions::classify_region;
+use crate::engine::resolve::regions::classify_text;
 use crate::pathctx::PathCtx;
 use crate::verdict::{SafetyLevel, Verdict};
 
@@ -39,11 +39,11 @@ fn approved(level: FolderLevel, command: &str) -> bool {
 /// of it reaches.
 fn landing(anchor: &str, target: &str) -> LocalLocus {
     let _ctx = crate::pathctx::enter(PathCtx { cwd: Some(anchor.to_string()), root: Some(root()), session_id: None });
-    let resolved = crate::pathctx::resolve(target).into_owned();
+    let resolved = crate::pathctx::place(target, None).into_judged();
     if crate::engine::resolve::is_unpinnable(&resolved) {
         return LocalLocus::Machine;
     }
-    let role = classify_region(&resolved);
+    let role = classify_text(&resolved);
     role.write_locus.max(role.rebind_locus)
 }
 
@@ -93,7 +93,7 @@ proptest! {
         if level == FolderLevel::Developer {
             let home = std::env::var("HOME").unwrap_or_default();
             let _ctx = crate::pathctx::enter(PathCtx { cwd: Some(home.clone()), root: Some(root()), session_id: None });
-            let at_home = crate::pathctx::resolve(&target).into_owned();
+            let at_home = crate::pathctx::place(&target, None).into_judged();
             prop_assert!(!home.is_empty(), "HOME is unset, so the home check cannot run");
             prop_assert!(!crate::engine::resolve::regions::names_a_region(&at_home), "`{command}` is approved at developer and run in ~ it writes `{at_home}`, a named place");
         }

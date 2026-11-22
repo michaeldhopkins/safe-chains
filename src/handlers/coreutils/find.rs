@@ -181,8 +181,8 @@ fn execdir_directories(base: &str) -> Vec<Option<String>> {
             head => head,
         }),
     };
-    let parent = parent.map_or_else(unnamed, |p| crate::pathctx::join_cwd(cwd.as_deref(), p).or_else(|| cwd.clone()));
-    let own = crate::pathctx::join_cwd(cwd.as_deref(), base).or_else(|| cwd.clone());
+    let parent = parent.map_or_else(unnamed, |p| crate::pathctx::join_cwd_chdir(cwd.as_deref(), p).or_else(|| cwd.clone()));
+    let own = crate::pathctx::join_cwd_chdir(cwd.as_deref(), base).or_else(|| cwd.clone());
     vec![parent, own]
 }
 

@@ -368,7 +368,7 @@ pub(crate) fn workspace_reaches(command: &str) -> impl Iterator<Item = (String, 
         if !policy::looks_like_path(&text) {
             return None;
         }
-        let t = if pathctx::resolve(&text) == resolved { text } else { resolved.clone() };
+        let t = if pathctx::place(&text, None).judged() == resolved { text } else { resolved.clone() };
         // A temp path is READ/WRITE admitted, so the outside-test below never fires on it — but it
         // is not EXECUTABLE unless it is this session's scratchpad. When the command was denied,
         // that is the likely reason, and it is the one case where the fix is a grant rather than a

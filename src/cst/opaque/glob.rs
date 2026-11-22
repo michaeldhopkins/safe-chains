@@ -33,7 +33,7 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
     let cwd = if absolute {
         String::new()
     } else {
-        crate::pathctx::cwd().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD)?
+        crate::pathctx::folder_on_disk().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD)?
     };
     let mut found = vec![String::new()];
     let mut seen = 0usize;
@@ -189,7 +189,7 @@ pub(crate) fn unresolved_glob(path: &str) -> bool {
         String::from("/")
     } else {
         // No directory context: the spelling's locus is the whole answer (`sed -i *` in a worktree).
-        match crate::pathctx::cwd().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD) {
+        match crate::pathctx::folder_on_disk().filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD) {
             Some(cwd) => cwd,
             None => return false,
         }

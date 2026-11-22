@@ -19,7 +19,7 @@ const CONSUMERS: &[(&str, usize, &str)] = &[
     ("src/handlers/vcs/git.rs", 1, "a directory counts as outside the project unless granted for writing"),
     ("src/pathctx.rs", 1, "nothing lies in the root"),
     ("src/pathctx/folder.rs", 3, "no workspace, so folder code is refused"),
-    ("src/pathctx/physical.rs", 1, "a glob match is not judged together"),
+    ("src/pathctx/place/physical.rs", 1, "a glob match is not judged together"),
     ("src/pathgate/folder_code.rs", 2, "the folder is foreign"),
     ("src/pathgate/handlers/jj.rs", 1, "the working directory counts as moved from the root"),
 ];
@@ -31,7 +31,7 @@ const FIELD_READERS: &[(&str, usize, &str)] = &[
     ("src/pathctx.rs", 1, "a `cd` keeps the root as it was"),
     ("src/pathctx/home.rs", 1, "a `~/` path never lies inside the unknown folder, so it stays a home path"),
     (
-        "src/pathctx/placing.rs",
+        "src/pathctx/place.rs",
         2,
         "a `~/` path stays absolute; a relative one is placed by the folder level, or followed through a link in the reported folder",
     ),

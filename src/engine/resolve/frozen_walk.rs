@@ -356,11 +356,12 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
 
 fn outside_sandbox(base: &str) -> bool {
     let repr = format!("{}/f", base.trim_end_matches('/'));
-    let placed = crate::pathctx::on_the_link(|| crate::pathctx::resolve(&repr));
-    let canonical = super::locus::canonicalize(&placed);
-    (placed.starts_with('/') || placed.starts_with('~'))
+    let placed = crate::pathctx::on_the_link(|| crate::pathctx::place(&repr, None));
+    let judged = placed.judged();
+    let canonical = super::locus::canonicalize(judged);
+    (judged.starts_with('/') || judged.starts_with('~'))
         && (super::locus::is_unpinnable(&canonical) || {
-            let role = super::regions::classify_region(&canonical);
+            let role = super::regions::classify_text(&canonical);
             role.read_locus >= crate::engine::facet::LocalLocus::User && role.write_locus >= crate::engine::facet::LocalLocus::User
         })
 }
@@ -374,12 +375,12 @@ pub(crate) fn on_disk(base: &str) -> Option<String> {
     if base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX) {
         return None;
     }
-    let placed = crate::pathctx::resolve(base);
+    let placed = crate::pathctx::place(base, None).into_judged();
     if placed.starts_with('~') {
         return crate::pathctx::join_cwd(None, &placed).filter(|home| home != crate::pathctx::UNRESOLVED_CWD);
     }
     if placed.starts_with('/') {
-        return (!crate::pathctx::folder::is_unknown(&placed) && placed != crate::pathctx::UNRESOLVED_CWD).then(|| placed.into_owned());
+        return (!crate::pathctx::folder::is_unknown(&placed) && placed != crate::pathctx::UNRESOLVED_CWD).then_some(placed);
     }
     let crate::pathctx::Root::Known(root) = crate::pathctx::root() else { return None };
     if !root.starts_with('/') {

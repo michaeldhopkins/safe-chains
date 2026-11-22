@@ -171,6 +171,7 @@ owed = [
 "src/registry/dispatch/credential_args.rs" = ["a_credential_name_is_found_in_any_position", "a_pattern_that_could_spell_a_credential_name_is_one"]
 "src/registry/dispatch/pre_flags.rs" = ["the_listed_flags_in_front_are_skipped_with_their_values"]
 "src/registry/dispatch/delegate.rs" = ["only_listed_flags_pass_before_the_separator"]
+"src/engine/resolve/regions/role_merge.rs" = ["src/engine/resolve/locus.rs::a_temp_directory_is_not_lifted_into_the_worktree_by_a_substitution_tag"]
 "src/engine/resolve/regions/home_spelling.rs" = ["a_prefix_strips_in_any_case_only_at_a_component_boundary"]
 "src/engine/resolve/regions/path_text.rs" = ["a_path_is_below_a_root_only_past_a_component_boundary", "the_folded_prefix_agrees_with_lowercasing", "a_hidden_component_is_found_wherever_it_is"]
 "src/engine/archetype.rs" = []
@@ -214,6 +215,8 @@ owed = [
   "a_read_is_exposed_exactly_when_it_claims_a_secret",
 ]
 "src/engine/resolve/flags.rs" = []
+"src/engine/resolve/stage_output.rs" = ["src/handler_property_tests.rs::tagged_substitution_residue_cannot_escape"]
+"src/engine/resolve/pinned_face.rs" = ["src/handler_property_tests.rs::tagged_substitution_residue_cannot_escape"]
 "src/engine/resolve/locus.rs" = [
   "a_dollar_anywhere_forces_machine",
   "a_parent_escape_forces_machine",
@@ -686,8 +689,8 @@ owed = [
 "src/handlers/followed_read.rs" = "lists the tree a command that follows links would read"
 "src/handlers/followed_read/ackrc.rs" = "reads the environment and the ack config files it names"
 "src/handlers/followed_read/archive.rs" = "lists the trees pax, 7z and diff read when they follow links"
-"src/pathctx/physical.rs" = "reads the filesystem: lstat, readlink and directory listings along a path"
-"src/pathctx/placing.rs" = "reads the thread-local directory context and, through physical, the filesystem"
+"src/pathctx/place/physical.rs" = "reads the filesystem: lstat, readlink and directory listings along a path"
+"src/pathctx/place.rs" = "reads the thread-local directory context and, through place/physical, the filesystem"
 "src/registry/custom.rs" = "reads .safe-chains.toml and ~/.config/safe-chains.toml"
 "src/registry/mod.rs" = "the process-wide registries, including the one loaded from the user's config"
 "src/registry/flag_sets.rs" = "reads the process-wide registries in registry/mod.rs"
@@ -726,7 +729,7 @@ owed = [
 "src/envvars/shell_words_tests.rs" = "the shell program and shell text suite (#[cfg(test)] mod in envvars/shell_words.rs)"
 "src/pathctx/folder_tests.rs" = "the unknown-folder suite (#[cfg(test)] mod in pathctx/folder.rs)"
 "src/pathctx/folder_soundness_tests.rs" = "the anchor-soundness property (#[cfg(test)] mod in pathctx/folder.rs)"
-"src/pathctx/physical_tests.rs" = "the link-following suite (#[cfg(test)] mod in pathctx/physical.rs)"
+"src/pathctx/place/physical_tests.rs" = "the link-following suite (#[cfg(test)] mod in pathctx/place/physical.rs)"
 "src/engine/resolve/frozen_reach_tests.rs" = "the recursive-reach suite (#[cfg(test)] mod in engine/resolve/frozen_reach.rs)"
 "src/engine/resolve/frozen_walk_tests.rs" = "the bounded-walk suite (#[cfg(test)] mod in engine/resolve/frozen_walk.rs)"
 "src/engine/resolve/shell_operand_tests.rs" = "the destructive-operand suite (#[cfg(test)] mod in engine/resolve.rs)"

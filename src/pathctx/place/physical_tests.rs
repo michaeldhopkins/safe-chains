@@ -50,7 +50,7 @@ fn a_loop_is_unresolvable() {
     let (_dir, base) = tree();
     symlink(format!("{base}/p/b"), format!("{base}/p/a2")).unwrap();
     symlink(format!("{base}/p/a2"), format!("{base}/p/b")).unwrap();
-    assert_eq!(resolve(&format!("{base}/p/a2"), true).as_deref(), Some(super::super::UNRESOLVED_CWD));
+    assert_eq!(resolve(&format!("{base}/p/a2"), true).as_deref(), Some(crate::pathctx::UNRESOLVED_CWD));
 }
 
 #[test]
@@ -77,7 +77,7 @@ fn a_glob_through_a_link_reaches_the_link_target() {
     symlink(format!("{base}/o/f"), format!("{base}/p/rc")).unwrap();
     assert_eq!(resolve(&format!("{base}/p/r[c]"), true), Some(format!("{base}/o/f")));
     assert_eq!(resolve(&format!("{base}/p/s*/a"), true), None);
-    assert_eq!(resolve(&format!("{base}/p/*"), true).as_deref(), Some(super::super::UNRESOLVED_CWD));
+    assert_eq!(resolve(&format!("{base}/p/*"), true).as_deref(), Some(crate::pathctx::UNRESOLVED_CWD));
 }
 
 #[test]
@@ -108,7 +108,7 @@ fn a_glob_budget_counts_entries_across_nested_directories() {
             std::fs::write(format!("{sub}/file-{f}-long-enough-to-expose-backtracking"), "").unwrap();
         }
     }
-    assert_eq!(resolve(&format!("{base}/p/d*/******."), true).as_deref(), Some(super::super::UNRESOLVED_CWD));
+    assert_eq!(resolve(&format!("{base}/p/d*/******."), true).as_deref(), Some(crate::pathctx::UNRESOLVED_CWD));
     let tokens: Vec<_> = ["cargo", "--target-dir", "--output-dir=/**/******./.."]
         .into_iter()
         .map(|s| crate::parse::Token::from_raw(s.to_string()))

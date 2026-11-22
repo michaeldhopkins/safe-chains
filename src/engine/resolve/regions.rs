@@ -19,6 +19,7 @@ pub(crate) use home_spelling::absolute_other_home;
 pub(crate) mod hypothetical;
 pub(crate) mod metadata;
 mod path_text;
+mod role_merge;
 mod protection;
 use path_text::{at_or_below, ci_starts_with, has_hidden_component};
 mod unicode_spelling;
@@ -26,7 +27,7 @@ mod unicode_spelling;
 pub(crate) use protection::anchored_protected_paths_here;
 use protection::role_is_protective;
 pub(crate) use protection::{
-    granted_for_writing, home_nodes, is_workspace_root, keeps_absolute, lies_in_root, names_a_region, names_a_secret, protection_covers,
+    granted_for_writing, home_nodes, is_workspace_root, keeps_absolute, lies_in_root, names_a_region, names_a_secret_text, protection_covers,
 };
 
 /// Which faces a user grant may NOT widen. Two distinct needs, and collapsing them was a real
@@ -59,19 +60,6 @@ pub(crate) struct Role {
     pub rebind_locus: LocalLocus,
     pub reads_secret: bool,
     pub frozen: Frozen,
-}
-
-impl Role {
-    /// Whether a grant may widen this role's WRITE face.
-    fn write_grantable(&self) -> bool {
-        self.frozen != Frozen::Write && self.write_locus < LocalLocus::SystemIntegrity
-    }
-
-    /// Whether a grant may widen this role's REBIND face. Strictly stronger: freezing the write
-    /// necessarily freezes the rebind, since a rebind is the more destructive of the two.
-    fn rebind_grantable(&self) -> bool {
-        self.frozen == Frozen::Nothing && self.write_locus < LocalLocus::SystemIntegrity
-    }
 }
 
 #[derive(Deserialize)]
@@ -661,12 +649,22 @@ fn apply_grant(path: &str, base: Role) -> Role {
     }
 }
 
-/// The role for `path`. Most-specific applicable node wins; ties break toward the more
-/// restrictive role (higher write locus, then read locus) — a safety backstop. No match →
-/// fail-closed default: an absolute or home path is `unknown` (deny), a relative one is
-/// `worktree`. Then a user trust grant may widen the result. `path` is expected already
-/// resolved and past the `$`/`..` guard.
-pub(crate) fn classify_region(path: &str) -> Role {
+/// The role for a placed path: its name rules are asked of the place it lands and of the way it was
+/// spelled, and the worse answer stands. A link can add a refusal for the name it was given, and
+/// never take one away for the place it leads.
+pub(crate) fn classify_region(placed: &crate::pathctx::Placed) -> Role {
+    let landed = classify_text(placed.judged());
+    if placed.spelled() == placed.judged() {
+        return landed;
+    }
+    landed.worse(classify_text(placed.spelled()))
+}
+
+/// The role for `path` as text. Most-specific applicable node wins; ties break toward the more
+/// restrictive role (higher write locus, then read locus). No match is fail-closed: an absolute or
+/// home path is `unknown` (deny), a relative one is `worktree`. Then a user trust grant may widen
+/// the result. `path` is expected already resolved and past the `$`/`..` guard.
+pub(crate) fn classify_text(path: &str) -> Role {
     // Canonicalized HERE, at the choke point, rather than by each caller. `classify_pinned` did it
     // and the other two callers did not, so `names_credential_store` and `frozen_write_kind` judged
     // raw spellings: `/Users/you/.config` and `~/.config/` are the same directory, and only the
@@ -960,10 +958,10 @@ mod tests {
     #[test]
     fn the_region_file_compiles_and_defaults_exist() {
         // forces the LazyLock; panics here if the TOML is malformed or a role is undefined
-        let _ = classify_region("/etc/hosts");
-        assert_eq!(classify_region("relative/file.txt").write_locus, LocalLocus::Worktree);
-        assert_eq!(classify_region("/some/unmapped/path").write_locus, LocalLocus::Machine);
-        assert_eq!(classify_region("/some/unmapped/path").read_locus, LocalLocus::Machine);
+        let _ = classify_text("/etc/hosts");
+        assert_eq!(classify_text("relative/file.txt").write_locus, LocalLocus::Worktree);
+        assert_eq!(classify_text("/some/unmapped/path").write_locus, LocalLocus::Machine);
+        assert_eq!(classify_text("/some/unmapped/path").read_locus, LocalLocus::Machine);
     }
 
     #[test]
@@ -973,12 +971,12 @@ mod tests {
         // loader/boot regions are `os = ["linux"]`, so they're not asserted here (this test is
         // platform-portable); their routing is the same role.
         for p in ["/etc/passwd", "/etc/group", "/etc/sudoers", "/etc/sudoers.d/pkg", "/etc/pam.d/sshd"] {
-            assert_eq!(classify_region(p).write_locus, LocalLocus::SystemIntegrity, "write {p}");
-            assert_eq!(classify_region(p).read_locus, LocalLocus::Machine, "read {p}");
+            assert_eq!(classify_text(p).write_locus, LocalLocus::SystemIntegrity, "write {p}");
+            assert_eq!(classify_text(p).read_locus, LocalLocus::Machine, "read {p}");
         }
         // Ordinary /etc app config is NOT the trust substrate — it stays machine (unknown → machine).
-        assert_eq!(classify_region("/etc/nginx/nginx.conf").write_locus, LocalLocus::Machine, "ordinary /etc stays machine");
-        assert_eq!(classify_region("/usr/local/bin/tool").write_locus, LocalLocus::Machine, "/usr/local is admin-managed, stays machine");
+        assert_eq!(classify_text("/etc/nginx/nginx.conf").write_locus, LocalLocus::Machine, "ordinary /etc stays machine");
+        assert_eq!(classify_text("/usr/local/bin/tool").write_locus, LocalLocus::Machine, "/usr/local is admin-managed, stays machine");
     }
 
     /// The sibling-workspace (`adjacent`) classifier and its guards — the edge cases that make it
@@ -988,7 +986,7 @@ mod tests {
         use crate::pathctx::{PathCtx, enter};
         let ws = |root: &str, path: &str| {
             let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()), ..Default::default() });
-            classify_region(path)
+            classify_text(path)
         };
         const WS: &str = "~/projects/safe-chains";
 
@@ -1032,7 +1030,7 @@ mod tests {
         assert_ne!(ws("/opt/app", "/opt/other/x").read_locus, LocalLocus::Adjacent);
 
         // No workspace context → no adjacency (fail-closed).
-        assert_ne!(classify_region("~/projects/branchdiff/src/main.rs").read_locus, LocalLocus::Adjacent);
+        assert_ne!(classify_text("~/projects/branchdiff/src/main.rs").read_locus, LocalLocus::Adjacent);
     }
 
     /// A peer project's HIDDEN files are ordinary peer content now, and the credential shield is
@@ -1048,7 +1046,7 @@ mod tests {
         use crate::pathctx::{PathCtx, enter};
         let at = |root: &str, path: &str| {
             let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()), ..Default::default() });
-            classify_region(path).read_locus
+            classify_text(path).read_locus
         };
         const WS: &str = "~/projects/safe-chains";
 
@@ -1077,20 +1075,20 @@ mod tests {
     #[test]
     fn most_specific_wins() {
         // the .ssh SEGMENT shield fires at any depth/spelling and reads_secret
-        let ssh = classify_region("~/.ssh/id_rsa");
+        let ssh = classify_text("~/.ssh/id_rsa");
         assert_eq!(ssh.read_locus, LocalLocus::Machine);
         assert!(ssh.reads_secret);
-        assert!(classify_region("myproj/.ssh/id_rsa").reads_secret, "segment bites a relative spelling too");
+        assert!(classify_text("myproj/.ssh/id_rsa").reads_secret, "segment bites a relative spelling too");
         // ~/notes matches no node → the home fallback → `user`, and NOT writable.
-        assert_eq!(classify_region("~/notes.txt").read_locus, LocalLocus::User);
-        assert_eq!(classify_region("~/notes.txt").write_locus, LocalLocus::Machine);
+        assert_eq!(classify_text("~/notes.txt").read_locus, LocalLocus::User);
+        assert_eq!(classify_text("~/notes.txt").write_locus, LocalLocus::Machine);
         // ...while another user's home is shielded rather than merely far away.
-        assert!(classify_region("~root/.bashrc").reads_secret, "another user's home is private");
+        assert!(classify_text("~root/.bashrc").reads_secret, "another user's home is private");
     }
 
     #[test]
     fn in_project_trusted_files_read_but_do_not_write() {
-        let git = classify_region(".git/config");
+        let git = classify_text(".git/config");
         assert_eq!(git.read_locus, LocalLocus::WorktreeTrusted, "read is admitted at read-local");
         assert_eq!(git.write_locus, LocalLocus::WorktreeTrusted, "above the worktree write ceiling → frozen");
     }
@@ -1105,29 +1103,29 @@ mod tests {
                 format!("sub/{dir}/hgrc"),
                 dir.to_string(),
             ] {
-                let r = classify_region(&path);
+                let r = classify_text(&path);
                 assert_eq!(r.write_locus, LocalLocus::WorktreeTrusted, "{path} must be write-frozen");
                 assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "{path} stays readable");
             }
         }
-        assert_eq!(classify_region("src/jj/config.toml").write_locus, LocalLocus::Worktree, "a plain dir named like one is not");
+        assert_eq!(classify_text("src/jj/config.toml").write_locus, LocalLocus::Worktree, "a plain dir named like one is not");
     }
 
     #[test]
     fn user_grant_widens_read_and_write() {
         with_grants(&[("~/projects/", true, true)], || {
-            let r = classify_region("~/projects/other/src/main.rs");
+            let r = classify_text("~/projects/other/src/main.rs");
             assert_eq!(r.write_locus, LocalLocus::Worktree, "write admitted");
             assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
         });
         // grant gone → unknown/deny (home is not admitted)
-        assert_eq!(classify_region("~/projects/other/src/main.rs").write_locus, LocalLocus::Machine);
+        assert_eq!(classify_text("~/projects/other/src/main.rs").write_locus, LocalLocus::Machine);
     }
 
     #[test]
     fn read_only_grant_admits_read_but_not_write() {
         with_grants(&[("~/.local/share/mise/", true, false)], || {
-            let r = classify_region("~/.local/share/mise/installs/python/bin/python");
+            let r = classify_text("~/.local/share/mise/installs/python/bin/python");
             assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
             assert!(r.write_locus > LocalLocus::Worktree, "write NOT admitted");
         });
@@ -1177,7 +1175,7 @@ mod tests {
         assert_eq!(paths, vec!["~/.local/share/mise/".to_string()]);
         let grants: Vec<(&str, bool, bool)> = paths.iter().map(|p| (p.as_str(), true, false)).collect();
         with_grants(&grants, || {
-            let r = classify_region("~/.local/share/mise/installs/python/bin/python");
+            let r = classify_text("~/.local/share/mise/installs/python/bin/python");
             assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
             assert!(r.write_locus > LocalLocus::Worktree, "the Edit() rule is ignored — write stays denied");
         });
@@ -1189,9 +1187,9 @@ mod tests {
         assert_eq!(paths, vec!["~/work/".to_string()]);
         let grants: Vec<(&str, bool, bool)> = paths.iter().map(|p| (p.as_str(), true, false)).collect();
         with_grants(&grants, || {
-            assert!(classify_region("~/work/notes.txt").read_locus <= LocalLocus::WorktreeTrusted, "granted read admitted");
+            assert!(classify_text("~/work/notes.txt").read_locus <= LocalLocus::WorktreeTrusted, "granted read admitted");
             // a hidden credential swept under the grant is still not widened
-            assert_eq!(classify_region("~/work/.ssh/id_rsa").read_locus, LocalLocus::Machine, "hidden cred not widened");
+            assert_eq!(classify_text("~/work/.ssh/id_rsa").read_locus, LocalLocus::Machine, "hidden cred not widened");
         });
     }
 
@@ -1271,7 +1269,7 @@ mod tests {
             assert_eq!(secret_node_root("/root/notes.txt").as_deref(), Some("/root"));
             with_grants(&[("/root", true, true)], || {
                 assert_eq!(
-                    classify_region("/root/.ssh/id_rsa").read_locus,
+                    classify_text("/root/.ssh/id_rsa").read_locus,
                     LocalLocus::Machine,
                     "a grant on /root must not name the .ssh nested inside it"
                 );
@@ -1390,8 +1388,8 @@ mod tests {
             // asserted BOTH with and without a grant, since the un-granted case failed safe on its
             // own (`unknown` denies) and hid the divergence until a grant was present.
             let compare = |when: &str| {
-                let t = classify_region(tilde);
-                let a = classify_region(&absolute);
+                let t = classify_text(tilde);
+                let a = classify_text(&absolute);
                 assert_eq!(a.reads_secret, t.reads_secret, "{absolute} ({when}): {what} loses its secret bit");
                 assert_eq!(a.write_locus, t.write_locus, "{absolute} ({when}): {what} write face diverges");
                 assert_eq!(a.rebind_locus, t.rebind_locus, "{absolute} ({when}): {what} rebind face diverges");
@@ -1415,7 +1413,7 @@ mod tests {
             .into_iter()
             .filter(|p| p.starts_with("~/") && !p.contains('*'))
             .map(|p| p.trim_end_matches('/').to_string())
-            .filter(|p| classify_region(p).reads_secret)
+            .filter(|p| classify_text(p).reads_secret)
             .collect();
         assert!(stores.iter().any(|p| p == "~/.s3cfg"), "the walk must reach ~/.s3cfg: {stores:?}");
         with_os("macos", || {
@@ -1427,7 +1425,7 @@ mod tests {
                     format!("/System/Volumes/Data{home}{rest}"),
                     format!("/system/volumes/data{}{rest}", home.to_ascii_lowercase()),
                 ] {
-                    assert!(classify_region(&spelling).reads_secret, "{spelling} must stay a credential store like {store}");
+                    assert!(classify_text(&spelling).reads_secret, "{spelling} must stay a credential store like {store}");
                 }
             }
         });
@@ -1452,7 +1450,7 @@ mod tests {
                     "/system/volumes/data/users/sc-someone-else/notes",
                     "/System/Volumes/Data/home/sc-someone-else/notes",
                 ] {
-                    assert!(classify_region(spelling).reads_secret, "{spelling} ({os}) is another user's home");
+                    assert!(classify_text(spelling).reads_secret, "{spelling} ({os}) is another user's home");
                 }
                 if !ours.is_empty() {
                     let own = format!("/users/{ours}/notes.txt");
@@ -1516,16 +1514,16 @@ mod tests {
         for spelling in ["~/projects", "~/projects/"] {
             with_grants(&[(spelling, true, true)], || {
                 assert_eq!(
-                    classify_region("~/projects/sibling/notes.txt").write_locus,
+                    classify_text("~/projects/sibling/notes.txt").write_locus,
                     LocalLocus::Worktree,
                     "{spelling} must cover its contents"
                 );
-                assert_eq!(classify_region("~/projects").write_locus, LocalLocus::Worktree, "{spelling} covers the dir itself");
+                assert_eq!(classify_text("~/projects").write_locus, LocalLocus::Worktree, "{spelling} covers the dir itself");
             });
         }
         // The component boundary still holds: a neighbour sharing a name prefix is not covered.
         with_grants(&[("~/projects", true, true)], || {
-            assert_eq!(classify_region("~/projectsX/secret.txt").write_locus, LocalLocus::Machine, "~/projectsX is a different directory");
+            assert_eq!(classify_text("~/projectsX/secret.txt").write_locus, LocalLocus::Machine, "~/projectsX is a different directory");
         });
     }
 
@@ -1549,7 +1547,7 @@ mod tests {
                     }
                     covered += 1;
                     let private = format!("/private{path}");
-                    let (plain, firm) = (classify_region(&path), classify_region(&private));
+                    let (plain, firm) = (classify_text(&path), classify_text(&private));
                     assert_eq!(
                         (plain.read_locus, plain.write_locus, plain.reads_secret),
                         (firm.read_locus, firm.write_locus, firm.reads_secret),
@@ -1569,7 +1567,7 @@ mod tests {
                         for variant in ["/PRIVATE", "/Private"] {
                             let cased = format!("{variant}{path}");
                             assert!(
-                                classify_region(&cased).reads_secret,
+                                classify_text(&cased).reads_secret,
                                 "{os}: {cased} is {path} on a case-insensitive volume, but the shield missed it"
                             );
                         }
@@ -1595,14 +1593,14 @@ mod tests {
                         assert!(base_region(&path).reads_secret, "{os}: probe {path} does not reach the secret node it was built from");
                         with_grants(&[(naming.as_str(), true, true)], || {
                             assert_eq!(
-                                classify_region(&path).read_locus,
+                                classify_text(&path).read_locus,
                                 LocalLocus::WorktreeTrusted,
                                 "{os}: a grant naming {naming} must reach {path}"
                             );
                         });
                         with_grants(&[(parent.as_str(), true, true)], || {
                             assert_eq!(
-                                classify_region(&path).read_locus,
+                                classify_text(&path).read_locus,
                                 LocalLocus::Machine,
                                 "{os}: a grant on the parent {parent} must NOT reach the secret at {path}"
                             );
@@ -1629,7 +1627,7 @@ mod tests {
                     };
                     with_derived_grants(&[(naming.as_str(), true, false)], || {
                         assert_eq!(
-                            classify_region(&path).read_locus,
+                            classify_text(&path).read_locus,
                             LocalLocus::Machine,
                             "{os}: a derived grant on {naming} must not reach {path}"
                         );
@@ -1637,7 +1635,7 @@ mod tests {
                     // The same grant written by the user in safe-chains' own config DOES reach it,
                     // so this guard is testing the source and not merely re-testing the naming test.
                     with_grants(&[(naming.as_str(), true, false)], || {
-                        assert_eq!(classify_region(&path).read_locus, LocalLocus::WorktreeTrusted);
+                        assert_eq!(classify_text(&path).read_locus, LocalLocus::WorktreeTrusted);
                     });
                     covered += 1;
                 }
@@ -1670,7 +1668,7 @@ mod tests {
                     };
                     for grant in [naming.as_str(), parent.as_str(), "~/", "/"] {
                         with_grants(&[(grant, true, true)], || {
-                            let r = classify_region(&path);
+                            let r = classify_text(&path);
                             // The rebind face is frozen for BOTH kinds: a write freeze implies it.
                             assert!(r.rebind_locus > LocalLocus::Worktree, "{os}: grant {grant} opens the frozen rebind at {path}");
                             if role.frozen == Frozen::Write || system {
@@ -1684,7 +1682,7 @@ mod tests {
                     if role.frozen == Frozen::Rebind {
                         with_grants(&[(naming.as_str(), true, true)], || {
                             assert!(
-                                classify_region(&path).write_locus <= LocalLocus::Worktree,
+                                classify_text(&path).write_locus <= LocalLocus::Worktree,
                                 "{os}: a rebind-only freeze must still allow writing into {path}"
                             );
                         });
@@ -1705,19 +1703,19 @@ mod tests {
         // On APFS (case-insensitive) a case-variant names the SAME file, so every protection —
         // credential stores AND the `.git`/`.envrc` write-freeze — must fire on the variant.
         with_os("macos", || {
-            assert!(classify_region("~/.AWS/credentials").reads_secret, ".AWS folds to the .aws secret");
-            assert!(classify_region("~/.SSH/id_rsa").reads_secret, ".SSH folds to the .ssh secret");
-            assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::Machine);
-            assert_eq!(classify_region("/etc/Master.Passwd").read_locus, LocalLocus::Machine, "system secret folds");
+            assert!(classify_text("~/.AWS/credentials").reads_secret, ".AWS folds to the .aws secret");
+            assert!(classify_text("~/.SSH/id_rsa").reads_secret, ".SSH folds to the .ssh secret");
+            assert_eq!(classify_text("~/.AWS/credentials").read_locus, LocalLocus::Machine);
+            assert_eq!(classify_text("/etc/Master.Passwd").read_locus, LocalLocus::Machine, "system secret folds");
             // the agent-injectable one: a case-variant .git/.envrc WRITE stays frozen
-            assert!(classify_region(".GIT/hooks/pre-commit").write_locus > LocalLocus::Worktree, ".GIT write frozen");
-            assert!(classify_region(".Git/hooks/pre-commit").write_locus > LocalLocus::Worktree, "mixed-case .Git frozen");
-            assert!(classify_region(".ENVRC").write_locus > LocalLocus::Worktree, ".ENVRC write frozen");
+            assert!(classify_text(".GIT/hooks/pre-commit").write_locus > LocalLocus::Worktree, ".GIT write frozen");
+            assert!(classify_text(".Git/hooks/pre-commit").write_locus > LocalLocus::Worktree, "mixed-case .Git frozen");
+            assert!(classify_text(".ENVRC").write_locus > LocalLocus::Worktree, ".ENVRC write frozen");
             // A grant NAMING the folded spelling reaches it: on this filesystem `~/.AWS` is the
             // very same directory as `~/.aws`, so someone who granted one granted the other.
             with_grants(&[("~/.AWS/", true, false)], || {
                 assert_eq!(
-                    classify_region("~/.AWS/credentials").read_locus,
+                    classify_text("~/.AWS/credentials").read_locus,
                     LocalLocus::WorktreeTrusted,
                     "a grant naming the folded secret reaches it"
                 );
@@ -1725,7 +1723,7 @@ mod tests {
             // A grant that does NOT name it still cannot reach through the fold.
             with_grants(&[("~/", true, false)], || {
                 assert_eq!(
-                    classify_region("~/.AWS/credentials").read_locus,
+                    classify_text("~/.AWS/credentials").read_locus,
                     LocalLocus::Machine,
                     "a broad grant cannot reach a folded secret"
                 );
@@ -1739,16 +1737,16 @@ mod tests {
         // folding there would be a false-deny. The canonical spelling is shielded on every OS.
         with_os("linux", || {
             assert_eq!(
-                classify_region(".GIT/hooks/pre-commit").write_locus,
+                classify_text(".GIT/hooks/pre-commit").write_locus,
                 LocalLocus::Worktree,
                 "linux: .GIT is an ordinary worktree path"
             );
-            assert!(!classify_region("~/.AWS/credentials").reads_secret, "linux: .AWS is not the .aws secret");
+            assert!(!classify_text("~/.AWS/credentials").reads_secret, "linux: .AWS is not the .aws secret");
         });
         for os in ["macos", "linux"] {
-            assert!(with_os(os, || classify_region("~/.aws/credentials").reads_secret), "{os}: canonical .aws shielded");
+            assert!(with_os(os, || classify_text("~/.aws/credentials").reads_secret), "{os}: canonical .aws shielded");
             assert!(
-                with_os(os, || classify_region(".git/hooks/pre-commit").write_locus > LocalLocus::Worktree),
+                with_os(os, || classify_text(".git/hooks/pre-commit").write_locus > LocalLocus::Worktree),
                 "{os}: canonical .git frozen"
             );
         }
@@ -1759,37 +1757,37 @@ mod tests {
         // Folding an ADMIT would be fail-OPEN on a case-sensitive volume (`/TMP` ≠ `/tmp`). So even
         // on macOS `/TMP` is NOT admitted as scratch — it fails closed to unknown.
         with_os("macos", || {
-            assert!(classify_region("/tmp/x").write_locus <= LocalLocus::Worktree, "/tmp is scratch (admitted)");
-            assert_eq!(classify_region("/TMP/x").write_locus, LocalLocus::Machine, "/TMP is not folded into the scratch admit");
+            assert!(classify_text("/tmp/x").write_locus <= LocalLocus::Worktree, "/tmp is scratch (admitted)");
+            assert_eq!(classify_text("/TMP/x").write_locus, LocalLocus::Machine, "/TMP is not folded into the scratch admit");
         });
     }
 
     #[test]
     fn safe_chains_config_is_read_ok_write_denied_and_ungrantable() {
         let cfg = "~/.config/safe-chains.toml";
-        assert!(classify_region(cfg).read_locus <= LocalLocus::WorktreeTrusted, "read is fine");
+        assert!(classify_text(cfg).read_locus <= LocalLocus::WorktreeTrusted, "read is fine");
         // `system-integrity`, not `machine`, and the exact rung is the point rather than an
         // implementation detail: `machine` is admitted outright by `local-admin`, so the file that
         // SETS the level was writable at a level it was supposed to bound. The rung above is the
         // one no level below yolo admits.
-        assert_eq!(classify_region(cfg).write_locus, LocalLocus::SystemIntegrity, "write denied");
+        assert_eq!(classify_text(cfg).write_locus, LocalLocus::SystemIntegrity, "write denied");
         // even a broad ~/ grant cannot widen the write (the trust root is pinned)
         with_grants(&[("~/", true, true)], || {
-            assert_eq!(classify_region(cfg).write_locus, LocalLocus::SystemIntegrity, "grant can't unlock the config write");
-            assert!(classify_region(cfg).read_locus <= LocalLocus::WorktreeTrusted);
+            assert_eq!(classify_text(cfg).write_locus, LocalLocus::SystemIntegrity, "grant can't unlock the config write");
+            assert!(classify_text(cfg).read_locus <= LocalLocus::WorktreeTrusted);
         });
     }
 
     #[test]
     fn a_grant_does_not_widen_hidden_files_or_system_secrets() {
         with_grants(&[("~/", true, true)], || {
-            assert_eq!(classify_region("~/projects/foo/main.rs").write_locus, LocalLocus::Worktree);
+            assert_eq!(classify_text("~/projects/foo/main.rs").write_locus, LocalLocus::Worktree);
             // Credential dotfiles are NOT swept up by a broad grant. They are held by the shield
             // NAMING them, not by being hidden: this release made ordinary home dotfiles readable
             // (`~/.zshrc`, `~/.gitconfig`), so "hidden" stopped being the test and the list below
             // is exactly the set the shield declares.
             for p in ["~/.git-credentials", "~/.npmrc", "~/.config/gh/hosts.yml", "~/.pgpass"] {
-                assert_eq!(classify_region(p).read_locus, LocalLocus::Machine, "shielded, not widened: {p}");
+                assert_eq!(classify_text(p).read_locus, LocalLocus::Machine, "shielded, not widened: {p}");
             }
             // `.SSH` is the CASE variant, so it depends on the filesystem and must be asserted per
             // OS rather than once. macOS folds shields (the default volume is case-insensitive, so
@@ -1797,24 +1795,24 @@ mod tests {
             // directory and reads as the ordinary dotfile it is. Asserting the macOS answer
             // everywhere is what broke on CI.
             assert_eq!(
-                with_os("macos", || classify_region("~/.SSH/id_rsa").read_locus),
+                with_os("macos", || classify_text("~/.SSH/id_rsa").read_locus),
                 LocalLocus::Machine,
                 "macos: the case variant is the same directory, so the shield must fold onto it"
             );
             assert_eq!(
-                with_os("linux", || classify_region("~/.SSH/id_rsa").read_locus),
+                with_os("linux", || classify_text("~/.SSH/id_rsa").read_locus),
                 LocalLocus::User,
                 "linux: ~/.SSH is not ~/.ssh, and an unlisted dotfile is an ordinary home read"
             );
         });
         // a `/` grant cannot reach a system credential store (un-grantable shield)
         with_grants(&[("/", true, true)], || {
-            assert_eq!(classify_region("/etc/ssl/private/server.key").read_locus, LocalLocus::Machine);
-            assert_eq!(with_os("linux", || classify_region("/etc/shadow").read_locus), LocalLocus::Machine);
+            assert_eq!(classify_text("/etc/ssl/private/server.key").read_locus, LocalLocus::Machine);
+            assert_eq!(with_os("linux", || classify_text("/etc/shadow").read_locus), LocalLocus::Machine);
         });
         // an EXPLICIT dotdir grant still reaches its non-hidden contents
         with_grants(&[("~/.runner-scripts/", true, true)], || {
-            assert_eq!(classify_region("~/.runner-scripts/deploy.sh").write_locus, LocalLocus::Worktree);
+            assert_eq!(classify_text("~/.runner-scripts/deploy.sh").write_locus, LocalLocus::Worktree);
         });
         // macOS ~/Library credential stores are NOT dot-prefixed, so the dotfile rule can't catch
         // them under `grant ~/` — the shields must (un-grantable, like the dotdirs).
@@ -1826,7 +1824,7 @@ mod tests {
                 "~/Library/Application Support/Google/Chrome/Default/Login Data",
                 "~/.config/git/credentials",
             ] {
-                assert_eq!(with_os("macos", || classify_region(p).read_locus), LocalLocus::Machine, "shield: {p}");
+                assert_eq!(with_os("macos", || classify_text(p).read_locus), LocalLocus::Machine, "shield: {p}");
             }
         });
     }
@@ -1834,7 +1832,7 @@ mod tests {
     #[test]
     fn a_broad_grant_never_reaches_a_secret_carveout() {
         with_grants(&[("~/", true, true)], || {
-            let r = classify_region("~/.ssh/id_rsa");
+            let r = classify_text("~/.ssh/id_rsa");
             assert_eq!(r.read_locus, LocalLocus::Machine, "a ~/ grant does not name ~/.ssh, so it does not reach it");
             assert!(r.reads_secret);
         });
@@ -1854,7 +1852,7 @@ mod tests {
     #[test]
     fn a_grant_that_names_a_secret_store_opens_it_for_reading() {
         with_grants(&[("~/.ssh", true, false)], || {
-            let r = classify_region("~/.ssh/id_rsa");
+            let r = classify_text("~/.ssh/id_rsa");
             assert!(!r.reads_secret, "the grant named ~/.ssh, so the shield yields to it");
             assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "and the locus is granted too");
         });
@@ -1862,14 +1860,14 @@ mod tests {
         // A grant one level INSIDE the store also names it — the rule is at-or-below, so granting
         // `~/.ssh/config` must not accidentally clear `~/.ssh/id_rsa` beside it.
         with_grants(&[("~/.ssh/config", true, false)], || {
-            assert!(!classify_region("~/.ssh/config").reads_secret, "the named file opens");
-            assert!(classify_region("~/.ssh/id_rsa").reads_secret, "a sibling the grant did not name stays shielded");
+            assert!(!classify_text("~/.ssh/config").reads_secret, "the named file opens");
+            assert!(classify_text("~/.ssh/id_rsa").reads_secret, "a sibling the grant did not name stays shielded");
         });
 
         // A WRITE grant does not clear the read shield, and does not open the write face of a
         // store either.
         with_grants(&[("~/.ssh", false, true)], || {
-            let r = classify_region("~/.ssh/id_rsa");
+            let r = classify_text("~/.ssh/id_rsa");
             assert!(r.reads_secret, "write = true is not a statement about reading");
         });
     }
@@ -1890,8 +1888,8 @@ mod tests {
             return;
         };
         with_grants(&[("~/work/", true, true)], || {
-            assert!(classify_region("~/work/a.txt").write_locus == LocalLocus::Worktree);
-            assert!(classify_region(&format!("{home}/work/a.txt")).write_locus == LocalLocus::Worktree);
+            assert!(classify_text("~/work/a.txt").write_locus == LocalLocus::Worktree);
+            assert!(classify_text(&format!("{home}/work/a.txt")).write_locus == LocalLocus::Worktree);
         });
     }
 

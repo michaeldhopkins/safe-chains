@@ -270,7 +270,7 @@ fn spawn_verdict(rest: &[Token], plain: &str, valued: &str) -> Verdict {
         [one] => one.as_str().to_string(),
         words => shell_words::join(words.iter().map(Token::as_str)),
     };
-    let _cwd = dir.map(|d| crate::pathctx::enter_cwd(crate::pathctx::join_cwd(crate::pathctx::cwd().as_deref(), &d)));
+    let _cwd = dir.map(|d| crate::pathctx::enter_cwd(crate::pathctx::join_cwd_chdir(crate::pathctx::cwd().as_deref(), &d)));
     verdict.combine(crate::command_verdict(&inner))
 }
 

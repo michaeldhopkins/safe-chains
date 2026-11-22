@@ -337,13 +337,13 @@ fn sed_verdict(tokens: &[Token]) -> Verdict {
     // authoritative. A local `w`/`r` is a SafeWrite/read; a system/home/out-of-worktree target denies.
     let mut level = SafetyLevel::Inert;
     for w in &scan.writes {
-        if !crate::engine::resolve::write_target_verdict(&crate::pathctx::resolve(w)).is_allowed() {
+        if !crate::engine::resolve::write_target_verdict(w).is_allowed() {
             return Verdict::Denied;
         }
         level = SafetyLevel::SafeWrite;
     }
     for r in &scan.reads {
-        if !crate::engine::resolve::read_content_verdict(&crate::pathctx::resolve(r)).is_allowed() {
+        if !crate::engine::resolve::read_content_verdict(r).is_allowed() {
             return Verdict::Denied;
         }
     }

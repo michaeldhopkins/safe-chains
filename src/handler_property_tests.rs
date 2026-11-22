@@ -2438,7 +2438,7 @@ fn the_frozen_write_nudge_matches_what_a_grant_actually_does() {
         let kind = crate::engine::resolve::frozen_write_kind(&probe);
         // What a grant NAMING this exact path actually achieves, per face.
         let (opens_write, opens_rebind) = crate::engine::resolve::regions::with_grants(&[(probe.as_str(), true, true)], || {
-            let r = crate::engine::resolve::regions::classify_region(&probe);
+            let r = crate::engine::resolve::regions::classify_text(&probe);
             let admitted = crate::engine::facet::LocalLocus::Worktree;
             (r.write_locus <= admitted, r.rebind_locus <= admitted)
         });

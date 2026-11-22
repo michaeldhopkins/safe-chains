@@ -279,15 +279,15 @@ fn is_sensitive(segments: &[&str]) -> bool {
 /// `~/Library`), a key file (`id_rsa`) or a file a shield node pins (`credentials`). Reads of other
 /// sensitive names (`.gitignore`, `.github/`) are ordinary, so only these stay refused.
 pub fn read_is_secret(segments: &[&str]) -> bool {
-    use crate::engine::resolve::regions::names_a_secret;
+    use crate::engine::resolve::regions::names_a_secret_text;
     let same = |a: &str, b: &str| a.eq_ignore_ascii_case(b);
     let Some(last) = segments.last() else { return false };
     let joined = segments.join("/");
     KEY_FILES.iter().any(|n| same(n, last))
         || pinned_names(true).any(|n| same(n, last))
         || starts_with_the_end_of_a_home_node(segments, true)
-        || names_a_secret(&joined)
-        || names_a_secret(&format!("~/{joined}"))
+        || names_a_secret_text(&joined)
+        || names_a_secret_text(&format!("~/{joined}"))
 }
 
 /// Private keys, by OpenSSH's default names (ssh(1) FILES).

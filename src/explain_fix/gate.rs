@@ -174,7 +174,7 @@ fn leads_out_through_a_link(word: &str) -> bool {
 /// Whether a READ grant on `path` alone would get `segment` approved: the segment only reads the
 /// runs-later place it reached, which is not a boundary. A write or an exec there needs more.
 fn reads_only(segment: &str, path: &str, approved: &dyn Fn(&str) -> bool) -> bool {
-    let resolved = crate::pathctx::resolve(path).into_owned();
+    let resolved = crate::pathctx::place(path, None).into_judged();
     crate::engine::resolve::regions::hypothetical::with_hypothetical_grant(&resolved, true, false, || approved(segment))
 }
 
@@ -291,7 +291,7 @@ fn leaves_the_workspace(word: &str) -> bool {
         return false;
     }
     let expanded = expand_home(word);
-    let resolved = crate::pathctx::resolve(&expanded);
+    let resolved = crate::pathctx::place(&expanded, None).into_judged();
     let outside = resolved.starts_with(['/', '~']) || resolved == ".." || resolved.starts_with("../");
     outside && !crate::pathctx::under_temp_root(&resolved) && !crate::pathctx::in_session_scratchpad(&resolved)
 }
@@ -309,7 +309,7 @@ fn names_a_protected_place(word: &str) -> bool {
     let path = if word.starts_with('~') || word.starts_with('/') {
         word.to_string()
     } else if word.contains('/') || word.starts_with('.') {
-        crate::pathctx::resolve(word).into_owned()
+        crate::pathctx::place(word, None).into_judged()
     } else {
         return false;
     };

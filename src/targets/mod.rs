@@ -165,7 +165,7 @@ fn is_a_plain_folder(dir: &str) -> bool {
             && !d.contains('$')
             && !d.contains("__SAFE_CHAINS_")
             && d.split('/').all(|part| part != "." && part != "..")
-            && !crate::engine::resolve::regions::names_a_secret(d)
+            && !crate::engine::resolve::regions::names_a_secret_text(d)
     };
     plain(dir) && std::fs::canonicalize(dir).is_ok_and(|real| real.is_dir() && real.to_str().is_some_and(plain))
 }

@@ -239,7 +239,7 @@ pub(crate) fn is_packaged(name: &str) -> bool {
 /// once the folder a `cd` moved to is joined on. No commit of the project's own shows that code. A
 /// frozen folder named last is the folder itself (`GIT_DIR=.git`), which its tool reads as its own.
 pub(crate) fn runs_unreviewed_code(path: &str) -> bool {
-    let placed = crate::pathctx::resolve(path);
+    let placed = crate::pathctx::place(path, None).into_judged();
     let (dirs, last) = placed.rsplit_once('/').unwrap_or(("", &placed));
     is_packaged(last) || dirs.split('/').any(|part| is_frozen(part) || is_packaged(part))
 }
@@ -247,7 +247,7 @@ pub(crate) fn runs_unreviewed_code(path: &str) -> bool {
 /// Whether a tool that runs the code of the folder `path` names would run files from installed
 /// packages or a frozen folder: the folder itself counts, since the tool reads the files inside it.
 pub(crate) fn is_unreviewed_folder(path: &str) -> bool {
-    crate::pathctx::resolve(path).split('/').any(|part| is_frozen(part) || is_packaged(part))
+    crate::pathctx::place(path, None).into_judged().split('/').any(|part| is_frozen(part) || is_packaged(part))
 }
 
 #[cfg(test)]

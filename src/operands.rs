@@ -38,7 +38,7 @@ fn operand(word: String) -> Operand {
     let opaque = cst::check::is_opaque_value;
     let expanded = pathctx::expand_vars(&word, false).into_owned();
     let text = if opaque(&expanded) && !opaque(&word) { word } else { expanded };
-    let resolved = pathctx::resolve(&text).into_owned();
+    let resolved = pathctx::place(&text, None).into_judged();
     let resolved = if opaque(&resolved) && !opaque(&text) { text.clone() } else { resolved };
     Operand { text, resolved }
 }

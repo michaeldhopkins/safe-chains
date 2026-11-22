@@ -103,7 +103,7 @@ fn wildcard_match(p: &[char], n: &[char]) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::super::classify_region;
+    use super::super::classify_text;
     use super::*;
     use proptest::prelude::*;
 
@@ -114,17 +114,17 @@ mod tests {
         for dir in [".git", ".jj", ".hg", ".sl"] {
             for base in ["/tmp/r", "/var/tmp/r", "/private/tmp/r", "/tmp"] {
                 let path = format!("{base}/{dir}/config");
-                assert_eq!(classify_region(&path).write_locus, LocalLocus::WorktreeTrusted, "{path}");
-                assert!(classify_region(&path).read_locus <= LocalLocus::WorktreeTrusted, "{path} stays readable");
+                assert_eq!(classify_text(&path).write_locus, LocalLocus::WorktreeTrusted, "{path}");
+                assert!(classify_text(&path).read_locus <= LocalLocus::WorktreeTrusted, "{path} stays readable");
             }
         }
-        assert_eq!(classify_region("/tmp/r/.envrc").write_locus, LocalLocus::WorktreeTrusted);
-        assert!(classify_region("/tmp/r/src/a.rs").write_locus < LocalLocus::Worktree);
+        assert_eq!(classify_text("/tmp/r/.envrc").write_locus, LocalLocus::WorktreeTrusted);
+        assert!(classify_text("/tmp/r/src/a.rs").write_locus < LocalLocus::Worktree);
     }
 
     #[test]
     fn a_stricter_region_keeps_its_own_answer() {
-        let shielded = classify_region("/root/.ssh/.git/config");
+        let shielded = classify_text("/root/.ssh/.git/config");
         assert!(shielded.reads_secret && shielded.write_locus > LocalLocus::WorktreeTrusted);
     }
 
@@ -134,14 +134,14 @@ mod tests {
             ".j?/repo/config.toml", ".[j]j/repo/config.toml", ".gi[t]/hooks/pre-commit", ".en?rc", ".*/config", "/tmp/r/.g*/config",
             ".[!x]it/config",
         ] {
-            assert_eq!(classify_region(path).write_locus, LocalLocus::WorktreeTrusted, "{path}");
+            assert_eq!(classify_text(path).write_locus, LocalLocus::WorktreeTrusted, "{path}");
         }
     }
 
     #[test]
     fn globs_the_shell_cannot_expand_onto_a_dot_name_stay_ordinary() {
         for path in ["target/*", "src/*.rs", "*/config", "build/?", "x[.]git/config", ".gx?/config"] {
-            assert_eq!(classify_region(path).write_locus, LocalLocus::Worktree, "{path}");
+            assert_eq!(classify_text(path).write_locus, LocalLocus::Worktree, "{path}");
         }
     }
 

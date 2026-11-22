@@ -132,11 +132,10 @@ pub(crate) fn remote_shell_verdict(value: &str) -> Verdict {
     }
     let program = value.split_ascii_whitespace().next().unwrap_or_default();
     if program.contains('/') && !program.starts_with('/') {
-        let placed = crate::pathctx::resolve(program);
-        if !relative_program_stays(&placed) {
+        if !relative_program_stays(&crate::pathctx::place(program, None)) {
             return Verdict::Denied;
         }
-        crate::engine::resolve::execute_file_verdict(&placed)
+        crate::engine::resolve::execute_file_verdict(program)
     } else {
         Verdict::Allowed(SafetyLevel::Inert)
     }
@@ -145,7 +144,8 @@ pub(crate) fn remote_shell_verdict(value: &str) -> Verdict {
 /// A relative program, after the working directory is joined on. Absolute means it climbed out.
 /// `..` left in the spelling was not joined, so it still climbs. A frozen directory runs its own
 /// code, and `node_modules/.bin` is a package's.
-fn relative_program_stays(placed: &str) -> bool {
+fn relative_program_stays(placed: &crate::pathctx::Placed) -> bool {
+    let placed = placed.judged();
     if placed.starts_with('/') || placed.starts_with('~') {
         return false;
     }
@@ -171,11 +171,10 @@ fn rsync_path_verdict(value: &str) -> Verdict {
     if value.starts_with('/') {
         return Verdict::Denied;
     }
-    let placed = crate::pathctx::resolve(value);
-    if !relative_program_stays(&placed) {
+    if !relative_program_stays(&crate::pathctx::place(value, None)) {
         return Verdict::Denied;
     }
-    crate::engine::resolve::execute_file_verdict(&placed)
+    crate::engine::resolve::execute_file_verdict(value)
 }
 
 /// A filter rule that reads its rules from a file: `merge`, `dir-merge`, or their short forms `.`

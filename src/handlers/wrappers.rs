@@ -142,7 +142,7 @@ fn trusted_heavy_slot_path(arg0: &str) -> bool {
         if !arg0.contains('/') {
             return true;
         }
-        let resolved = crate::pathctx::resolve(arg0);
+        let resolved = crate::pathctx::place(arg0, None).into_judged();
         return trusted_inner_command(&resolved)
             || resolved
                 .strip_prefix("~/")
@@ -158,7 +158,7 @@ fn trusted_heavy_slot_path(arg0: &str) -> bool {
         return false;
     };
     let tilde = format!("~/{rel}");
-    let resolved = crate::pathctx::resolve(&tilde);
+    let resolved = crate::pathctx::place(&tilde, None).into_judged();
     resolved
         .strip_prefix("~/")
         .or_else(|| strip_env_home(&resolved))

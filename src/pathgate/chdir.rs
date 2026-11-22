@@ -57,7 +57,7 @@ fn dirs<'a>(spec: &Chdir, tokens: &'a [Token]) -> Vec<&'a str> {
 /// (relative paths keep their worktree reading, as after a relative `cd`), except one that climbs:
 /// nothing can say where `..` lands from nowhere, so it leaves the cwd unresolved.
 fn moved(cur: Option<String>, dir: &str) -> Option<String> {
-    crate::pathctx::join_cwd(cur.as_deref(), dir)
+    crate::pathctx::join_cwd_chdir(cur.as_deref(), dir)
         .or_else(|| if dir.split('/').any(|seg| seg == "..") { Some(crate::pathctx::UNRESOLVED_CWD.to_string()) } else { cur })
 }
 

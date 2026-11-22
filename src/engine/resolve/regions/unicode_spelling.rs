@@ -77,7 +77,7 @@ fn could_start_with(pattern: &str, prefix: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::super::classify_region;
+    use super::super::classify_text;
     use crate::engine::facet::LocalLocus;
 
     const READS: [(&str, &str); 10] = [
@@ -96,25 +96,25 @@ mod tests {
     #[test]
     fn a_credential_store_spelled_with_a_folding_character_stays_shielded() {
         for (spelled, ascii) in READS {
-            assert!(classify_region(ascii).reads_secret, "{ascii} is a shield");
-            assert!(classify_region(spelled).reads_secret, "{spelled} reads as {ascii}");
+            assert!(classify_text(ascii).reads_secret, "{ascii} is a shield");
+            assert!(classify_text(spelled).reads_secret, "{spelled} reads as {ascii}");
         }
     }
 
     #[test]
     fn a_frozen_name_spelled_with_a_folding_character_stays_frozen() {
         for path in [".\u{17F}l/config", ".g\u{131}t/hooks/pre-commit", ".j\u{FF4A}/repo/config.toml", "/tmp/r/.\u{17F}l/config"] {
-            assert!(classify_region(path).write_locus >= LocalLocus::WorktreeTrusted, "{path}");
+            assert!(classify_text(path).write_locus >= LocalLocus::WorktreeTrusted, "{path}");
         }
     }
 
     #[test]
     fn a_name_outside_ascii_that_cannot_be_protected_stays_ordinary() {
         for path in ["r\u{E9}sum\u{E9}.txt", "docs/\u{66F8}\u{985E}.md", "\u{1F600}/notes.txt"] {
-            assert_eq!(classify_region(path).write_locus, LocalLocus::Worktree, "{path}");
-            assert!(!classify_region(path).reads_secret, "{path}");
+            assert_eq!(classify_text(path).write_locus, LocalLocus::Worktree, "{path}");
+            assert!(!classify_text(path).reads_secret, "{path}");
         }
-        assert!(!classify_region("~/\u{66F8}\u{985E}/notes.txt").reads_secret);
+        assert!(!classify_text("~/\u{66F8}\u{985E}/notes.txt").reads_secret);
     }
 
     fn shielded_paths() -> Vec<String> {
@@ -255,10 +255,10 @@ mod tests {
             format!("/Users/{user}"),
         ];
         for store in shielded_paths() {
-            let ascii = classify_region(&store);
+            let ascii = classify_text(&store);
             for parent in &parents {
                 let spelled = format!("{parent}{}", &store[1..]);
-                let s = classify_region(&spelled);
+                let s = classify_text(&spelled);
                 assert!(s.reads_secret >= ascii.reads_secret, "{spelled} reads as {store}");
                 assert!(s.write_locus >= ascii.write_locus, "{spelled} writes as {store}");
             }
@@ -266,7 +266,7 @@ mod tests {
         for other in
             ["/U\u{17F}ers/someone/notes.txt", "/System/Volumes/Data/U\u{17F}ers/someone/notes.txt", "/\u{17F}ystem/Volumes/Data/.vol/1/2"]
         {
-            assert!(classify_region(other).reads_secret || classify_region(other).read_locus > LocalLocus::Machine, "{other}");
+            assert!(classify_text(other).reads_secret || classify_text(other).read_locus > LocalLocus::Machine, "{other}");
         }
     }
 
@@ -286,7 +286,7 @@ mod tests {
             let forms = equivalents(rest);
             proptest::prop_assume!(!forms.is_empty());
             let spelled = format!("{home}{}", forms[pick % forms.len()]);
-            let (a, s) = (classify_region(ascii), classify_region(&spelled));
+            let (a, s) = (classify_text(ascii), classify_text(&spelled));
             proptest::prop_assert!(s.reads_secret >= a.reads_secret, "{} reads as {}", spelled, ascii);
             proptest::prop_assert!(s.write_locus >= a.write_locus, "{} writes as {}", spelled, ascii);
         }

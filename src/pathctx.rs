@@ -13,7 +13,6 @@
 //! path) [`resolve`] returns the path unchanged, so the classifiers behave exactly as before
 //! — the signal tightens when present, never a regression when absent.
 
-use std::borrow::Cow;
 use std::cell::RefCell;
 
 pub mod anchor;
@@ -21,18 +20,16 @@ pub mod folder;
 mod root;
 pub(crate) use folder::judging;
 pub(crate) use root::folder_on_disk;
-use root::reported_folder;
 pub use root::{Root, root};
 mod home;
 pub mod item_shape;
 mod lexical;
-mod physical;
-mod placing;
+mod place;
 mod vars;
 pub use item_shape::{Binding, Facts, ItemShape, ItemShapeGuard, binding, enter_loop_shape, enter_stdin_shape, loop_shape, stdin_shape};
 use lexical::{expand_home, lexical_join, names_no_known_directory};
-pub(crate) use placing::on_the_link;
-use placing::resolve_placed;
+use place::physical;
+pub(crate) use place::{Here, Placed, here, on_the_link, place};
 pub use vars::{LoopGuard, VarGuard, enter_loop_var, enter_var, expand_vars, names_a_loop_var};
 
 /// The working directory and project root for the command under evaluation. Both optional:
@@ -57,10 +54,13 @@ thread_local! {
 pub fn enter(ctx: PathCtx) -> Guard {
     let reported = REPORTED.with(|r| r.replace(ctx.cwd.clone()));
     let raw = REPORTED_RAW.with(|r| r.replace(None));
-    Guard(CURRENT.with(|c| c.replace(ctx)), Some((reported, raw)))
+    let here = place::swap_here(None);
+    physical::evaluation_begins();
+    Guard(CURRENT.with(|c| c.replace(ctx)), Some((reported, raw, here)))
 }
 
 pub fn note_reported_cwd(cwd: Option<String>) {
+    place::note_here(cwd.as_deref());
     REPORTED_RAW.with(|r| *r.borrow_mut() = cwd);
 }
 
@@ -72,17 +72,23 @@ pub(crate) fn display_cwd() -> Option<String> {
 }
 
 pub(crate) fn reported_is_secret() -> bool {
-    REPORTED_RAW.with(|r| r.borrow().as_deref().is_some_and(crate::engine::resolve::regions::names_a_secret))
+    use crate::engine::resolve::regions::names_a_secret_text;
+    let spelled = REPORTED_RAW.with(|r| r.borrow().as_deref().is_some_and(names_a_secret_text));
+    spelled || here().is_some_and(|here| names_a_secret_text(&here.physical))
 }
 
-pub struct Guard(PathCtx, Option<(Option<String>, Option<String>)>);
+type Saved = (Option<String>, Option<String>, Option<Here>);
+
+pub struct Guard(PathCtx, Option<Saved>);
 
 impl Drop for Guard {
     fn drop(&mut self) {
         CURRENT.with(|c| *c.borrow_mut() = std::mem::take(&mut self.0));
-        if let Some((reported, raw)) = self.1.take() {
+        if let Some((reported, raw, here)) = self.1.take() {
             REPORTED.with(|r| *r.borrow_mut() = reported);
             REPORTED_RAW.with(|r| *r.borrow_mut() = raw);
+            place::swap_here(here);
+            physical::evaluation_ends();
         }
     }
 }
@@ -115,9 +121,9 @@ pub fn cwd() -> Option<String> {
 
 /// Whether the absolute, already placed `abs` lies at or below the project root as the kernel sees
 /// it, including a root that is itself a protected place.
-pub(crate) fn placed_in_root(abs: &str) -> bool {
+pub(crate) fn placed_in_root(placed: &Placed) -> bool {
     match root() {
-        Root::Known(root) if root.starts_with('/') => crate::engine::resolve::regions::lies_in_root(abs, &physical::root(&root)),
+        Root::Known(root) if root.starts_with('/') => crate::engine::resolve::regions::lies_in_root(placed, &physical::root(&root)),
         Root::Known(_) | Root::Unknown => false,
     }
 }
@@ -283,28 +289,13 @@ impl Drop for RipgrepConfigGuard {
     }
 }
 
-/// Resolve a path argument for classification against the ambient `cwd`/`root`. Returns a
-/// path the *existing* classifiers (`classify_locus`, `is_safe_write_target`) can score
-/// unchanged. When `cwd` and `root` are both known and absolute, a **relative** path is lexically
-/// joined onto `cwd` (no filesystem access) and an **absolute** path is normalized in place; then
-/// either way, if the result is inside `root` it comes back as a **root-relative** path (so the
-/// classifiers see "worktree"), and if it escaped `root` (e.g. `cwd` is `/etc`, or an absolute
-/// `/etc/hosts`) it comes back **absolute** (so they see `machine`/etc.). This makes the absolute
-/// and relative spellings of the SAME in-root file classify identically — safety on the OPERATION,
-/// not the SYNTAX. A `~/…` path that expands into `root` comes back root-relative too, as its
-/// `$HOME/…` spelling does; any other `~` path, a `$`-unpinnable one, or no context, is returned
-/// as-is for the home classifiers. In an unknown folder (`folder`), a placed path joins the root.
-pub fn resolve(path: &str) -> Cow<'_, str> {
-    resolve_placed(path, None)
-}
-
-/// As [`resolve`], for a path put to `use_`. A write or a rebind is recorded as one the command leaf
+/// Place a path argument put to `use_`. A write or a rebind is recorded as one the command leaf
 /// being judged NAMED (`folder`).
-pub fn resolve_for(path: &str, use_: anchor::Use) -> Cow<'_, str> {
+pub(crate) fn place_for(path: &str, use_: anchor::Use) -> Placed {
     if use_.mutates() {
         folder::note_named_write();
     }
-    resolve_placed(path, Some(use_))
+    place(path, Some(use_))
 }
 
 /// The cwd after a `cd` whose target cannot be pinned. It looks like a path AND is unpinnable, so
@@ -327,6 +318,15 @@ pub(crate) const UNRESOLVED_CWD: &str = "/__SAFE_CHAINS_CMDSUB__";
 /// everything downstream.
 pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
     join_cwd_mode(cur, target, false)
+}
+
+/// The cwd after a command that calls `chdir(2)` on `target` (`git -C`, `tmux -c`, `find -execdir`):
+/// the kernel climbs `..` from where a link leads, not from the link, and a command in the unknown
+/// folder starts from the reported folder on disk. `cd` is different: the shell joins `..` on the
+/// spelling (`cd -L`), and [`join_cwd`] does that.
+pub(crate) fn join_cwd_chdir(cur: Option<&str>, target: &str) -> Option<String> {
+    let on_disk = cur.filter(|c| folder::is_unknown(c)).and_then(place::here_below);
+    join_cwd_mode(on_disk.as_deref().or(cur), target, true)
 }
 
 pub fn join_cwd_mode(cur: Option<&str>, target: &str, physical: bool) -> Option<String> {
@@ -390,6 +390,10 @@ mod root_consumers_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn resolve(path: &str) -> String {
+        place(path, None).into_judged()
+    }
 
     #[test]
     fn an_inherited_ripgrep_config_follows_when_it_says_so_or_cannot_be_read() {

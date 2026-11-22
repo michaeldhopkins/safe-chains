@@ -112,7 +112,7 @@ pub fn fix_for(command: &str, approved: &dyn Fn(&str) -> bool, approved_by_defau
     let reason = reason.settled(command, approved);
     match reason {
         ReachReason::OutsideWorkspace | ReachReason::ForeignTemp => {
-            let resolved = crate::pathctx::resolve(&path).into_owned();
+            let resolved = crate::pathctx::place(&path, None).into_judged();
             let candidates = [folder_of(&resolved), Some(resolved.clone())];
             let grantable: Vec<String> = candidates
                 .into_iter()

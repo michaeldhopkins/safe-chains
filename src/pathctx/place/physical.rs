@@ -18,7 +18,8 @@
 //! racing the decision can do the same, and no check made before execution can close that window.
 //! Recorded in `docs/design/hard-problems.md`, HP-5.
 
-use std::collections::VecDeque;
+use std::cell::{Cell, RefCell};
+use std::collections::{HashMap, VecDeque};
 
 const MAX_LINKS: usize = 40;
 const MAX_ENTRIES: usize = 4096;
@@ -29,6 +30,49 @@ const MAX_MATCHES: usize = 256;
 /// a physical path is written back with them.
 const SYSTEM_LINKS: [&str; 3] = ["/private/etc", "/private/tmp", "/private/var"];
 const DATA_VOLUME: &str = "/System/Volumes/Data";
+
+/// What one `lstat` found. A link whose target cannot be read as text carries `None`.
+#[derive(Clone)]
+enum Lookup {
+    Missing,
+    Other,
+    Link(Option<String>),
+}
+
+thread_local! {
+    static MEMO: RefCell<HashMap<String, Lookup>> = RefCell::new(HashMap::new());
+    static EVALUATIONS: Cell<usize> = const { Cell::new(0) };
+}
+
+/// Every lookup made while an evaluation is in force is remembered until it ends, so all the checks
+/// of one decision read the same disk and a folder is looked up once, however many paths pass it.
+pub(in crate::pathctx) fn evaluation_begins() {
+    EVALUATIONS.set(EVALUATIONS.get() + 1);
+    MEMO.with(|m| m.borrow_mut().clear());
+}
+
+pub(in crate::pathctx) fn evaluation_ends() {
+    EVALUATIONS.set(EVALUATIONS.get().saturating_sub(1));
+    MEMO.with(|m| m.borrow_mut().clear());
+}
+
+fn lookup(path: &str) -> Lookup {
+    let remember = EVALUATIONS.get() > 0;
+    if remember && let Some(known) = MEMO.with(|m| m.borrow().get(path).cloned()) {
+        return known;
+    }
+    let found = match std::fs::symlink_metadata(path) {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            Lookup::Link(std::fs::read_link(path).ok().and_then(|t| t.to_str().map(str::to_string)))
+        }
+        Ok(_) => Lookup::Other,
+        Err(_) => Lookup::Missing,
+    };
+    if remember {
+        MEMO.with(|m| m.borrow_mut().insert(path.to_string(), found.clone()));
+    }
+    found
+}
 
 /// A walked path: no link met, or the physical spelling it leads to.
 #[derive(Debug, PartialEq, Eq)]
@@ -46,7 +90,7 @@ struct Budget {
 /// The physical spelling of the absolute path `raw`, read as the shell hands it over (not yet
 /// normalized), or `None` when no link lies on its way. A loop, an unreadable link or a glob whose
 /// matches lead to different places yields the unresolvable placeholder.
-pub(super) fn resolve(raw: &str, follow_last: bool) -> Option<String> {
+pub(in crate::pathctx) fn resolve(raw: &str, follow_last: bool) -> Option<String> {
     if !raw.starts_with('/') {
         return None;
     }
@@ -56,13 +100,13 @@ pub(super) fn resolve(raw: &str, follow_last: bool) -> Option<String> {
     let mut budget = Budget { links: 0, entries: 0, matches: 0 };
     match walk(Vec::new(), parts(raw, true), follow_last, &mut budget) {
         Outcome::Plain => None,
-        Outcome::Followed(real) => (real != super::lexical::lexical_join("/", raw)).then_some(real),
+        Outcome::Followed(real) => (real != crate::pathctx::lexical_join("/", raw)).then_some(real),
     }
 }
 
 /// The project root as the kernel sees it, so a path resolved through links is compared with a root
 /// resolved the same way.
-pub(super) fn root(root: &str) -> String {
+pub(in crate::pathctx) fn root(root: &str) -> String {
     resolve(root, true).unwrap_or_else(|| root.to_string())
 }
 
@@ -78,7 +122,7 @@ fn joined(done: &[String]) -> String {
 }
 
 fn unresolved() -> Outcome {
-    Outcome::Followed(super::UNRESOLVED_CWD.to_string())
+    Outcome::Followed(crate::pathctx::UNRESOLVED_CWD.to_string())
 }
 
 fn system_spelling(path: String) -> String {
@@ -122,19 +166,19 @@ fn walk(mut done: Vec<String>, mut todo: VecDeque<(String, bool)>, follow_last: 
             && part.contains(['*', '?', '['])
             && let Some(outcome) = glob(&done, &part, &todo, follow_last, budget)
         {
-            let literal_link = std::fs::symlink_metadata(&candidate).is_ok_and(|m| m.file_type().is_symlink());
-            let unresolved = matches!(&outcome, Outcome::Followed(real) if real == super::UNRESOLVED_CWD);
+            let literal_link = matches!(lookup(&candidate), Lookup::Link(_));
+            let unresolved = matches!(&outcome, Outcome::Followed(real) if real == crate::pathctx::UNRESOLVED_CWD);
             if !literal_link || unresolved {
                 return outcome;
             }
         }
-        match std::fs::symlink_metadata(&candidate) {
-            Ok(meta) if meta.file_type().is_symlink() => {
+        match lookup(&candidate) {
+            Lookup::Link(target) => {
                 budget.links += 1;
                 if budget.links > MAX_LINKS {
                     return unresolved();
                 }
-                let Some(target) = std::fs::read_link(&candidate).ok().and_then(|t| t.to_str().map(str::to_string)) else {
+                let Some(target) = target else {
                     return unresolved();
                 };
                 if target.starts_with('/') {
@@ -145,8 +189,8 @@ fn walk(mut done: Vec<String>, mut todo: VecDeque<(String, bool)>, follow_last: 
                 }
                 followed = true;
             }
-            Ok(_) => done.push(part),
-            Err(_) => {
+            Lookup::Other => done.push(part),
+            Lookup::Missing => {
                 missing = Some(done.len());
                 done.push(part);
             }
@@ -191,7 +235,7 @@ fn glob(done: &[String], pattern: &str, rest: &VecDeque<(String, bool)>, follow_
         let mut next = rest.clone();
         next.push_front((name, false));
         match walk(done.to_vec(), next, follow_last, budget) {
-            Outcome::Followed(real) if real == super::UNRESOLVED_CWD => return Some(unresolved()),
+            Outcome::Followed(real) if real == crate::pathctx::UNRESOLVED_CWD => return Some(unresolved()),
             Outcome::Followed(real) => reached.push(real),
             Outcome::Plain => plain += 1,
         }
@@ -210,7 +254,7 @@ fn glob(done: &[String], pattern: &str, rest: &VecDeque<(String, bool)>, follow_
 /// project itself, so the matches can be judged together as the pattern is written. The place is
 /// judged as a write, the stricter role.
 fn stays_unprotected(real: &str) -> bool {
-    let super::Root::Known(root) = super::root() else {
+    let crate::pathctx::Root::Known(root) = crate::pathctx::root() else {
         return false;
     };
     if !root.starts_with('/') {

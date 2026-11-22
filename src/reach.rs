@@ -237,7 +237,7 @@ pub(crate) fn repository_snapshot(command: &str) -> Option<(String, ReachReason)
     let rewritten = without_snapshot(command)?;
     let words = shell_words::split(command).ok()?;
     let repository = crate::pathgate::handlers::jj::repository_value(&words)?;
-    if classify(&crate::pathctx::resolve(&repository)) != ReachReason::FrozenTrustRoot {
+    if classify(crate::pathctx::place(&repository, None).judged()) != ReachReason::FrozenTrustRoot {
         return None;
     }
     (!crate::is_safe_command(command) && crate::is_safe_command(&rewritten)).then_some((repository, ReachReason::RepositorySnapshot))

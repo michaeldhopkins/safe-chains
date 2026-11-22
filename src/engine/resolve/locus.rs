@@ -17,6 +17,9 @@ use super::regions::classify_region;
 use crate::engine::facet::LocalLocus;
 #[path = "lookup_prefix.rs"]
 pub(crate) mod lookup_prefix;
+#[path = "pinned_face.rs"]
+mod pinned_face;
+use pinned_face::{classify_pinned, classify_residue};
 #[path = "locus_url.rs"]
 mod url;
 pub(crate) use url::is_url;
@@ -176,13 +179,11 @@ fn classify_one(path: &str, want_write: Face) -> LocalLocus {
     //     Reachable since `cd $(…)` began carrying a locus instead of being silently ignored:
     //     `cd $(fd d /etc) && cat f` classified `f` as an ordinary relative name and approved a
     //     read under /etc. Same ordering mistake as (1), one layer further down.
-    let resolved = crate::pathctx::resolve_for(&base, want_write);
-    let (cwd_tag, base) = match tagged_substitution(&resolved) {
-        Some((tag, rewritten)) => (Some(tag), Cow::Owned(rewritten)),
-        None => (None, resolved),
+    let placed = crate::pathctx::place_for(&base, want_write);
+    let (cwd_tag, plain) = match tagged_substitution(placed.judged()) {
+        Some((tag, rewritten)) => (Some(tag), classify_residue(&rewritten, want_write)),
+        None => (None, classify_pinned(&placed, want_write)),
     };
-
-    let plain = classify_pinned(&base, want_write);
     let tags = [operand_tag, cwd_tag];
     let folded = tags.into_iter().flatten().fold(plain, LocalLocus::max);
     // A temp directory must not be lifted into the band where executing a file is approved.
@@ -267,23 +268,7 @@ fn unpinnable_after_resolution(path: &str) -> bool {
     // deliberately not a prefix-match of the unpinnable `__SAFE_CHAINS_CMDSUB__`, so
     // `$(git diff --name-only)` is not unpinnable here and keeps its bounded locus over in
     // `classify_one`.
-    let resolved = crate::pathctx::resolve(&expanded).into_owned();
-    is_unpinnable(&canonicalize(&resolved))
-}
-
-/// Classify an ALREADY-resolved path: canonicalize, fail closed on an unpinnable spelling, then
-/// read the region model's face.
-fn classify_pinned(resolved: &str, want_write: Face) -> LocalLocus {
-    let canonical = canonicalize(resolved);
-    if is_unpinnable(&canonical) {
-        return LocalLocus::Machine;
-    }
-    let role = classify_region(&canonical);
-    match want_write {
-        Face::Read => role.read_locus,
-        Face::Write => role.write_locus,
-        Face::Rebind => role.rebind_locus,
-    }
+    is_unpinnable(&canonicalize(crate::pathctx::place(&expanded, None).judged()))
 }
 
 /// A path component standing in for a substitution's value while the SURROUNDING text is
@@ -515,7 +500,7 @@ mod atom_backstop {
 pub(crate) fn names_credential_store(path: &str) -> bool {
     let expanded = crate::pathctx::expand_vars(path, false);
     let neutralized = neutralize_atoms(&expanded);
-    classify_region(&crate::pathctx::resolve(&neutralized)).reads_secret
+    classify_region(&crate::pathctx::place(&neutralized, None)).reads_secret
 }
 
 /// Whether a WRITE to `path` is frozen — never auto-approved, and not openable by a grant — and if
@@ -527,7 +512,7 @@ pub(crate) fn names_credential_store(path: &str) -> bool {
 pub(crate) fn frozen_write_kind(path: &str) -> Option<FrozenWrite> {
     let expanded = crate::pathctx::expand_vars(path, false);
     let neutralized = neutralize_atoms(&expanded);
-    let role = classify_region(&crate::pathctx::resolve(&neutralized));
+    let role = classify_region(&crate::pathctx::place(&neutralized, None));
     match role.frozen {
         super::regions::Frozen::Write => Some(FrozenWrite::TrustFile),
         super::regions::Frozen::Rebind => Some(FrozenWrite::TrustRootDir),

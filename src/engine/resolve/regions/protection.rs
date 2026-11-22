@@ -189,10 +189,10 @@ pub(crate) fn granted_for_writing(path: &str) -> bool {
 /// Whether the absolute `abs` lies at or below the project root, which `keeps_absolute` does not
 /// say for a project that is itself a protected place (a session working in `~/.claude`). A root
 /// at or above a home directory contains nothing, as there.
-pub(crate) fn lies_in_root(abs: &str, root: &str) -> bool {
+pub(crate) fn lies_in_root(placed: &crate::pathctx::Placed, root: &str) -> bool {
     let root = comparable(root);
     let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'));
-    root != "/" && !holds_a_home(&root, home.as_deref()) && under(&comparable(abs), &root)
+    root != "/" && !holds_a_home(&root, home.as_deref()) && under(&comparable(placed.judged()), &root)
 }
 
 /// `path` up to its first component holding a glob character: the directory a glob can reach into.
@@ -316,7 +316,10 @@ pub(crate) fn home_nodes() -> &'static [HomeNode] {
 }
 
 /// Whether `path` falls under a node that shields a secret (`.ssh`, `~/.aws/`).
-pub(crate) fn names_a_secret(path: &str) -> bool {
+/// Whether a bare name or spelling falls under a node that shields a secret: for a name no path
+/// stands behind (a reported folder, an anchor's relative name). A path that was placed goes to
+/// `classify_region`, which asks the same of both its readings.
+pub(crate) fn names_a_secret_text(path: &str) -> bool {
     secret_node(&super::super::locus::canonicalize(path)).is_some()
 }
 

@@ -158,7 +158,7 @@ fn lands_outside_the_project(dir: Option<String>) -> bool {
     }
     let crate::pathctx::Root::Known(root) = crate::pathctx::root() else {
         let _here = crate::pathctx::enter_cwd(Some(dir));
-        let placed = crate::pathctx::resolve(".");
+        let placed = crate::pathctx::place(".", None).into_judged();
         return !(placed.starts_with('/')
             && !crate::pathctx::folder::is_unknown(&placed)
             && !placed.contains("__SAFE_CHAINS_")
@@ -168,14 +168,15 @@ fn lands_outside_the_project(dir: Option<String>) -> bool {
         return false;
     }
     let _here = crate::pathctx::enter_cwd(Some(dir));
-    let placed = crate::pathctx::resolve(".");
-    if placed.starts_with('/')
-        && !placed.contains("__SAFE_CHAINS_")
-        && (crate::pathctx::placed_in_root(&placed) || crate::engine::resolve::regions::granted_for_writing(&placed))
+    let placed = crate::pathctx::place(".", None);
+    let judged = placed.judged();
+    if judged.starts_with('/')
+        && !judged.contains("__SAFE_CHAINS_")
+        && (crate::pathctx::placed_in_root(&placed) || crate::engine::resolve::regions::granted_for_writing(judged))
     {
         return false;
     }
-    placed.starts_with(['/', '~']) || placed.contains("__SAFE_CHAINS_") || placed.split('/').any(|part| part == "..")
+    judged.starts_with(['/', '~']) || judged.contains("__SAFE_CHAINS_") || judged.split('/').any(|part| part == "..")
 }
 
 fn only_asks_the_version(tokens: &[Token]) -> bool {
