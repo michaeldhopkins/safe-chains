@@ -16,11 +16,27 @@ pub(super) fn cd_target(pipeline: &Pipeline) -> Option<(String, bool)> {
     let [Cmd::Simple(s)] = pipeline.commands.as_slice() else {
         return None;
     };
-    if s.words.first()?.eval() != "cd" {
+    let mut words = s.words.iter().map(super::Word::eval).peekable();
+    if words.peek().is_some_and(|word| word == "time") {
+        words.next();
+        while let Some(flag) = words.peek() {
+            match flag.as_str() {
+                "-p" => {
+                    words.next();
+                }
+                "--" => {
+                    words.next();
+                    break;
+                }
+                _ => break,
+            }
+        }
+    }
+    if words.next()? != "cd" {
         return None;
     }
     let mut physical = false;
-    let mut args = s.words.iter().skip(1).map(super::Word::eval);
+    let mut args = words;
     let mut target = None;
     for arg in &mut args {
         if arg == "--" {
