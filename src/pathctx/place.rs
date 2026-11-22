@@ -138,7 +138,7 @@ pub(crate) fn on_the_link<T>(judge: impl FnOnce() -> T) -> T {
 /// workspace. Only reads come here: the real place is never judged more leniently than a file of the
 /// unknown folder for a read, and writes there are judged by name.
 fn through_a_link_in_here(cwd: &str, path: &str, follow_last: bool) -> Option<String> {
-    let folder = here_below(cwd)?;
+    let folder = folder_below(cwd)?;
     physical::resolve(&format!("{}/{path}", folder.trim_end_matches('/')), follow_last)
 }
 
