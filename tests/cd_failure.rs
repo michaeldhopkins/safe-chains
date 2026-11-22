@@ -123,7 +123,7 @@ fn a_timed_cd_moves_the_shell_like_a_plain_one() {
 }
 
 #[test]
-fn a_timed_cd_is_tracked_like_a_plain_one_in_both_directions() {
+fn a_timed_cd_leaves_the_folder_unknown_for_what_follows() {
     let machine = Machine::new();
     for command in ["time cd sub && ls", "time -p cd sub && ls"] {
         assert!(machine.approves(command), "`{command}` should stay approved for reads without relative paths");
