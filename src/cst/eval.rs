@@ -128,6 +128,7 @@ fn sub_sentinel(inner: &super::Script) -> String {
         // but `ATOM` is not a locus term — `tagged_substitution` intercepts it before the term
         // parse, and anything that does not intercept it fails closed via `is_unpinnable`.
         Some(SubClaim::Atom) => ATOM_SENTINEL.to_string(),
+        Some(SubClaim::Literal(dir)) => dir,
         None => UNPINNABLE.to_string(),
     }
 }
