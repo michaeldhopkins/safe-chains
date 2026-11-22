@@ -45,5 +45,5 @@ pub(crate) fn folder_on_disk() -> Option<String> {
     if !(below.is_empty() || below.starts_with('/')) {
         return None;
     }
-    super::place::here_below(&cwd)
+    super::place::folder_below(&cwd)
 }

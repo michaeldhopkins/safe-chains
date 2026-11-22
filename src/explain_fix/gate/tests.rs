@@ -461,7 +461,7 @@ fn a_link_in_the_reported_folder_leads_out_from_an_unknown_one() {
     in_linked_workspace(|root| {
         let unknown = crate::targets::UNKNOWN_WORKDIR.to_string();
         let _ctx = enter(PathCtx { cwd: Some(unknown.clone()), root: Some(unknown), session_id: None });
-        crate::pathctx::note_reported_cwd(Some(root.to_string()));
+        crate::pathctx::note_reported_cwd(Some(root.to_string()), true);
         for word in ["key", "rc", "out/hosts", "sub/../key"] {
             assert!(leads_out_through_a_link(word), "{word}");
         }

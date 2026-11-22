@@ -59,8 +59,10 @@ pub fn enter(ctx: PathCtx) -> Guard {
     Guard(CURRENT.with(|c| c.replace(ctx)), Some((reported, raw, here)))
 }
 
-pub fn note_reported_cwd(cwd: Option<String>) {
-    place::note_here(cwd.as_deref());
+/// Record the folder the harness reported. `runs_there` is whether the harness runs the command in
+/// it (`HookFormat::cwd_is_the_commands`); when not, the folder is never taken for where it runs.
+pub fn note_reported_cwd(cwd: Option<String>, runs_there: bool) {
+    place::note_here(cwd.as_deref(), runs_there);
     REPORTED_RAW.with(|r| *r.borrow_mut() = cwd);
 }
 
@@ -325,7 +327,7 @@ pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
 /// folder starts from the reported folder on disk. `cd` is different: the shell joins `..` on the
 /// spelling (`cd -L`), and [`join_cwd`] does that.
 pub(crate) fn join_cwd_chdir(cur: Option<&str>, target: &str) -> Option<String> {
-    let on_disk = cur.filter(|c| folder::is_unknown(c)).and_then(place::here_below);
+    let on_disk = cur.filter(|c| folder::is_unknown(c)).and_then(place::folder_below);
     join_cwd_mode(on_disk.as_deref().or(cur), target, true)
 }
 

@@ -70,9 +70,13 @@ impl Placed {
 pub(crate) struct Here {
     pub(crate) logical: String,
     pub(crate) physical: String,
+    /// Whether the harness runs the command in this folder. Codex's reported cwd is only a hint (its
+    /// `workdir` is left out of the payload), so there the folder is judged for what a link in it
+    /// would add to a refusal and is never a place a command is taken to run.
+    pub(crate) runs_there: bool,
 }
 
-pub(super) fn note_here(reported: Option<&str>) {
+pub(super) fn note_here(reported: Option<&str>, runs_there: bool) {
     let here = reported
         .filter(|c| {
             c.starts_with('/') && !folder::is_unknown(c) && *c != super::UNRESOLVED_CWD && !c.contains('$') && !c.contains("__SAFE_CHAINS_")
@@ -80,6 +84,7 @@ pub(super) fn note_here(reported: Option<&str>) {
         .map(|logical| Here {
             physical: physical::resolve(logical, true).unwrap_or_else(|| lexical_join("/", logical)),
             logical: logical.to_string(),
+            runs_there,
         });
     HERE.with(|h| *h.borrow_mut() = here);
 }
@@ -100,6 +105,14 @@ pub(super) fn here_below(cwd: &str) -> Option<String> {
         return None;
     }
     Some(format!("{}{below}", here()?.logical.trim_end_matches('/')))
+}
+
+/// The folder a command in the unknown folder runs in on disk, when the harness says it runs in the
+/// reported one. Where it does not (Codex), nothing is known of where the command runs and this is
+/// `None`: a directory option or a glob there must not make the reported folder a known place.
+pub(super) fn folder_below(cwd: &str) -> Option<String> {
+    here().filter(|h| h.runs_there)?;
+    here_below(cwd)
 }
 
 /// Runs `judge` with the last component of every path kept, not followed: the command acts on a link

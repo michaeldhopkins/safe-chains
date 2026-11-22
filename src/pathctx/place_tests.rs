@@ -111,11 +111,11 @@ fn the_reported_folder_is_placed_once_in_both_readings() {
     let (_dir, base) = tree();
     symlink(format!("{base}/out"), format!("{base}/proj/lnk")).unwrap();
     let _ctx = enter(PathCtx::default());
-    note_reported_cwd(Some(format!("{base}/proj/lnk")));
-    assert_eq!(here(), Some(Here { logical: format!("{base}/proj/lnk"), physical: format!("{base}/out") }));
-    note_reported_cwd(Some("relative".to_string()));
+    note_reported_cwd(Some(format!("{base}/proj/lnk")), true);
+    assert_eq!(here(), Some(Here { logical: format!("{base}/proj/lnk"), physical: format!("{base}/out"), runs_there: true }));
+    note_reported_cwd(Some("relative".to_string()), true);
     assert_eq!(here(), None, "a relative report names no folder");
-    note_reported_cwd(Some("/work/$HOME".to_string()));
+    note_reported_cwd(Some("/work/$HOME".to_string()), true);
     assert_eq!(here(), None, "a report holding a variable names no folder");
 }
 
@@ -123,7 +123,7 @@ fn the_reported_folder_is_placed_once_in_both_readings() {
 fn entering_a_context_starts_with_no_reported_folder_and_restores_the_last_one() {
     let (_dir, base) = tree();
     let _outer = enter(PathCtx::default());
-    note_reported_cwd(Some(format!("{base}/proj")));
+    note_reported_cwd(Some(format!("{base}/proj")), true);
     let before = here();
     assert!(before.is_some());
     {
@@ -131,4 +131,22 @@ fn entering_a_context_starts_with_no_reported_folder_and_restores_the_last_one()
         assert_eq!(here(), None);
     }
     assert_eq!(here(), before);
+}
+
+#[test]
+fn a_reported_folder_the_command_does_not_run_in_is_never_the_folder_on_disk() {
+    let (_dir, base) = tree();
+    let unknown = format!("{}/sub", crate::targets::UNKNOWN_WORKDIR);
+    for (runs_there, expected) in [(true, Some(format!("{base}/proj/sub"))), (false, None)] {
+        let _ctx = enter(PathCtx::default());
+        note_reported_cwd(Some(format!("{base}/proj")), runs_there);
+        assert_eq!(super::place::folder_below(&unknown), expected, "runs_there {runs_there}");
+        assert_eq!(
+            super::join_cwd_chdir(Some(&unknown), ".."),
+            expected
+                .map(|_| format!("{base}/proj"))
+                .or_else(|| super::join_cwd_mode(Some(&unknown), "..", true))
+        );
+        assert!(here().is_some(), "the folder is still placed, so a link in it can add a refusal");
+    }
 }
