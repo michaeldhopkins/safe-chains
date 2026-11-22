@@ -204,3 +204,14 @@ fn a_declared_folder_code_runner_follows_the_working_directory_to_a_temporary_fo
     assert!(checked > 50, "only {checked} declared folder code runners are approved at the root");
     assert!(wrong.is_empty(), "{} wrong, first:\n{}", wrong.len(), wrong.iter().take(25).cloned().collect::<Vec<_>>().join("\n"));
 }
+
+#[test]
+fn with_no_known_root_folder_code_and_a_bundle_are_refused_on_their_own() {
+    let unknown = crate::targets::UNKNOWN_WORKDIR.to_string();
+    let _ctx = crate::pathctx::enter(PathCtx { cwd: Some(unknown.clone()), root: Some(unknown), session_id: None });
+    assert_eq!(folder_code_verdict(Some(Anchor::RunsFolderCode)), Verdict::Denied);
+    assert_eq!(folder_code_verdict(Some(Anchor::ImplicitOutput)), Verdict::Denied);
+    assert_eq!(folder_code_verdict(None), Verdict::Allowed(SafetyLevel::Inert));
+    let tokens: Vec<crate::parse::Token> = ["bundle", "list"].iter().map(|w| crate::parse::Token::from_test(w)).collect();
+    assert!(crate::handlers::ruby::gemfile::loads_a_gemfile_out_of_sight(&tokens));
+}
