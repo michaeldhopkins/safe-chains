@@ -163,7 +163,10 @@ impl HookFormat for GrokHookFormat {
     /// `defer` is never used: it would let grok's own read-only list run `cat /etc/hosts` unasked.
     fn gated_policy_for(&self, kind: crate::explain_fix::gate::GateKind, permission_mode: Option<&str>) -> super::GatedPolicy {
         match (kind, permission_mode) {
-            (crate::explain_fix::gate::GateKind::NotYet, Some("default" | "auto" | "plan")) => super::GatedPolicy::Ask,
+            (
+                crate::explain_fix::gate::GateKind::NotYet | crate::explain_fix::gate::GateKind::TooLarge,
+                Some("default" | "auto" | "plan"),
+            ) => super::GatedPolicy::Ask,
             _ => super::GatedPolicy::Deny,
         }
     }
@@ -323,6 +326,27 @@ mod tests {
     fn parse_input_rejects_garbage() {
         assert!(GrokHookFormat.parse_input("not json").is_err());
         assert!(GrokHookFormat.parse_input("{}").is_err());
+    }
+
+    /// An exhausted work budget is "too large to read", not "dangerous": where grok can ask, the
+    /// command goes to a person, who sees it, instead of being vetoed. Where an ask may be answered
+    /// by nobody, it stays a veto.
+    #[test]
+    fn a_spent_classification_budget_is_put_to_a_person_in_a_prompting_mode() {
+        use super::super::GatedPolicy;
+        let project = std::env::var("HOME").unwrap_or_else(|_| "/home/tester".into()) + "/projects/budgetprobe";
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
+        let cmd = "zzbudgettool sync";
+        let explanation = crate::explain_with_coverage_at_level(cmd, None);
+        let _outer = crate::enter_classify_budget(cmd);
+        while crate::cst::check::charge_classify_work(1) {}
+        let kind = crate::explain_fix::gate::gate_kind(cmd, &explanation, &|_| false, &|_| false);
+        for mode in ["default", "auto", "plan"] {
+            assert_eq!(GrokHookFormat.gated_policy_for(kind, Some(mode)), GatedPolicy::Ask, "{mode}");
+        }
+        for mode in [None, Some("bypassPermissions"), Some("dontAsk")] {
+            assert_eq!(GrokHookFormat.gated_policy_for(kind, mode), GatedPolicy::Deny, "{mode:?}");
+        }
     }
 
     #[test]
