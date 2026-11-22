@@ -149,3 +149,25 @@ fn a_timed_cd_is_tracked_like_a_plain_one_in_both_directions() {
         assert!(!machine.approves(command), "`{command}` was approved");
     }
 }
+
+#[test]
+fn nesting_twenty_deep_is_judged_in_time_that_grows_with_the_depth_not_past_it() {
+    let machine = Machine::new();
+    let shapes = [
+        "cd sub || cd ..; { @@; }; true",
+        "time cd sub || time -p cd ..; ( @@ ); true",
+        "! time cd sub && cd ..; if @@; then true; fi",
+        "cd sub || cd ..; echo \"$(@@)\"",
+        "cd sub || cd ..; f() { @@; }; f",
+        "{ cd sub || cd ..; } && { @@; } || { cd ./q; }",
+    ];
+    for shape in shapes {
+        let mut command = "echo x > f".to_string();
+        for _ in 0..20 {
+            command = shape.replacen("@@", &command, 1);
+        }
+        let started = std::time::Instant::now();
+        machine.approves(&command);
+        assert!(started.elapsed() < std::time::Duration::from_secs(10), "`{shape}` took {:?}", started.elapsed());
+    }
+}
