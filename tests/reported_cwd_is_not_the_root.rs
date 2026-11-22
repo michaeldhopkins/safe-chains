@@ -224,3 +224,40 @@ fn a_hook_that_reports_no_folder_judges_the_command_in_an_unknown_one() {
     }
     assert!(approved.is_empty(), "approved with no reported folder:\n{}", approved.join("\n"));
 }
+
+/// A folder that is not a known workspace is judged as an unknown one, but the command still runs
+/// in the real folder the hook reported. A link there is followed as the kernel would follow it, so
+/// a file committed as a link to `~/.ssh/id_rsa` is read as the key, not as a file of the folder.
+#[test]
+fn a_link_in_a_reported_folder_that_is_not_a_workspace_is_followed() {
+    let base = tempfile::tempdir().expect("tempdir");
+    let home = base.path().join("home");
+    let ssh = home.join(".ssh");
+    let folder = home.join("Downloads/clone");
+    for dir in [&ssh, &folder] {
+        std::fs::create_dir_all(dir).expect("mkdir");
+    }
+    std::fs::write(ssh.join("id_rsa"), "secret-key").expect("write id_rsa");
+    std::fs::write(folder.join("plain.txt"), "words").expect("write plain");
+    std::os::unix::fs::symlink(ssh.join("id_rsa"), folder.join("notes.txt")).expect("link to the key");
+    std::os::unix::fs::symlink(&ssh, folder.join("leak")).expect("link to .ssh");
+    std::os::unix::fs::symlink(ssh.join("not-yet"), folder.join("dangling")).expect("dangling link into .ssh");
+    std::fs::create_dir_all(folder.join("sub")).expect("mkdir sub");
+    std::os::unix::fs::symlink(folder.join("plain.txt"), folder.join("alias.txt")).expect("link inside the folder");
+
+    for read in ["cat plain.txt", "ls", "cat alias.txt"] {
+        let out = decision(&home, &folder, read);
+        assert!(out.contains("\"allow\""), "`{read}` is an ordinary read and stays approved: {out}");
+    }
+    let mut approved = Vec::new();
+    for command in [
+        "cat notes.txt", "cat ./notes.txt", "wc -c notes.txt", "base64 notes.txt", "cp notes.txt /tmp/out", "cat leak/id_rsa",
+        "cat dangling", "cat sub/../notes.txt", "cd sub && cat ../notes.txt", "cd leak && cat id_rsa", "cd leak && cp id_rsa /tmp/out",
+        "echo x >> notes.txt",
+    ] {
+        if decision(&home, &folder, command).contains("\"allow\"") {
+            approved.push(command);
+        }
+    }
+    assert!(approved.is_empty(), "read through a link out of the folder:\n{}", approved.join("\n"));
+}

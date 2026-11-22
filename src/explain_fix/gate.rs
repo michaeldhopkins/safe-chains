@@ -129,7 +129,9 @@ fn reaches_a_boundary(command: &str) -> bool {
 /// committed as a link to `~/.ssh/id_rsa` is written like any file name. A link whose end cannot
 /// be found counts as leading out.
 fn leads_out_through_a_link(word: &str) -> bool {
-    let Some(cwd) = crate::pathctx::cwd() else {
+    // In the unknown folder the command still runs in the folder the harness reported, so that is
+    // where its links are met.
+    let Some(cwd) = crate::pathctx::folder_on_disk() else {
         return false;
     };
     // With no known root the working directory is the most that can be taken as the workspace, so a

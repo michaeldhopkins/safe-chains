@@ -452,3 +452,27 @@ fn a_link_is_followed_out_when_the_project_root_is_unknown() {
         }
     });
 }
+
+/// A hook whose folder is not a known workspace judges the command in the unknown folder, but the
+/// command runs in the folder it reported, so a link there is met by the kernel. It counts as
+/// leading out, also when the work budget is spent and only the text checks run.
+#[test]
+fn a_link_in_the_reported_folder_leads_out_from_an_unknown_one() {
+    in_linked_workspace(|root| {
+        let unknown = crate::targets::UNKNOWN_WORKDIR.to_string();
+        let _ctx = enter(PathCtx { cwd: Some(unknown.clone()), root: Some(unknown), session_id: None });
+        crate::pathctx::note_reported_cwd(Some(root.to_string()));
+        for word in ["key", "rc", "out/hosts", "sub/../key"] {
+            assert!(leads_out_through_a_link(word), "{word}");
+        }
+        for word in ["a.txt", "inner", "zz-missing", "sub"] {
+            assert!(!leads_out_through_a_link(word), "{word}");
+        }
+        let cmd = "cat key";
+        let explanation = crate::explain_with_coverage_at_level(cmd, None);
+        assert_eq!(gate_kind(cmd, &explanation, &|_| false, &|_| false), GateKind::Boundary);
+        let _outer = crate::enter_classify_budget(cmd);
+        while crate::cst::check::charge_classify_work(1) {}
+        assert_eq!(gate_kind(cmd, &explanation, &|_| false, &|_| false), GateKind::Boundary, "spent budget");
+    });
+}

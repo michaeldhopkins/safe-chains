@@ -20,6 +20,8 @@ pub mod anchor;
 pub mod folder;
 mod root;
 pub(crate) use folder::judging;
+pub(crate) use root::folder_on_disk;
+use root::reported_folder;
 pub use root::{Root, root};
 mod home;
 pub mod item_shape;

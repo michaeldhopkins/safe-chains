@@ -34,3 +34,24 @@ pub fn root() -> Root {
         }
     })
 }
+
+/// The real folder the harness reported, when the command is judged in the unknown one instead:
+/// absolute, and not one of our own stand-ins.
+pub(super) fn reported_folder() -> Option<String> {
+    super::REPORTED_RAW.with(|r| r.borrow().clone()).filter(|c| {
+        c.starts_with('/') && !folder::is_unknown(c) && c != UNRESOLVED_CWD && !c.contains('$') && !c.contains("__SAFE_CHAINS_")
+    })
+}
+
+/// The folder the command runs in on disk: the working directory, or, in the unknown folder, the
+/// one the harness reported with any `cd` below it applied. `None` when neither names a real place.
+pub(crate) fn folder_on_disk() -> Option<String> {
+    let cwd = super::cwd()?;
+    let Some(below) = cwd.strip_prefix(crate::targets::UNKNOWN_WORKDIR) else {
+        return (cwd != UNRESOLVED_CWD).then_some(cwd);
+    };
+    if !(below.is_empty() || below.starts_with('/')) {
+        return None;
+    }
+    Some(format!("{}{below}", reported_folder()?.trim_end_matches('/')))
+}

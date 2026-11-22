@@ -49,6 +49,12 @@ pub(super) fn resolve_placed(path: &str, use_: Option<anchor::Use>) -> Cow<'_, s
         let ctx = c.borrow();
         match (ctx.cwd.as_deref(), ctx.root.as_deref()) {
             (Some(cwd), Some(root)) if cwd.starts_with('/') && root.starts_with('/') => {
+                if !path.starts_with('/')
+                    && !use_.is_some_and(anchor::Use::mutates)
+                    && let Some(real) = through_a_link_in_the_reported_folder(cwd, path, follow_last)
+                {
+                    return Some(real);
+                }
                 if folder::is_unknown(root)
                     && !path.starts_with('/')
                     && !use_.is_some_and(anchor::Use::mutates)
@@ -72,4 +78,25 @@ pub(super) fn resolve_placed(path: &str, use_: Option<anchor::Use>) -> Cow<'_, s
         }
     });
     resolved.map_or(Cow::Borrowed(path), Cow::Owned)
+}
+
+/// Where a relative `path` read in the unknown folder lands when it passes through a link in the
+/// real folder the harness reported, or `None` when it meets no link there.
+///
+/// The unknown folder names no place on disk, so a file committed as a link to `~/.ssh/id_rsa` would
+/// otherwise be judged as a file of the folder. The command still runs in the reported folder, where
+/// the kernel follows the link, so the path is judged where it lands, as it is in a known
+/// workspace. Only reads come here: the real place is never judged more
+/// leniently than a file of the unknown folder for a read, and writes there are judged by name.
+fn through_a_link_in_the_reported_folder(cwd: &str, path: &str, follow_last: bool) -> Option<String> {
+    let below = cwd.strip_prefix(crate::targets::UNKNOWN_WORKDIR)?;
+    if !(below.is_empty() || below.starts_with('/')) {
+        return None;
+    }
+    // Compared with the reported folder itself, so a link the `cd` walked into is met too.
+    let reported = super::reported_folder()?;
+    let below = below.trim_start_matches('/');
+    let relative = if below.is_empty() { path.to_string() } else { format!("{below}/{path}") };
+    let real = physical::resolve(&format!("{}/{relative}", reported.trim_end_matches('/')), follow_last)?;
+    (real != lexical_join(&physical::root(&reported), &relative)).then_some(real)
 }
