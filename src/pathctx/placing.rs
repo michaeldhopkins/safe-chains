@@ -31,7 +31,7 @@ pub(super) fn resolve_placed(path: &str, use_: Option<anchor::Use>) -> Cow<'_, s
         return Cow::Borrowed(path);
     }
     let follow_last = use_ != Some(anchor::Use::Rebind) && !ON_THE_LINK.get();
-    let root = CURRENT.with(|c| c.borrow().root.clone()).filter(|r| r.starts_with('/'));
+    let root = CURRENT.with(|c| c.borrow().root.clone()).filter(|r| r.starts_with('/') && !folder::is_unknown(r));
     if path.starts_with('~') {
         let real = expand_home(path)
             .and_then(|abs| physical::resolve(&abs, follow_last))
@@ -49,8 +49,14 @@ pub(super) fn resolve_placed(path: &str, use_: Option<anchor::Use>) -> Cow<'_, s
         let ctx = c.borrow();
         match (ctx.cwd.as_deref(), ctx.root.as_deref()) {
             (Some(cwd), Some(root)) if cwd.starts_with('/') && root.starts_with('/') => {
-                // Relative → join onto cwd; absolute → normalize in place. Then express relative
-                // to root if inside (worktree), else absolute.
+                if folder::is_unknown(root)
+                    && !path.starts_with('/')
+                    && !use_.is_some_and(anchor::Use::mutates)
+                    && !super::reported_is_secret()
+                    && let Some(placed) = folder::place(cwd, path, use_)
+                {
+                    return Some(placed);
+                }
                 let raw = if path.starts_with('/') {
                     path.to_string()
                 } else {

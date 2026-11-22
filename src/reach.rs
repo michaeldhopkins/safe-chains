@@ -139,7 +139,7 @@ impl ReachReason {
                  reads. Add --ignore-working-copy after `jj` to read without the snapshot. Edits \
                  since the last snapshot will not show. No grant changes this"
             ),
-            ReachReason::OutsideWorkspace => match pathctx::cwd().map(|c| sanitize_display(&c)) {
+            ReachReason::OutsideWorkspace => match pathctx::display_cwd().map(|c| sanitize_display(&c)) {
                 Some(cwd) => format!(
                     "it reaches `{path}`, outside the working directory `{cwd}`. If the agent is \
                      running from the wrong directory, relaunch it where you meant to be. To allow \

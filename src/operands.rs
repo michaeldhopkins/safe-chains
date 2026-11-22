@@ -23,6 +23,7 @@ pub(crate) struct Operand {
 /// reads them. Read alone, `M=/elsewhere; git -C $M status` reaches `$M`, which names nothing, so
 /// the refusal named no place and offered no grant, though the verdict had judged `/elsewhere`.
 pub(crate) fn operand_words(command: &str) -> Option<Vec<Operand>> {
+    let _guard = cst::check::ClassifyGuard::enter(command.len())?;
     let Some(script) = cst::parse(command) else {
         return Some(shell_words::split(command).ok()?.into_iter().map(operand).collect());
     };

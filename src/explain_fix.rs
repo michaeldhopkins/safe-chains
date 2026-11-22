@@ -66,22 +66,28 @@ pub enum Because {
 /// config would help, though a grant on `/elsewhere` approves it. `None` when `command` does not
 /// parse.
 pub fn in_segment_scope<T>(command: &str, mut per_segment: impl FnMut(usize, &str) -> T) -> Option<Vec<T>> {
+    let _guard = crate::cst::check::ClassifyGuard::enter(command.len())?;
     let script = crate::cst::parse(command)?;
-    Some(crate::cst::check::walk_with_scope(
-        &script,
-        |stmt| {
-            let index = script.0.iter().position(|s| std::ptr::eq(s, stmt)).unwrap_or_default();
-            per_segment(index, &stmt.pipeline.to_string())
-        },
-        |first, _later| first,
-    ))
+    let mut seen = vec![false; script.0.len()];
+    Some(
+        crate::cst::check::walk_with_scope(
+            &script,
+            |stmt| {
+                let index = script.0.iter().position(|s| std::ptr::eq(s, stmt)).unwrap_or_default();
+                (!std::mem::replace(&mut seen[index], true)).then(|| per_segment(index, &stmt.pipeline.to_string()))
+            },
+            Option::or,
+        )
+        .into_iter()
+        .flatten()
+        .collect(),
+    )
 }
 
-/// The fix for one refused command (a segment of a chain, or the whole command).
-///
-/// `approved` answers "would this command be approved?" the way the caller's verdict does, at the
-/// caller's level. It is asked again with a hypothetical grant in place, and with the default level.
 pub fn fix_for(command: &str, approved: &dyn Fn(&str) -> bool, approved_by_default: bool) -> Fix {
+    let Some(_guard) = crate::cst::check::ClassifyGuard::enter(command.len()) else {
+        return Fix::Nothing(Because::BuiltInRule { names: Vec::new() });
+    };
     if crate::cst::parse(command).is_none() {
         return Fix::Nothing(Because::Unparseable);
     }

@@ -7,17 +7,42 @@
 //! runs in holds it, which is often the shell the agent runs commands in. zsh also reads the
 //! lowercase array `cdpath`, tied to it.
 
-use super::{Cmd, Pipeline};
+use super::{Cmd, Pipeline, Word, WordPart};
 
-/// The target of a statement-level `cd DIR` (a single simple command named `cd`). `None` for
-/// anything else, for `cd` with no plain positional (bare `cd`, `cd -`), and for a target CDPATH
-/// may redirect.
+fn plain_literal(word: &Word) -> Option<String> {
+    if word.0.is_empty() {
+        return None;
+    }
+    let mut out = String::new();
+    for part in &word.0 {
+        let WordPart::Lit(s) = part else {
+            return None;
+        };
+        out.push_str(s);
+    }
+    if out.contains(['$', '*', '?', '[', ']', '{', '}', '`', '\\']) || out.contains("__SAFE_CHAINS_") {
+        return None;
+    }
+    (word.expand().as_slice() == [out.as_str()]).then_some(out)
+}
+
+pub(super) fn shadows_cd_or_time(name: &str) -> bool {
+    matches!(name, "cd" | "time" | "pushd" | "popd")
+}
+
 pub(super) fn cd_target(pipeline: &Pipeline) -> Option<(String, bool)> {
     let [Cmd::Simple(s)] = pipeline.commands.as_slice() else {
         return None;
     };
-    let mut words = s.words.iter().map(super::Word::eval).peekable();
+    if !s.env.is_empty() || super::functions::names_a_function("cd") || super::functions::ever_defined("cd") {
+        return None;
+    }
+    let words: Vec<String> = s.words.iter().map(plain_literal).collect::<Option<_>>()?;
+    let mut words = words.into_iter().peekable();
     if words.peek().is_some_and(|word| word == "time") {
+        if super::functions::names_a_function("time") || super::functions::ever_defined("time") {
+            return None;
+        }
         words.next();
         while let Some(flag) = words.peek() {
             match flag.as_str() {
@@ -32,7 +57,7 @@ pub(super) fn cd_target(pipeline: &Pipeline) -> Option<(String, bool)> {
             }
         }
     }
-    if words.next()? != "cd" {
+    if words.next().as_deref() != Some("cd") {
         return None;
     }
     let mut physical = false;
@@ -63,17 +88,57 @@ pub(super) fn cd_target(pipeline: &Pipeline) -> Option<(String, bool)> {
         return None;
     }
     let target = target?;
-    let prefixed = s.env.iter().any(|(name, _)| name == "CDPATH" || name == "cdpath");
-    (!searches_cdpath(&target, prefixed || cdpath_in_scope())).then_some((target, physical))
+    if target == "-" || (target.starts_with('~') && target != "~" && !target.starts_with("~/")) {
+        return None;
+    }
+    (!searches_cdpath(&target, cdpath_in_scope())).then_some((target, physical))
 }
 
 pub(super) fn moves_cwd(simple: &super::SimpleCmd) -> bool {
-    let mut words = simple.words.iter().map(super::Word::eval);
-    let mut first = words.next();
-    if first.as_deref() == Some("time") {
-        first = words.find(|word| !word.starts_with('-'));
+    let mut idx = 0;
+    while let Some(word) = simple.words.get(idx) {
+        let mut expanded = word.expand();
+        let evaluated = word.eval();
+        if !expanded.contains(&evaluated) {
+            expanded.push(evaluated);
+        }
+        if expanded.iter().any(|w| {
+            let base = w.rsplit('/').next().unwrap_or(w);
+            matches!(base, "cd" | "pushd" | "popd")
+                || (base == "time" && (super::functions::names_a_function("time") || super::functions::ever_defined("time")))
+                || w.contains(['$', '*', '?'])
+                || (w.contains('[') && w.contains(']'))
+                || w.contains("__SAFE_CHAINS_")
+        }) {
+            return true;
+        }
+        if expanded.iter().any(|w| matches!(w.rsplit('/').next().unwrap_or(w), "alias" | "hash")) {
+            return simple.words[idx + 1..].iter().any(|arg| {
+                let v = arg.eval();
+                v.contains('=') || v.contains("cd") || v.contains("time") || v.contains("pushd") || v.contains("popd")
+            });
+        }
+        let is_wrapper = expanded
+            .iter()
+            .any(|w| matches!(w.rsplit('/').next().unwrap_or(w), "time" | "command" | "builtin" | "env"));
+        if !is_wrapper {
+            return false;
+        }
+        idx += 1;
+        while let Some(next) = simple.words.get(idx) {
+            let text = next.eval();
+            if text == "--" {
+                idx += 1;
+                break;
+            }
+            if text.starts_with('-') || text.contains('=') {
+                idx += 1;
+            } else {
+                break;
+            }
+        }
     }
-    first.is_some_and(|word| matches!(word.as_str(), "cd" | "pushd" | "popd"))
+    false
 }
 
 fn cdpath_in_scope() -> bool {

@@ -299,11 +299,17 @@ mod tests {
         let still: Vec<_> = outside.into_iter().filter(|command| judged_from(&root, command)).collect();
         assert!(still.is_empty(), "still approved: {still:?}");
         for command in [
-            "cd $(pwd) && cargo build", "cd $(pwd) && cargo test", "cd $(pwd) && cat f", "cd $(pwd) && npm test", "cd $(pwd) && pytest",
+            "cd $(pwd) && cargo build", "cd $(pwd) && cargo test", "cd $(pwd) && npm test", "cd $(pwd) && pytest",
             "cd $(pwd) && rustup show", "cd $(pwd) && jest", "cd \"$(pwd)\" && eslint src/", "cd sub && cd $(pwd) && cargo build",
-            "cd ./sub && cargo test", "cd /tmp/y && cat notes.txt", "cd /tmp/y && cd $(pwd) && cat notes.txt", "sh ./x.sh",
-            "cd $(pwd) && sh ./x.sh", "cd $(pwd) && bash ./x.sh", "cd $(pwd) && node ./x.js", "cargo build", "cargo test", "npm test",
-            "pytest", "rustup show", "jest", "eslint src/",
+            "cd $(pwd) && sh ./x.sh", "cd $(pwd) && bash ./x.sh", "cd $(pwd) && node ./x.js",
+        ] {
+            assert!(!judged_from(&root, command), "{command}");
+        }
+        for command in [
+            "cd ./sub && cargo build", "cd ./sub && cargo test", "cd ./sub && cat f", "cd ./sub && npm test", "cd ./sub && pytest",
+            "cd ./sub && rustup show", "cd ./sub && jest", "cd ./sub && eslint src/", "cd sub && cd .. && cargo build",
+            "cd /tmp/y && cat notes.txt", "sh ./x.sh", "cd ./sub && sh ./x.sh", "cd ./sub && bash ./x.sh", "cd ./sub && node ./x.js",
+            "cargo build", "cargo test", "npm test", "pytest", "rustup show", "jest", "eslint src/",
         ] {
             assert!(judged_from(&root, command), "{command}");
         }

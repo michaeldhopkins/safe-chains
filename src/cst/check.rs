@@ -1,4 +1,4 @@
-pub(super) use super::classify_budget::ClassifyGuard;
+pub(crate) use super::classify_budget::ClassifyGuard;
 pub(crate) use super::classify_budget::charge_classify_work;
 use super::cwd_flow::{Cwd, CwdFlow, statement_flow};
 pub(crate) use super::functions::names_a_function;
@@ -63,7 +63,7 @@ pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt
             per_stmt(stmt)
         });
         out.extend(results.reduce(&merge));
-        let effects = if scope_budget_spent() { ShellEffects::default() } else { shell_effects(&stmt.pipeline) };
+        let effects = if scope_budget_spent() { ShellEffects { cwd: true, ..Default::default() } } else { shell_effects(&stmt.pipeline) };
         flow = flow.then(previous, statement_flow(stmt, &effects, &starts));
         previous = stmt.op;
         let _cwd = crate::pathctx::enter_cwd(starts.first().cloned().flatten());
@@ -149,17 +149,15 @@ fn scan_effects(cmd: &Cmd, depth: usize, seen: &mut Vec<String>, out: &mut Shell
                 out.cwd = true;
                 return;
             }
-            // A CALL runs the body in THIS shell, so its effects escape with it.
-            if seen.contains(&name) {
-                return;
-            }
-            if let Some(body) = lookup_function(&name) {
+            if !seen.contains(&name)
+                && let Some(body) = lookup_function(&name)
+            {
                 seen.push(name);
                 scan_script_effects(&body, depth, seen, out);
             }
         }
-        // The two constructs the shell really does isolate, plus forms that run nothing.
-        Cmd::Subshell { .. } | Cmd::DoubleBracket { .. } | Cmd::FunctionDef { .. } => {}
+        Cmd::FunctionDef { name, .. } => out.cwd |= super::cd::shadows_cd_or_time(name),
+        Cmd::Subshell { .. } | Cmd::DoubleBracket { .. } => {}
         Cmd::BraceGroup { body, .. } => scan_script_effects(body, depth, seen, out),
         Cmd::For { var, body, .. } => {
             out.vars.push(var.clone());

@@ -1067,14 +1067,12 @@ fn a_cd_is_tracked_exactly_where_the_shell_would_keep_it() {
 fn an_unresolvable_cd_makes_later_relative_paths_unpinnable() {
     let cases = [
         "cd $HOME && echo hi > .bashrc", "cd $HOME/.aws && cat credentials", "cd \"$SOMEDIR\" && rm -rf x", "cd ~root && cat f",
-        "cd $(hostname) && cat f", "cd $(hostname) && echo hi > f",
+        "cd $(hostname) && cat f", "cd $(hostname) && echo hi > f", "cd $(pwd) && echo hi > f",
     ];
     let leaked: Vec<_> = cases.iter().filter(|c| command_verdict_in(c, workspace()).is_allowed()).collect();
     assert!(leaked.is_empty(), "an unresolvable cd was treated as no cd: {leaked:?}");
 
-    // Non-vacuity both ways: a RESOLVABLE cd still works, and a DECLARED substitution still carries
-    // its locus rather than being lumped in with the unpinnable cases.
-    for allowed in ["cd ./sub && echo hi > f.txt", "cd $(pwd) && cat f"] {
+    for allowed in ["cd ./sub && echo hi > f.txt", "cd sub && cat f"] {
         assert!(
             command_verdict_in(allowed, workspace()).is_allowed(),
             "`{allowed}` must still be allowed — the fix is aimed at UNRESOLVABLE targets only",

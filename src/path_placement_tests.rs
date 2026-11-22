@@ -198,10 +198,11 @@ fn a_project_root_holding_a_trust_file_still_writes_its_other_files() {
     let Some(home) = absolute_home() else { return };
     let root = format!("{home}/.claude");
     let here = PathCtx { cwd: Some(root.clone()), root: Some(root), ..Default::default() };
-    for line in ["echo x > CLAUDE.md", "echo x > skills/foo/SKILL.md", "cat settings.json"] {
-        assert!(command_verdict_in(line, here.clone()).is_allowed(), "`{line}` should approve");
-    }
-    for line in ["echo x > settings.json", "echo x > settings.jso?", "rm -rf .", "cp x settings.json"] {
+    assert!(command_verdict_in("cat settings.json", here.clone()).is_allowed(), "`cat settings.json` should approve");
+    for line in [
+        "echo x > CLAUDE.md", "echo x > skills/foo/SKILL.md", "echo x > settings.json", "echo x > settings.jso?", "rm -rf .",
+        "cp x settings.json",
+    ] {
         assert!(!command_verdict_in(line, here.clone()).is_allowed(), "`{line}` should ask");
     }
 }

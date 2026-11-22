@@ -351,6 +351,10 @@ pub fn sanitize_display(s: &str) -> String {
 /// skipped; an absolute or home path that isn't admitted for read *or* write is the reach. A
 /// credential store outranks the hidden-peer wording; a hidden peer path outranks the generic
 /// outside-workspace reason.
+pub fn enter_classify_budget(command: &str) -> Option<cst::check::ClassifyGuard> {
+    cst::check::ClassifyGuard::enter(command.len())
+}
+
 pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
     workspace_reaches(command).next()
 }

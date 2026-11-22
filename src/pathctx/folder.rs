@@ -81,17 +81,24 @@ pub fn is_unknown(cwd: &str) -> bool {
 /// A path that climbs out of the folder, or cannot be read, is placed NOWHERE at every level, even
 /// for a read: joined onto the unknown folder it would name an ordinary directory, while the real
 /// parent of an unknown folder can be anything, another user's home included.
+fn has_workspace() -> bool {
+    super::root().is_some()
+}
+
 pub(super) fn place(cwd: &str, path: &str, stated: Option<Use>) -> Option<String> {
     let use_ = stated.unwrap_or(Use::Read);
     let level = level()?;
     if path.starts_with('/') || path.starts_with('~') || !is_unknown(cwd) {
         return None;
     }
+    if !use_.mutates() && super::reported_is_secret() {
+        return Some(NOWHERE.to_string());
+    }
     let below = cwd[crate::targets::UNKNOWN_WORKDIR.len()..].trim_start_matches('/');
     let relative = if below.is_empty() { path.to_string() } else { format!("{below}/{path}") };
     let anchor = anchor::of_path(&relative);
     let placed = anchor::placement(&relative, use_, level)
-        .filter(|p| !use_.mutates() || ((p != "." || declares_writes_in_its_folder()) && !items_in_scope()));
+        .filter(|p| !use_.mutates() || (has_workspace() && (p != "." || declares_writes_in_its_folder()) && !items_in_scope()));
     if level > FolderLevel::Reads && stated.is_some_and(Use::mutates) {
         record(Note::Path { path: relative.clone(), anchor, use_, placed: placed.is_some() });
     }
@@ -159,9 +166,7 @@ pub(crate) fn judge_leaf(tokens: &[Token], with_env: bool, classify: impl FnOnce
         return verdict;
     };
     let names_its_writes = declared == Some(Anchor::NamesItsWrites) && frame.named_write;
-    // An assignment in front can move a write the declaration describes (`GIT_INDEX_FILE=.zshrc git
-    // add .`, `CARGO_TARGET_DIR=../.. cargo build`), so it voids an implicit declaration.
-    let implicit = !with_env && declared.is_some_and(|a| level.admits_implicit(a));
+    let implicit = !with_env && has_workspace() && declared.is_some_and(|a| level.admits_implicit(a));
     let accounted = implicit || names_its_writes || frame.nested_accounted;
     let command = tokens.iter().take(4).map(Token::as_str).collect::<Vec<_>>().join(" ");
     record(Note::Leaf { command, anchor: declared, admitted: accounted });

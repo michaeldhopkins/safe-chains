@@ -615,7 +615,12 @@ mod tests {
         let input = CodexPermissionRequestFormat.parse_input(&permission_request("Bash", "ls")).unwrap();
         let (cwd, root) = super::super::evaluation_dirs(&CodexPermissionRequestFormat, &input);
         assert_eq!(cwd.as_deref(), Some(super::super::UNKNOWN_WORKDIR));
-        assert_eq!(root.as_deref(), Some("/w"), "the reported cwd stays the workspace");
+        assert_eq!(root.as_deref(), Some(super::super::UNKNOWN_WORKDIR));
+        let (cwd, root) = crate::engine::resolve::regions::with_grants(&[("/w", true, true)], || {
+            super::super::evaluation_dirs(&CodexPermissionRequestFormat, &input)
+        });
+        assert_eq!(cwd.as_deref(), Some(super::super::UNKNOWN_WORKDIR));
+        assert_eq!(root.as_deref(), Some("/w"), "a granted cwd stays the workspace");
     }
 
     #[test]

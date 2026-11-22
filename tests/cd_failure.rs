@@ -154,12 +154,8 @@ fn a_timed_cd_is_tracked_like_a_plain_one_in_both_directions() {
 fn nesting_twenty_deep_is_judged_in_time_that_grows_with_the_depth_not_past_it() {
     let machine = Machine::new();
     let shapes = [
-        "cd sub || cd ..; { @@; }; true",
-        "time cd sub || time -p cd ..; ( @@ ); true",
-        "! time cd sub && cd ..; if @@; then true; fi",
-        "cd sub || cd ..; echo \"$(@@)\"",
-        "cd sub || cd ..; f() { @@; }; f",
-        "{ cd sub || cd ..; } && { @@; } || { cd ./q; }",
+        "cd sub || cd ..; { @@; }; true", "time cd sub || time -p cd ..; ( @@ ); true", "! time cd sub && cd ..; if @@; then true; fi",
+        "cd sub || cd ..; echo \"$(@@)\"", "cd sub || cd ..; f() { @@; }; f", "{ cd sub || cd ..; } && { @@; } || { cd ./q; }",
     ];
     for shape in shapes {
         let mut command = "echo x > f".to_string();
@@ -169,5 +165,43 @@ fn nesting_twenty_deep_is_judged_in_time_that_grows_with_the_depth_not_past_it()
         let started = std::time::Instant::now();
         machine.approves(&command);
         assert!(started.elapsed() < std::time::Duration::from_secs(10), "`{shape}` took {:?}", started.elapsed());
+    }
+}
+
+#[test]
+fn non_literal_or_shadowed_cd_and_time_spellings_leave_the_folder_unknown() {
+    let machine = Machine::new();
+    for command in [
+        format!("\"time\" cd sub && {WRITE}"),
+        format!("\\time cd sub && {WRITE}"),
+        format!("'time' cd sub && {WRITE}"),
+        format!("t\"i\"me cd sub && {WRITE}"),
+        format!("$'time' cd sub && {WRITE}"),
+        format!("! \"time\" cd sub || {WRITE}"),
+        format!("A=1 time cd sub && {WRITE}"),
+        format!("A=1 time -p cd sub && {WRITE}"),
+        format!("! A=1 time cd sub || {WRITE}"),
+        format!("time() {{ :; }}; time cd sub && {WRITE}"),
+        format!("cd() {{ :; }}; time cd sub && {WRITE}"),
+        format!("cd() {{ :; }}; cd sub && {WRITE}"),
+        "time {c..c}d /etc && echo x > hosts".to_string(),
+        "{c..c}d /etc && echo x > hosts".to_string(),
+        "{c..c}d sub && echo x > f".to_string(),
+        "\"cd\" sub && echo x > f".to_string(),
+        "'cd' sub && echo x > f".to_string(),
+        "\\cd sub && echo x > f".to_string(),
+        "cd \"sub\" && echo x > f".to_string(),
+        "cd 'sub' && echo x > f".to_string(),
+        "cd \\sub && echo x > f".to_string(),
+        "cd sub* && echo x > f".to_string(),
+        "cd {sub,sub} && echo x > f".to_string(),
+        "A=1 cd sub && echo x > f".to_string(),
+        "command cd sub && echo x > f".to_string(),
+        "builtin cd sub && echo x > f".to_string(),
+        "/usr/bin/time cd sub && echo x > f".to_string(),
+        format!("alias cd=true; cd sub && {WRITE}"),
+        format!("alias time=true; time cd sub && {WRITE}"),
+    ] {
+        assert!(!machine.approves(&command), "`{command}` was approved");
     }
 }

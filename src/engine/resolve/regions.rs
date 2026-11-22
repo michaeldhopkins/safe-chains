@@ -26,7 +26,7 @@ mod unicode_spelling;
 pub(crate) use protection::anchored_protected_paths_here;
 use protection::role_is_protective;
 pub(crate) use protection::{
-    granted_for_writing, home_nodes, keeps_absolute, lies_in_root, names_a_region, names_a_secret, protection_covers,
+    granted_for_writing, home_nodes, is_workspace_root, keeps_absolute, lies_in_root, names_a_region, names_a_secret, protection_covers,
 };
 
 /// Which faces a user grant may NOT widen. Two distinct needs, and collapsing them was a real
@@ -115,7 +115,7 @@ struct RegionDef {
     researched: String,
 }
 
-enum Matcher {
+pub(super) enum Matcher {
     /// `/etc/hosts`, `~` — the whole path (a `Prefix` also matches its own dir, sans slash).
     Exact(String),
     /// `/proc/sys/` — the subtree under it (path is a descendant, or the dir itself).
@@ -344,16 +344,16 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
 /// permission prompt, and does not say the user wants every command touching `~/.ssh` auto-approved
 /// here. Borrowing those rules is a convenience, and it stops short of the expensive case.
 #[derive(Clone, Copy, PartialEq)]
-enum GrantSource {
+pub(super) enum GrantSource {
     UserConfig,
     Derived,
 }
 
-struct Grant {
-    matcher: Matcher,
-    read: bool,
-    write: bool,
-    source: GrantSource,
+pub(super) struct Grant {
+    pub(super) matcher: Matcher,
+    pub(super) read: bool,
+    pub(super) write: bool,
+    pub(super) source: GrantSource,
 }
 
 // Grants are read from the user config in the real binary; tests inject them via `with_grants`.
@@ -502,11 +502,11 @@ fn as_subtree(path: &str) -> String {
 }
 
 #[cfg(not(test))]
-static USER_GRANTS: LazyLock<Vec<Grant>> = LazyLock::new(load_user_grants);
+pub(super) static USER_GRANTS: LazyLock<Vec<Grant>> = LazyLock::new(load_user_grants);
 
 #[cfg(test)]
 thread_local! {
-    static TEST_GRANTS: std::cell::RefCell<Vec<Grant>> = const { std::cell::RefCell::new(Vec::new()) };
+    pub(super) static TEST_GRANTS: std::cell::RefCell<Vec<Grant>> = const { std::cell::RefCell::new(Vec::new()) };
 }
 
 /// Run `f` with the given grants active (tests only): `(path, read, write)`. These carry

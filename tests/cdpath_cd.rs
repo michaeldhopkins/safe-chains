@@ -10,21 +10,21 @@ fn approved_in_project(command: &str) -> bool {
 }
 
 const SETTINGS: &[&str] = &[
-    "CDPATH=/elsewhere cd {target} && {body}",
     "CDPATH=/elsewhere; cd {target} && {body}",
     "export CDPATH=/elsewhere; cd {target} && {body}",
     "export CDPATH=/elsewhere && cd {target} && {body}",
     "export -n CDPATH=/elsewhere; cd {target} && {body}",
     "cdpath=/elsewhere; cd {target} && {body}",
-    "cdpath=/elsewhere cd {target} && {body}",
     "export cdpath=/elsewhere; cd {target} && {body}",
 ];
+
+const PREFIXED_SETTINGS: &[&str] = &["CDPATH=/elsewhere cd {target} && {body}", "cdpath=/elsewhere cd {target} && {body}"];
 
 const BODIES: &[&str] = &["jj new", "touch a", "echo x > out.txt"];
 
 #[test]
 fn a_relative_cd_under_cdpath_leaves_the_working_directory_unknown() {
-    for setting in SETTINGS {
+    for setting in SETTINGS.iter().chain(PREFIXED_SETTINGS) {
         for body in BODIES {
             let command = setting.replace("{target}", "sub").replace("{body}", body);
             assert!(!approved_in_project(&command), "{command}");
@@ -39,6 +39,14 @@ fn an_anchored_cd_under_cdpath_is_tracked_as_before() {
             for target in ["./sub", "../cdpathprobe/sub"] {
                 let command = setting.replace("{target}", target).replace("{body}", body);
                 assert!(approved_in_project(&command), "{command}");
+            }
+        }
+    }
+    for setting in PREFIXED_SETTINGS {
+        for body in BODIES {
+            for target in ["./sub", "../cdpathprobe/sub"] {
+                let command = setting.replace("{target}", target).replace("{body}", body);
+                assert!(!approved_in_project(&command), "assignment-prefixed cd is untracked: {command}");
             }
         }
     }

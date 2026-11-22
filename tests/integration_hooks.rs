@@ -26,9 +26,12 @@ fn hook_at_level(level: &str, command: &str) -> (String, i32) {
     use std::sync::atomic::{AtomicU32, Ordering};
     static N: AtomicU32 = AtomicU32::new(0);
     let home = std::env::temp_dir().join(format!("sc-lvl-{}-{}", std::process::id(), N.fetch_add(1, Ordering::Relaxed)));
-    [home.join(".config"), home.join("proj")].iter().try_for_each(std::fs::create_dir_all).unwrap();
+    [home.join(".config"), home.join("projects/proj")]
+        .iter()
+        .try_for_each(std::fs::create_dir_all)
+        .unwrap();
     std::fs::write(home.join(".config/safe-chains.toml"), format!("level = \"{level}\"\n")).unwrap();
-    let payload = format!(r#"{{"tool_input": {{"command": "{command}"}}, "cwd": "{}"}}"#, home.join("proj").display());
+    let payload = format!(r#"{{"tool_input": {{"command": "{command}"}}, "cwd": "{}"}}"#, home.join("projects/proj").display());
     let mut child = Command::new(binary())
         .args(["hook", "claude"])
         .env("HOME", &home)

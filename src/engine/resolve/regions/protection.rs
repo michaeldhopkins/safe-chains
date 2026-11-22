@@ -33,9 +33,12 @@ pub(super) fn role_is_protective(role: &Role) -> bool {
 /// `..` collapsed, macOS's `/private` firmlinks folded (a session started in `/etc` reports
 /// `/private/etc`), and case folded on macOS. A folded comparison only ever finds more.
 pub(crate) fn keeps_absolute(abs: &str, root: &str) -> bool {
-    let root = comparable(root);
+    if crate::pathctx::folder::is_unknown(root) {
+        return true;
+    }
+    let root_cmp = comparable(root);
     let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'));
-    if holds_a_home(&root, home.as_deref()) {
+    if holds_a_home(&root_cmp, home.as_deref()) || protection_or_ancestor_covers(root) {
         return true;
     }
     let path = comparable(&literal_dir(abs));
@@ -43,15 +46,129 @@ pub(crate) fn keeps_absolute(abs: &str, root: &str) -> bool {
         .nodes
         .iter()
         .filter(|n| n.applies_here() && role_is_protective(&n.role))
-        .filter_map(|n| fixed_place(&n.matcher))
+        .filter_map(|n| {
+            let (place, sub) = fixed_place(&n.matcher)?;
+            Some((place, sub || n.role.frozen == Frozen::Rebind))
+        })
         .any(|(place, subtree)| {
             let place = match (place.strip_prefix('~'), home.as_deref()) {
                 (Some(rest), Some(h)) => comparable(&format!("{h}{rest}")),
                 (Some(_), None) => return true,
                 (None, _) => comparable(&place),
             };
-            under(&place, &root) && ((subtree && under(&path, &place)) || under(&place, &path))
+            (under(&place, &root_cmp) || (subtree && under(&root_cmp, &place)))
+                && ((subtree && under(&path, &place)) || under(&place, &path))
         })
+}
+
+fn region_node_covers(path: &str) -> bool {
+    let path = super::super::locus::canonicalize(path);
+    let fold_shields = current_os() == "macos";
+    REGIONS
+        .nodes
+        .iter()
+        .filter(|n| n.applies_here() && role_is_protective(&n.role))
+        .any(|n| n.matcher.specificity(&path, n.fold && fold_shields).is_some())
+}
+
+fn protection_or_ancestor_covers(path: &str) -> bool {
+    let Some(norm) = crate::pathctx::join_cwd(None, path).filter(|p| p.starts_with('/')) else {
+        return region_node_covers(path);
+    };
+    let mut cur = norm.as_str();
+    loop {
+        if region_node_covers(cur) {
+            return true;
+        }
+        let Some((parent, _)) = cur.rsplit_once('/') else {
+            return false;
+        };
+        if parent.is_empty() {
+            return region_node_covers("/");
+        }
+        cur = parent;
+    }
+}
+
+fn has_disallowed_dot_component(path: &str, home: Option<&str>) -> bool {
+    let Some(norm) = crate::pathctx::join_cwd(None, path).filter(|p| p.starts_with('/')) else {
+        return true;
+    };
+    if let Some(h) = home.map(|h| h.trim_end_matches('/')).filter(|h| !h.is_empty())
+        && let Some(rel) = norm.strip_prefix(h).and_then(|r| r.strip_prefix('/'))
+    {
+        if let Some(wt_rel) = rel.strip_prefix(".worktrees/") {
+            return wt_rel.is_empty() || wt_rel.split('/').any(|c| c.starts_with('.'));
+        }
+        return rel.split('/').any(|c| c.starts_with('.'));
+    }
+    norm.rsplit('/').next().unwrap_or("").starts_with('.')
+}
+
+pub(crate) fn is_workspace_root(dir: &str) -> bool {
+    if !dir.starts_with('/')
+        || dir == crate::targets::UNKNOWN_WORKDIR
+        || dir == crate::pathctx::UNRESOLVED_CWD
+        || dir.contains('$')
+        || dir.contains("__SAFE_CHAINS_")
+    {
+        return false;
+    }
+    let Some(lex) = crate::pathctx::join_cwd(None, dir).filter(|p| p.starts_with('/')) else {
+        return false;
+    };
+    let phys = crate::pathctx::physical_directory(&lex);
+    if phys == crate::pathctx::UNRESOLVED_CWD {
+        return false;
+    }
+    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1);
+    let phys_home = home.as_deref().map(crate::pathctx::physical_directory);
+    let clean = |p: &str, h: Option<&str>| {
+        !holds_a_home(&comparable(p), h)
+            && !protection_or_ancestor_covers(p)
+            && !has_disallowed_dot_component(p, h)
+            && in_known_workspace(p, h)
+    };
+    clean(&lex, home.as_deref()) && clean(&phys, phys_home.as_deref().or(home.as_deref()))
+}
+
+fn in_known_workspace(path: &str, home: Option<&str>) -> bool {
+    if let Some(h) = home.map(|h| h.trim_end_matches('/')).filter(|h| !h.is_empty())
+        && let Some(rel) = path.strip_prefix(h).and_then(|r| r.strip_prefix('/'))
+        && (rel == "projects"
+            || rel.starts_with("projects/")
+            || (rel.starts_with(".worktrees/") && !rel[".worktrees/".len()..].is_empty()))
+    {
+        return true;
+    }
+    granted_in_user_config(path)
+        || path
+            .strip_prefix("/private")
+            .filter(|rest| rest.starts_with("/var/") || rest.starts_with("/tmp/") || rest.starts_with("/etc/"))
+            .is_some_and(granted_in_user_config)
+}
+
+fn granted_in_user_config(path: &str) -> bool {
+    let canon = super::super::locus::canonicalize(path);
+    let matches = |grants: &mut dyn Iterator<Item = &super::Grant>| {
+        for g in grants {
+            if g.source == super::GrantSource::UserConfig
+                && g.matcher.specificity(&canon, false).is_some()
+                && !super::has_hidden_component(g.matcher.remainder(&canon))
+            {
+                return true;
+            }
+        }
+        false
+    };
+    #[cfg(test)]
+    {
+        super::TEST_GRANTS.with(|g| super::hypothetical::with_extra(|extra| matches(&mut g.borrow().iter().chain(extra))))
+    }
+    #[cfg(not(test))]
+    {
+        super::hypothetical::with_extra(|extra| matches(&mut super::USER_GRANTS.iter().chain(extra)))
+    }
 }
 
 fn under(inner: &str, outer: &str) -> bool {

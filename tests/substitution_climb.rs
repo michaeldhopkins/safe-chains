@@ -49,10 +49,11 @@ fn a_cd_that_climbs_out_of_a_known_substitution_is_judged_as_anywhere() {
         "cd \"$(pwd)/../..\" && echo x > .zshrc",
         "cd $(pwd)/.. && echo x > .zshrc",
         "cd \"$(pwd)\"/.. && echo x > .zshrc",
+        "cd \"$(pwd)\" && echo x > out",
     ] {
         assert!(!approves(command), "approved {command}");
     }
-    assert!(approves("cd \"$(pwd)\" && echo x > out"));
+    assert!(approves("cd ./sub && echo x > out"));
 }
 
 #[test]
@@ -63,10 +64,12 @@ fn a_climb_from_a_working_directory_left_by_a_known_substitution_is_judged_as_an
         "cd \"$(pwd)\" && echo x > ../../.zshrc",
         "cd \"$(pwd)\" && cd ../../.claude && touch settings.json",
         "cd \"$(pwd)/sub\" && cd ../../../.claude && touch settings.json",
+        "cd \"$(pwd)/sub\" && touch ../x",
+        "cd \"$(pwd)\" && cd sub && touch ../x",
     ] {
         assert!(!approves(command), "approved {command}");
     }
-    for command in ["cd \"$(pwd)/sub\" && touch ../x", "cd \"$(pwd)\" && cd sub && touch ../x"] {
+    for command in ["cd ./sub && touch ../x", "cd sub && touch ../x"] {
         assert!(approves(command), "refused {command}");
     }
 }

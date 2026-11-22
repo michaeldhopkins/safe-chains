@@ -55,7 +55,7 @@ pub(super) fn jj_repository(tokens: &[Token]) -> bool {
 }
 
 fn judges_here(moved: bool) -> bool {
-    moved || crate::engine::resolve::frozen_write_kind(".") != Some(crate::engine::resolve::FrozenWrite::TrustRootDir)
+    moved || !at_or_below_a_trust_root(".")
 }
 
 pub(super) fn jj_destination(tokens: &[Token]) -> bool {

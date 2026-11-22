@@ -37,10 +37,10 @@ pub(super) const MAX_CLASSIFY_WORK: u32 = 512;
 /// and charges one unit, plus the `input_len` bytes about to be parsed, per (re-)entry; `None` means
 /// the budget is spent and the caller must fail closed. Depth is bumped only on a successful enter,
 /// so it stays balanced with the `Drop`.
-pub(crate) struct ClassifyGuard;
+pub struct ClassifyGuard;
 
 impl ClassifyGuard {
-    pub(crate) fn enter(input_len: usize) -> Option<Self> {
+    pub fn enter(input_len: usize) -> Option<Self> {
         let len = input_len as u64;
         if CLASSIFY_DEPTH.with(|d| d.get()) == 0 {
             CLASSIFY_WORK.with(|w| w.set(0));

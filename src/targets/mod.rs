@@ -151,13 +151,31 @@ pub trait HookFormat: Send + Sync {
 /// approved, while one that names no such path classifies as it would anywhere.
 pub const UNKNOWN_WORKDIR: &str = "/nonexistent/safe-chains-unknown-workdir";
 
-/// The (cwd, root) a command is classified under. Most harnesses send no distinct project root, so
-/// the root defaults to the cwd, which engages the workspace boundary with the one directory known.
-/// Where the cwd is not the command's own (`HookFormat::cwd_is_the_commands`), the reported cwd
-/// stays the workspace root and the command is placed at `UNKNOWN_WORKDIR`.
+pub fn is_workspace_root(dir: &str) -> bool {
+    crate::engine::resolve::regions::is_workspace_root(dir)
+}
+
 pub fn evaluation_dirs(format: &dyn HookFormat, input: &HookInput) -> (Option<String>, Option<String>) {
-    let root = input.root.clone().or_else(|| input.cwd.clone());
-    if format.cwd_is_the_commands() { (input.cwd.clone(), root) } else { (Some(UNKNOWN_WORKDIR.to_string()), root) }
+    let valid_cwd = input.cwd.as_deref().filter(|c| is_workspace_root(c)).map(str::to_string);
+    let valid_root = input.root.as_deref().filter(|r| is_workspace_root(r)).map(str::to_string);
+    if !format.cwd_is_the_commands() {
+        let root = valid_root.or(valid_cwd).unwrap_or_else(|| UNKNOWN_WORKDIR.to_string());
+        return (Some(UNKNOWN_WORKDIR.to_string()), Some(root));
+    }
+    match (&input.cwd, valid_cwd) {
+        (Some(_), Some(cwd)) => {
+            let root = valid_root.unwrap_or_else(|| cwd.clone());
+            (Some(cwd), Some(root))
+        }
+        (Some(raw), None) => {
+            let root = (raw == UNKNOWN_WORKDIR)
+                .then_some(valid_root)
+                .flatten()
+                .unwrap_or_else(|| UNKNOWN_WORKDIR.to_string());
+            (Some(UNKNOWN_WORKDIR.to_string()), Some(root))
+        }
+        (None, _) => (None, valid_root),
+    }
 }
 
 /// How a harness's hook handles a gated command — see `HookFormat::gated_policy`.
@@ -229,20 +247,21 @@ pub fn respond(format: &dyn HookFormat, command: &str, verdict: crate::Verdict) 
 /// relative path was placed or left out by its anchor value and each such write was refused unless
 /// it is accounted for, so the verdict already says what the level allows. Without that, only a
 /// read is granted, which is the `reads` level.
+fn command_folder_is_unknown(format: &dyn HookFormat) -> bool {
+    !format.cwd_is_the_commands() || crate::pathctx::cwd().is_some_and(|c| crate::pathctx::folder::is_unknown(&c))
+}
+
 fn within_unknown_workdir_ceiling(format: &dyn HookFormat, verdict: crate::Verdict) -> bool {
-    format.cwd_is_the_commands()
+    !command_folder_is_unknown(format)
         || crate::pathctx::folder::judges_writes()
         || matches!(verdict, Verdict::Allowed(level) if level <= SafetyLevel::SafeRead)
 }
 
-/// The folder level a hook judges writes at when `format` does not report the command's folder:
-/// the `--unknown-folder` flag, else the user config, else `developer`. `None` when the folder is
-/// known, where the dial does not apply.
 pub fn unknown_folder_level(
     format: &dyn HookFormat,
     flag: Option<crate::pathctx::anchor::FolderLevel>,
 ) -> Option<crate::pathctx::anchor::FolderLevel> {
-    (!format.cwd_is_the_commands()).then(|| flag.unwrap_or_else(|| crate::registry::folder_config::user_setting().level()))
+    command_folder_is_unknown(format).then(|| flag.unwrap_or_else(|| crate::registry::folder_config::user_setting().level()))
 }
 
 /// Append `entry` to `settings[outer][event]`, creating the path when absent.

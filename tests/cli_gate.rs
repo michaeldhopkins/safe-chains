@@ -303,7 +303,8 @@ fn the_cli_and_the_hook_agree_in_the_same_directory() {
     std::fs::create_dir_all(home.path().join(".config")).expect("mkdir .config");
     std::fs::write(home.path().join(".claude/settings.json"), r#"{"permissions":{"allow":["Bash(cat:*)","Read(//opt/vendor/**)"]}}"#)
         .expect("write settings.json");
-    std::fs::write(home.path().join(".config/safe-chains.toml"), "").expect("write config");
+    std::fs::write(home.path().join(".config/safe-chains.toml"), format!("[[grant]]\npath = \"{workspace}\"\nread = true\nwrite = true\n"))
+        .expect("write config");
 
     const OUTSIDE: &[&str] = &["/etc", "/usr/share/vendor", "~/Library/Preferences/calibre", "/Users/someone/other-project"];
     // A spread across the roles the boundary treats differently: a named read, an archive listing,

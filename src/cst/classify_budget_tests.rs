@@ -134,3 +134,19 @@ fn a_backtick_body_is_remembered_only_for_the_classification_that_read_it() {
     let _guard = ClassifyGuard::enter(0).expect("a fresh budget");
     assert!(parse_backtick(&bodies[MAX_CLASSIFY_WORK as usize]).is_some(), "the memory is emptied when the classification ends");
 }
+
+#[test]
+fn explain_and_fix_share_one_work_budget_across_rewalks() {
+    use super::classify_budget::ClassifyGuard;
+    let step = "cd a || cd b || cd c; { ";
+    let close = "; }";
+    let depth = 12;
+    let cmd = format!("{}{}{}", step.repeat(depth), "rm /etc/passwd", close.repeat(depth));
+    let start = std::time::Instant::now();
+    let _budget = ClassifyGuard::enter(cmd.len());
+    let exp = super::explain(&cmd);
+    assert!(!exp.is_allowed());
+    let _fix = crate::explain_fix::fix_for(&cmd, &crate::is_safe_command, false);
+    let elapsed = start.elapsed();
+    assert!(elapsed < std::time::Duration::from_secs(2), "explain + fix_for took {elapsed:?}");
+}

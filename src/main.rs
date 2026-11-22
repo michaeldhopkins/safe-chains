@@ -51,6 +51,7 @@ fn run_cli(
     root: Option<&str>,
 ) {
     let explanation = safe_chains::explain_with_coverage_at_level(command, engine_level);
+    let _explain_budget = safe_chains::enter_classify_budget(command);
     let allowed = matches!(explanation.overall, Verdict::Allowed(level) if level <= threshold);
     // The CLI logs too. `--log` used to be accepted here and silently do nothing, which is the
     // worst behaviour available for a flag: `safe-chains --log "cmd"` reported the right verdict and
@@ -83,6 +84,7 @@ fn run_explain(
     // model's context, so an `--explain` that omitted the user's own patterns showed a `✗` beside a
     // segment the agent had just watched be approved.
     let explanation = safe_chains::explain_with_coverage_at_level(command, engine_level);
+    let _explain_budget = safe_chains::enter_classify_budget(command);
     // Held to the same `<= threshold` gate `run_cli` applies, or a write `--level reader` (or an
     // unknown folder at `reads`) refuses was explained as approved.
     let uncapped = explanation.overall;

@@ -46,24 +46,39 @@ pub struct PathCtx {
 thread_local! {
     static CURRENT: RefCell<PathCtx> = RefCell::new(PathCtx::default());
     static REPORTED: RefCell<Option<String>> = const { RefCell::new(None) };
+    static REPORTED_RAW: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
-/// Install `ctx` as the ambient context for the duration of the returned guard; the previous
-/// context is restored on drop (panic-safe, so a failing test can't leak into the next).
 #[must_use]
 pub fn enter(ctx: PathCtx) -> Guard {
     let reported = REPORTED.with(|r| r.replace(ctx.cwd.clone()));
-    Guard(CURRENT.with(|c| c.replace(ctx)), Some(reported))
+    let raw = REPORTED_RAW.with(|r| r.replace(None));
+    Guard(CURRENT.with(|c| c.replace(ctx)), Some((reported, raw)))
 }
 
-/// Restores the previous [`PathCtx`] when dropped.
-pub struct Guard(PathCtx, Option<Option<String>>);
+pub fn note_reported_cwd(cwd: Option<String>) {
+    REPORTED_RAW.with(|r| *r.borrow_mut() = cwd);
+}
+
+pub(crate) fn display_cwd() -> Option<String> {
+    if let Some(c) = cwd().filter(|c| !folder::is_unknown(c) && c != UNRESOLVED_CWD) {
+        return Some(c);
+    }
+    REPORTED_RAW.with(|r| r.borrow().clone()).filter(|c| !folder::is_unknown(c) && c != UNRESOLVED_CWD)
+}
+
+pub(crate) fn reported_is_secret() -> bool {
+    REPORTED_RAW.with(|r| r.borrow().as_deref().is_some_and(crate::engine::resolve::regions::names_a_secret))
+}
+
+pub struct Guard(PathCtx, Option<(Option<String>, Option<String>)>);
 
 impl Drop for Guard {
     fn drop(&mut self) {
         CURRENT.with(|c| *c.borrow_mut() = std::mem::take(&mut self.0));
-        if let Some(reported) = self.1.take() {
+        if let Some((reported, raw)) = self.1.take() {
             REPORTED.with(|r| *r.borrow_mut() = reported);
+            REPORTED_RAW.with(|r| *r.borrow_mut() = raw);
         }
     }
 }
@@ -99,7 +114,10 @@ pub fn cwd() -> Option<String> {
 pub fn root() -> Option<String> {
     CURRENT.with(|c| {
         let b = c.borrow();
-        b.root.clone().or_else(|| b.cwd.clone())
+        b.root
+            .clone()
+            .filter(|r| !folder::is_unknown(r) && r != UNRESOLVED_CWD)
+            .or_else(|| b.cwd.clone().filter(|c| !folder::is_unknown(c) && c != UNRESOLVED_CWD))
     })
 }
 
@@ -111,36 +129,11 @@ pub(crate) fn placed_in_root(abs: &str) -> bool {
         .is_some_and(|root| crate::engine::resolve::regions::lies_in_root(abs, &physical::root(&root)))
 }
 
-/// Whether `path` lies inside THIS session's scratchpad — the harness's own per-session working
-/// directory (e.g. Claude Code's `/private/tmp/claude-<uid>/<project-slug>/<session-id>/scratchpad`).
-///
-/// The anchor is the **session id as a whole path component**, not the surrounding layout. That is
-/// deliberate and is what makes this safe *and* durable:
-///
-/// - **Unforgeable.** The session id arrives in the harness's own hook envelope, never from the
-///   agent's shell. An attacker cannot pre-plant `/tmp/<this-session-id>/evil.sh` because the id is
-///   unknown until the session exists (and it is unique per session). Compare a *layout* pattern
-///   ("anything under `/tmp/claude-*`"), which anyone can create.
-/// - **Durable.** It survives the harness reorganizing the parts around the id — the uid suffix,
-///   the slug, `/tmp` vs `/private/tmp`, the trailing directory name. Those are internal details
-///   (Claude Code does not document or expose the scratchpad path, and declined to; see
-///   docs/design/agent-scratchpad.md), so matching them exactly would be brittle.
-/// - **Fail-closed.** No session id, or a path that does not contain it, simply does not match:
-///   the path keeps its ordinary classification (`/tmp` → `temp`, i.e. foreign). A harness that
-///   supplies no id, or whose scratchpad omits it, is exactly as restricted as before — never worse.
-///
-/// Requiring a TEMP-root prefix as well keeps the id from blessing something outside the scratch
-/// area on a harness that happens to embed the id elsewhere (a log path under `$HOME`, say).
 pub fn in_session_scratchpad(path: &str) -> bool {
     let Some(id) = CURRENT.with(|c| c.borrow().session_id.clone()) else {
         return false;
     };
-    // A short or trivial id could collide with an ordinary directory name; require something
-    // id-shaped before trusting it as an anchor.
-    if id.len() < 8 || !id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_') {
-        return false;
-    }
-    if !under_temp_root(path) {
+    if id.len() < 8 || !id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_') || !under_temp_root(path) {
         return false;
     }
     path.split('/').any(|seg| seg == id)
@@ -654,7 +647,7 @@ mod tests {
         assert_eq!(resolve("."), "/etc", "the root itself is above a protected place");
         drop(_etc);
         let _inside = enter(PathCtx { cwd: Some("/root/app".into()), root: Some("/root/app".into()), ..Default::default() });
-        assert_eq!(resolve("/root/app/x"), "x", "a root inside the protected place is where the user works");
+        assert_eq!(resolve("/root/app/x"), "/root/app/x");
     }
 
     #[test]
