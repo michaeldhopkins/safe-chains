@@ -71,7 +71,13 @@ fn run_hook_on(
     // defaults, including a harness whose reported cwd is not where the command runs.
     let (cwd, root) = targets::evaluation_dirs(format, &input);
     let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx { cwd, root, session_id: input.session_id.clone() });
-    safe_chains::pathctx::note_reported_cwd(input.cwd.clone(), format.cwd_is_the_commands());
+    // A call whose own directory could not be read (`targets::declared_cwd`) leaves the project
+    // root as the only folder the harness named: it is kept as a hint, never as where the command runs.
+    let cwd_unplaced = input.cwd.as_deref() == Some(targets::UNKNOWN_WORKDIR);
+    match (cwd_unplaced, &input.root) {
+        (true, Some(root)) => safe_chains::pathctx::note_reported_cwd(Some(root.clone()), false),
+        _ => safe_chains::pathctx::note_reported_cwd(input.cwd.clone(), format.cwd_is_the_commands()),
+    }
     let _folder = targets::unknown_folder_level(format, unknown_folder).map(safe_chains::pathctx::folder::enter);
     // The auto-approve ceiling comes from the write-protected user config (`~/.config/safe-chains.toml`,
     // `level = "…"`). Absent → the default developer band. An UPPER level (network-admin) RAISES it —

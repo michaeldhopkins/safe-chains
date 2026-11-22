@@ -138,8 +138,13 @@ pub(crate) fn on_the_link<T>(judge: impl FnOnce() -> T) -> T {
 /// workspace. Only reads come here: the real place is never judged more leniently than a file of the
 /// unknown folder for a read, and writes there are judged by name.
 fn through_a_link_in_here(cwd: &str, path: &str, follow_last: bool) -> Option<String> {
-    let folder = folder_below(cwd)?;
-    physical::resolve(&format!("{}/{path}", folder.trim_end_matches('/')), follow_last)
+    let folder = here_below(cwd)?;
+    let real = physical::resolve(&format!("{}/{path}", folder.trim_end_matches('/')), follow_last)?;
+    // Where the harness does not say the command runs in the reported folder (Codex), the link only
+    // adds a refusal: a place it leads to may be a credential store, but a harmless place is never
+    // taken for where the path lands, since the command may run where the same spelling reaches
+    // something else.
+    (here().is_some_and(|h| h.runs_there) || crate::engine::resolve::regions::names_a_secret_text(&real)).then_some(real)
 }
 
 /// Place `path` for `use_` against the ambient folder and project root. The result is judged as
