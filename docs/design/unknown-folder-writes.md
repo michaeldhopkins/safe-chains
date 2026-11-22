@@ -282,7 +282,7 @@ level above `reads` judged the command.
 
 **How a write is judged.** Two seams, both fail-closed:
 
-- `pathctx::resolve_for` places each relative path a command writes by its anchor value and use
+- `pathctx::place` places each relative path a command writes by its anchor value and use
   (`anchor::placement`): into the workspace when the level approves it, otherwise into the unknown
   folder, where no write is approvable. A relative read is placed at every level, `reads` included
   (the owner, 2026-10-08: "If a user chose to run from home, that's their choice"), so `grep -r foo

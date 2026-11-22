@@ -7,10 +7,10 @@
 //! leaf). Rather than add a pass-through parameter to ~15 recursive functions across `cst`,
 //! `handlers`, and `engine`, it lives in a scoped thread-local, installed by
 //! [`enter`] at the top of an evaluation and read at exactly two leaves: legacy
-//! `is_safe_write_target` and engine `classify_locus`, both via [`resolve`].
+//! `is_safe_write_target` and engine `classify_locus`, both via `place`.
 //!
 //! Everything is fail-open to *today's* behavior: with no `cwd`/`root` (or an unresolvable
-//! path) [`resolve`] returns the path unchanged, so the classifiers behave exactly as before
+//! path) `place` returns the path as written, so the classifiers behave exactly as before
 //! — the signal tightens when present, never a regression when absent.
 
 use std::cell::RefCell;

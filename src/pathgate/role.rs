@@ -59,6 +59,22 @@ impl Role {
     }
 }
 
+/// Whether the first positional is the pattern rather than a path. A search given no path searches
+/// the folder it runs in, as `rg pattern` does, so that folder is added as the path it reads.
+pub(super) fn skip_first_adding_its_folder(
+    spec: &super::RoleSpec,
+    role: Role,
+    tokens: &[crate::parse::Token],
+    positionals: &mut Vec<&str>,
+) -> bool {
+    let skip_first = spec.shape == super::Shape::SkipFirst && !crate::handlers::pattern_flags::supplies_pattern(tokens);
+    if spec.shape == super::Shape::SkipFirst && role == Role::ReadTree && positionals.len() <= usize::from(skip_first) {
+        positionals.resize(usize::from(skip_first), crate::engine::resolve::locus::UNKNOWABLE_ITEM);
+        positionals.push(".");
+    }
+    skip_first
+}
+
 #[cfg(test)]
 mod tests {
     use super::Role;
@@ -101,20 +117,4 @@ mod tests {
             }
         }
     }
-}
-
-/// Whether the first positional is the pattern rather than a path. A search given no path searches
-/// the folder it runs in, as `rg pattern` does, so that folder is added as the path it reads.
-pub(super) fn skip_first_adding_its_folder(
-    spec: &super::RoleSpec,
-    role: Role,
-    tokens: &[crate::parse::Token],
-    positionals: &mut Vec<&str>,
-) -> bool {
-    let skip_first = spec.shape == super::Shape::SkipFirst && !crate::handlers::pattern_flags::supplies_pattern(tokens);
-    if spec.shape == super::Shape::SkipFirst && role == Role::ReadTree && positionals.len() <= usize::from(skip_first) {
-        positionals.resize(usize::from(skip_first), crate::engine::resolve::locus::UNKNOWABLE_ITEM);
-        positionals.push(".");
-    }
-    skip_first
 }

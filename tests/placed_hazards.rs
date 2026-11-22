@@ -40,15 +40,13 @@ fn a_directory_option_climbs_from_where_its_link_leads() {
         &p,
         &p.root.clone(),
         &[
-            "git -C lnk/.. status",
-            "git -C lnk/.. log",
-            "git -C ./lnk/../ diff",
-            "tmux new-session -d -c lnk/.. 'touch x'",
+            "git -C lnk/.. status", "git -C lnk/.. log", "git -C ./lnk/../ diff", "tmux new-session -d -c lnk/.. 'touch x'",
             "tmux new-session -d -c lnk/.. 'echo x > y'",
         ],
     );
     assert!(approved.is_empty(), "a `..` after a link was climbed from the link's own folder:\n{}", approved.join("\n"));
-    let control = refused(&p, &p.root.clone(), &["git -C sub/.. status", "git -C ./sub/../ log", "tmux new-session -d -c sub/.. 'touch x'"]);
+    let control =
+        refused(&p, &p.root.clone(), &["git -C sub/.. status", "git -C ./sub/../ log", "tmux new-session -d -c sub/.. 'touch x'"]);
     assert_eq!(control.len(), 3, "a `..` after a plain folder stays approved: {control:?}");
 }
 

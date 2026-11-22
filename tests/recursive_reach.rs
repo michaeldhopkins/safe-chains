@@ -155,7 +155,10 @@ fn a_path_built_on_pwd_is_judged_as_the_same_path_without_it() {
             let plain = cmd.replace("BASE", "work");
             let built = cmd.replace("BASE/", "\"$(pwd)/work/\"").replace("BASE", "\"$(pwd)/work\"");
             // rsync refuses any `$(…)` source whatever it names, which is stricter and stays so.
-            assert!(!at(&p, &built).is_allowed() || at(&p, &plain).is_allowed(), "{built} is laxer than {plain} (frozen below: {frozen_below})");
+            assert!(
+                !at(&p, &built).is_allowed() || at(&p, &plain).is_allowed(),
+                "{built} is laxer than {plain} (frozen below: {frozen_below})"
+            );
             assert_eq!(at(&p, &plain).is_allowed(), !frozen_below, "{plain} (frozen below: {frozen_below})");
         }
     }

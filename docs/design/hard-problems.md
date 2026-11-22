@@ -75,7 +75,7 @@ expanding the glob is not seen; that window is accepted. Shell options that chan
 (`dotglob`, `nocaseglob`, `GLOBIGNORE`, `nullglob`) set earlier in the session are not seen either:
 bash's defaults are assumed (`src/cst/opaque/glob.rs`).
 *Accepted (links on disk):* when the hook knows the working directory and root, a path is followed
-through every symbolic link that exists at decision time before it is placed (`src/pathctx/physical.rs`):
+through every symbolic link that exists at decision time before it is placed (`src/pathctx/place/physical.rs`):
 each component is looked up with `lstat`, a link is replaced by its target relative to the link's
 folder, `..` steps back from the physical place, and the project root is resolved the same way. A
 read or write follows the last component; a rebind (`rm`, `mv`, `ln`) keeps it unless the path ends

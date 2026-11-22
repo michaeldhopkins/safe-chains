@@ -1,4 +1,9 @@
-use super::{PathCtx, anchor::Use, enter, note_reported_cwd, place::{Here, here, on_the_link, place}};
+use super::{
+    PathCtx,
+    anchor::Use,
+    enter, note_reported_cwd,
+    place::{Here, here, on_the_link, place},
+};
 use std::os::unix::fs::symlink;
 
 /// A project with `src/`, and a folder outside it holding `secret`, both under one canonical base.

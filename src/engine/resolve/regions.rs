@@ -19,15 +19,16 @@ pub(crate) use home_spelling::absolute_other_home;
 pub(crate) mod hypothetical;
 pub(crate) mod metadata;
 mod path_text;
-mod role_merge;
 mod protection;
+mod role_merge;
 use path_text::{at_or_below, ci_starts_with, has_hidden_component};
 mod unicode_spelling;
 #[cfg(test)]
 pub(crate) use protection::anchored_protected_paths_here;
 use protection::role_is_protective;
 pub(crate) use protection::{
-    granted_for_writing, home_nodes, is_workspace_root, keeps_absolute, lies_in_root, names_a_region, names_a_secret_text, protection_covers,
+    granted_for_writing, home_nodes, is_workspace_root, keeps_absolute, lies_in_root, names_a_region, names_a_secret_text,
+    protection_covers,
 };
 
 /// Which faces a user grant may NOT widen. Two distinct needs, and collapsing them was a real
@@ -654,10 +655,7 @@ fn apply_grant(path: &str, base: Role) -> Role {
 /// never take one away for the place it leads.
 pub(crate) fn classify_region(placed: &crate::pathctx::Placed) -> Role {
     let landed = classify_text(placed.judged());
-    if placed.spelled() == placed.judged() {
-        return landed;
-    }
-    landed.worse(classify_text(placed.spelled()))
+    if placed.spelled() == placed.judged() { landed } else { landed.worse(classify_text(placed.spelled())) }
 }
 
 /// The role for `path` as text. Most-specific applicable node wins; ties break toward the more

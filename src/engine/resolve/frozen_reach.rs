@@ -247,7 +247,10 @@ pub(crate) fn runs_unreviewed_code(path: &str) -> bool {
 /// Whether a tool that runs the code of the folder `path` names would run files from installed
 /// packages or a frozen folder: the folder itself counts, since the tool reads the files inside it.
 pub(crate) fn is_unreviewed_folder(path: &str) -> bool {
-    crate::pathctx::place(path, None).into_judged().split('/').any(|part| is_frozen(part) || is_packaged(part))
+    crate::pathctx::place(path, None)
+        .into_judged()
+        .split('/')
+        .any(|part| is_frozen(part) || is_packaged(part))
 }
 
 #[cfg(test)]

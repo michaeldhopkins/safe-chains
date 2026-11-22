@@ -107,7 +107,7 @@ follow, and the honest posture is to name them:
 
 - **Links on disk.** When the directory context is known, a path is followed through the
   symbolic links that exist at decision time before `classify_locus` sees it
-  (`src/pathctx/physical.rs`), so `./link → /etc/shadow` classifies as `machine`. A link
+  (`src/pathctx/place/physical.rs`), so `./link → /etc/shadow` classifies as `machine`. A link
   swapped in after the decision, and any hard link, still defeat `locus` (HP-5).
 - **Command identity is name + path, never binary content (a deliberate scope boundary).**
   safe-chains classifies by a command's executable name and path; verifying that a binary

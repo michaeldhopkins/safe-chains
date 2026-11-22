@@ -1,8 +1,8 @@
 //! Reading a region role through the face an operation asks for.
 
 use super::{Face, canonicalize, is_unpinnable};
-use crate::engine::resolve::regions::{Role, classify_region, classify_text};
 use crate::engine::facet::LocalLocus;
+use crate::engine::resolve::regions::{Role, classify_region, classify_text};
 
 /// Classify an ALREADY-placed path: fail closed on an unpinnable spelling, then read the region
 /// model's face, asked of both the place it lands and the way it was spelled.

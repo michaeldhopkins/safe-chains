@@ -25,10 +25,16 @@ Five deliberate exceptions read the filesystem, all racing the shell (accepted i
 - A glob starting with a pattern character (`ls *`) is listed against the known working directory at
   decision time, so its matches can be checked for a name that reads as a flag
   (`src/cst/opaque/glob.rs`).
-- Symbolic links are followed before a path is placed against the project root
-  (`src/pathctx/physical.rs`): every component that exists is looked up with `lstat`, so a committed
+- Every path operand is placed once, by `pathctx::place` (`src/pathctx/place.rs`), into a `Placed`
+  value that every path judge takes. Symbolic links are followed first (`src/pathctx/place/physical.rs`):
+  every component that exists is looked up with `lstat` (memoised for one evaluation), so a committed
   `rc -> ~/.zshrc` is judged as `~/.zshrc`, and `link/..` climbs from the link's target. The last
-  component is kept as written for `rm`/`mv`/`ln`, which act on the link itself.
+  component is kept as written for `rm`/`mv`/`ln`, which act on the link itself. A `Placed` keeps
+  both readings, where the kernel takes the path and how it was spelled, and a name rule (`.git`,
+  `id_rsa`) is asked of both and the worse answer stands: a link can add a refusal for its own name,
+  never remove one for the place it leads. The reported folder is placed the same way (`Here`, a
+  logical and a physical form): `cd` joins on the logical one, and `git -C`, `tmux -c` and `find
+  -execdir`, which call `chdir(2)`, join on the physical one.
 - A recursive write (`chmod -R`, `cp -r`, `rsync -a`, `find -exec`) lists the tree below its operand
   for a write-frozen name (`.git`, `.jj`, `.hg`, `.sl`, `.envrc`) and is judged as writing the first
   one it finds (`src/engine/resolve/frozen_reach.rs`). A walk that follows links also reports each
