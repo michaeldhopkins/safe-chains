@@ -155,6 +155,21 @@ pub fn is_workspace_root(dir: &str) -> bool {
     crate::engine::resolve::regions::is_workspace_root(dir)
 }
 
+/// A reported folder that is a real directory, named plainly, and neither it nor where it leads
+/// holds credentials. A command there is judged in that folder with no project root, so each
+/// relative path counts as the absolute path it names.
+fn is_a_plain_folder(dir: &str) -> bool {
+    let plain = |d: &str| {
+        d.starts_with('/')
+            && d != "/"
+            && !d.contains('$')
+            && !d.contains("__SAFE_CHAINS_")
+            && d.split('/').all(|part| part != "." && part != "..")
+            && !crate::engine::resolve::regions::names_a_secret(d)
+    };
+    plain(dir) && std::fs::canonicalize(dir).is_ok_and(|real| real.is_dir() && real.to_str().is_some_and(plain))
+}
+
 pub fn evaluation_dirs(format: &dyn HookFormat, input: &HookInput) -> (Option<String>, Option<String>) {
     let valid_cwd = input.cwd.as_deref().filter(|c| is_workspace_root(c)).map(str::to_string);
     let valid_root = input.root.as_deref().filter(|r| is_workspace_root(r)).map(str::to_string);
@@ -167,6 +182,7 @@ pub fn evaluation_dirs(format: &dyn HookFormat, input: &HookInput) -> (Option<St
             let root = valid_root.unwrap_or_else(|| cwd.clone());
             (Some(cwd), Some(root))
         }
+        (Some(raw), None) if valid_root.is_none() && is_a_plain_folder(raw) => (Some(raw.clone()), Some(UNKNOWN_WORKDIR.to_string())),
         (Some(raw), None) => {
             let root = (raw == UNKNOWN_WORKDIR)
                 .then_some(valid_root)

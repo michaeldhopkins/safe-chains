@@ -324,3 +324,55 @@ fn a_reported_folder_that_is_a_link_to_a_credential_store_reads_as_that_store() 
     }
     assert!(approved.is_empty(), "read a credential store through the reported folder:\n{}", approved.join("\n"));
 }
+
+/// A scratch folder outside every workspace, such as one under `/tmp`, is a real place on disk. A
+/// relative path there is judged as the absolute path it names, so ordinary work in it approves as it
+/// would when spelled out, while a link out of it, its repository metadata and its own code are still
+/// judged where they lead.
+#[test]
+fn a_scratch_folder_outside_a_workspace_is_judged_as_the_place_it_is() {
+    let home_base = tempfile::tempdir().expect("home tempdir");
+    let home = home_base.path().join("home");
+    let ssh = home.join(".ssh");
+    std::fs::create_dir_all(&ssh).expect("mkdir .ssh");
+    std::fs::write(ssh.join("id_rsa"), "secret-key").expect("write id_rsa");
+    let scratch = tempfile::Builder::new().prefix("sc-scratch").tempdir_in("/tmp").expect("scratch under /tmp");
+    let folder = std::path::PathBuf::from("/tmp").join(scratch.path().file_name().expect("name"));
+    for dir in ["sub", ".git/hooks"] {
+        std::fs::create_dir_all(folder.join(dir)).expect("mkdir");
+    }
+    for file in ["a.txt", "x.txt", "file.txt"] {
+        std::fs::write(folder.join(file), "a").expect("write");
+    }
+    std::os::unix::fs::symlink(ssh.join("id_rsa"), folder.join("key2")).expect("link to a key");
+    std::os::unix::fs::symlink(&ssh, folder.join("leak")).expect("link to .ssh");
+
+    let mut refused = Vec::new();
+    let mut approved = Vec::new();
+    for harness in ["claude", "grok", "antigravity"] {
+        for command in [
+            "touch new.txt", "mkdir -p sub/dir", "rm -f x.txt", "cp a.txt b.txt", "mv a.txt b.txt", "echo hi > out.txt",
+            "sed -i '' s/a/b/ file.txt", "cd sub && touch y.txt", "ls *.txt", "cat x.txt",
+        ] {
+            if !decision_as(harness, &home, &folder, command).contains("\"allow\"") {
+                refused.push(format!("{harness}: `{command}`"));
+            }
+        }
+        for command in [
+            "cat key2", "cat leak/id_rsa", "cd leak && cat id_rsa", "echo k > leak/authorized_keys", "cd leak && echo k > authorized_keys",
+            "cp key2 copy.txt", "echo x > .git/hooks/pre-commit", "cd .git/hooks && echo x > pre-commit", "rm -rf .git", "git status",
+            "jj log", "cargo build", "cargo test", "npm test", "bundle exec rake", "mise set FOO=bar", "cat ~/.ssh/id_rsa",
+        ] {
+            if decision_as(harness, &home, &folder, command).contains("\"allow\"") {
+                approved.push(format!("{harness}: `{command}`"));
+            }
+        }
+    }
+    for command in ["cat key2", "echo k > leak/authorized_keys", "echo x > .git/hooks/pre-commit"] {
+        if decision_as("codex", &home, &folder, command).contains("\"allow\"") {
+            approved.push(format!("codex: `{command}`"));
+        }
+    }
+    assert!(approved.is_empty(), "approved in a scratch folder:\n{}", approved.join("\n"));
+    assert!(refused.is_empty(), "ordinary work refused in a scratch folder:\n{}", refused.join("\n"));
+}
