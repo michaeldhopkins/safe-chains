@@ -174,7 +174,10 @@ pub fn evaluation_dirs(format: &dyn HookFormat, input: &HookInput) -> (Option<St
                 .unwrap_or_else(|| UNKNOWN_WORKDIR.to_string());
             (Some(UNKNOWN_WORKDIR.to_string()), Some(root))
         }
-        (None, _) => (None, valid_root),
+        (None, _) => match valid_root {
+            Some(root) => (None, Some(root)),
+            None => (Some(UNKNOWN_WORKDIR.to_string()), Some(UNKNOWN_WORKDIR.to_string())),
+        },
     }
 }
 

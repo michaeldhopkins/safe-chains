@@ -130,8 +130,8 @@ fn claude_nudges_when_a_command_reaches_outside_the_workspace() {
 
 #[test]
 fn claude_explicit_subcommand_allows_safe_command() {
-    let payload = r#"{"tool_input": {"command": "git status"}}"#;
-    let (stdout, _stderr, code) = run_hook(&["hook", "claude"], payload);
+    let payload = format!(r#"{{"tool_input": {{"command": "git status"}}, "cwd": "{}/projects/project"}}"#, hooks::bare_home().display());
+    let (stdout, _stderr, code) = run_hook(&["hook", "claude"], &payload);
     assert_eq!(code, 0);
     assert!(stdout.contains("\"permissionDecision\":\"allow\""));
 }
@@ -145,8 +145,8 @@ fn claude_invalid_json_exits_zero_silently() {
 
 #[test]
 fn claude_safewrite_carries_appropriate_reason() {
-    let payload = r#"{"tool_input": {"command": "cargo build"}}"#;
-    let (stdout, _stderr, code) = run_hook(&[], payload);
+    let payload = format!(r#"{{"tool_input": {{"command": "cargo build"}}, "cwd": "{}/projects/project"}}"#, hooks::bare_home().display());
+    let (stdout, _stderr, code) = run_hook(&[], &payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).expect(&stdout);
     let reason = v.pointer("/hookSpecificOutput/permissionDecisionReason").and_then(|s| s.as_str()).unwrap_or("");

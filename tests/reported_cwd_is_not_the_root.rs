@@ -193,3 +193,34 @@ fn round_four_unknown_root_and_readonly_grant_findings_are_all_refused() {
     }
     assert!(approved.is_empty(), "findings still approved:\n{}", approved.join("\n"));
 }
+
+#[test]
+fn a_hook_that_reports_no_folder_judges_the_command_in_an_unknown_one() {
+    let base = tempfile::tempdir().expect("tempdir");
+    let home = base.path().join("home");
+    std::fs::create_dir_all(&home).expect("mkdir");
+    let run = |command: &str| {
+        let payload = serde_json::json!({ "tool_name": "Bash", "tool_input": { "command": command } }).to_string();
+        let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+            .args(["hook", "claude"])
+            .current_dir(&home)
+            .env_clear()
+            .env("HOME", &home)
+            .env("PATH", "/usr/bin:/bin")
+            .stdin(Stdio::piped())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::null())
+            .spawn()
+            .expect("spawn");
+        child.stdin.take().expect("stdin").write_all(payload.as_bytes()).expect("write");
+        String::from_utf8(child.wait_with_output().expect("wait").stdout).expect("utf-8")
+    };
+    assert!(run("ls").contains("\"allow\""), "a read is still approved");
+    let mut approved = Vec::new();
+    for command in ["pytest", "cargo test", "git status", "bundle list", "echo evil > out.txt", "mise set FOO=bar"] {
+        if run(command).contains("\"allow\"") {
+            approved.push(command);
+        }
+    }
+    assert!(approved.is_empty(), "approved with no reported folder:\n{}", approved.join("\n"));
+}
