@@ -150,14 +150,25 @@ fn flag_values<'a>(words: &[&'a str], names: &[&str]) -> Vec<&'a str> {
 }
 
 fn lands_outside_the_project(dir: Option<String>) -> bool {
-    let (Some(root), Some(dir)) = (crate::pathctx::root(), dir) else {
+    let Some(dir) = dir else {
+        return false;
+    };
+    if dir == crate::pathctx::UNRESOLVED_CWD {
+        return true;
+    }
+    if crate::pathctx::root_is_unknown() {
+        let _here = crate::pathctx::enter_cwd(Some(dir));
+        let placed = crate::pathctx::resolve(".");
+        return !(placed.starts_with('/')
+            && !crate::pathctx::folder::is_unknown(&placed)
+            && !placed.contains("__SAFE_CHAINS_")
+            && crate::engine::resolve::regions::granted_for_writing(&placed));
+    }
+    let Some(root) = crate::pathctx::root() else {
         return false;
     };
     if crate::pathctx::folder::is_unknown(&dir) {
         return false;
-    }
-    if dir == crate::pathctx::UNRESOLVED_CWD {
-        return true;
     }
     let _here = crate::pathctx::enter_cwd(Some(dir));
     let placed = crate::pathctx::resolve(".");

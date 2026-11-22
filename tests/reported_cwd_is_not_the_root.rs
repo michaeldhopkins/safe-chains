@@ -129,3 +129,67 @@ fn known_workspaces_and_user_grants_become_the_root_while_protected_or_outside_d
         assert!(read_out.contains("\"allow\""), "`ls` should still approve in {}: {read_out}", rejected.display());
     }
 }
+
+#[test]
+fn round_four_unknown_root_and_readonly_grant_findings_are_all_refused() {
+    let base = tempfile::tempdir().expect("tempdir");
+    let tmp_base = tempfile::tempdir_in("/tmp").expect("tempdir in /tmp");
+    let home = base.path().join("home");
+    let ssh = home.join(".ssh");
+    let downloads = home.join("Downloads");
+    let claude_hooks = home.join(".claude/hooks");
+    let repo_git = home.join("projects/repo/.git");
+    let evil_dir = tmp_base.path().join("evil-dir");
+    let ro_grant = base.path().join("ro-vendor");
+    let rw_grant = base.path().join("rw-vendor");
+    let dot_under_grant = rw_grant.join(".secret/sub");
+    for dir in [&ssh, &downloads, &claude_hooks, &repo_git, &evil_dir, &ro_grant, &dot_under_grant, &home.join(".config")] {
+        std::fs::create_dir_all(dir).expect("mkdir");
+    }
+    std::fs::write(ssh.join("id_rsa"), "secret-key").expect("write id_rsa");
+    std::fs::write(home.join("Gemfile"), "source 'https://rubygems.org'").expect("write Gemfile");
+    std::os::unix::fs::symlink(&ssh, evil_dir.join("leak")).expect("symlink to .ssh");
+    std::fs::write(
+        home.join(".config/safe-chains.toml"),
+        format!(
+            "[[grant]]\npath = \"{}\"\nread = true\nwrite = false\n\n[[grant]]\npath = \"{}\"\nread = true\nwrite = true\n",
+            ro_grant.display(),
+            rw_grant.display()
+        ),
+    )
+    .expect("write config");
+
+    let cases: Vec<(&str, std::path::PathBuf, String)> = vec![
+        ("4.A", evil_dir.clone(), format!("find -L {} -exec cat {{}} +", evil_dir.display())),
+        ("4.A", evil_dir.clone(), format!("cp -RL {} {}/out", evil_dir.display(), tmp_base.path().display())),
+        ("4.A", evil_dir.clone(), "find -L . -exec cat {} +".into()),
+        ("4.A", evil_dir.clone(), "rg -L needle .".into()),
+        ("4.A", evil_dir.clone(), "tar -czhf - .".into()),
+        ("4.B", evil_dir.clone(), format!("git -C {} status", evil_dir.display())),
+        ("4.B", evil_dir.clone(), "git status".into()),
+        ("4.B", evil_dir.clone(), format!("cd {} && hg status", evil_dir.display())),
+        ("4.B", evil_dir.clone(), "bundle list".into()),
+        ("4.B", home.clone(), "bundle list".into()),
+        ("4.B", downloads.clone(), "bundle list".into()),
+        ("4.C", evil_dir.clone(), "pytest".into()),
+        ("4.C", evil_dir.clone(), "npm test".into()),
+        ("4.C", evil_dir.clone(), "cargo test".into()),
+        ("4.C", evil_dir, "cargo --version".into()),
+        ("4.C", ssh, "pytest".into()),
+        ("4.C", downloads, "npm test".into()),
+        ("4.C", repo_git, "cargo test".into()),
+        ("4.D", ro_grant.clone(), "echo evil > file.txt".into()),
+        ("4.D", ro_grant, "rm -rf sub".into()),
+        ("4.D", dot_under_grant, "echo evil > file.txt".into()),
+        ("2.F", claude_hooks, "cd ../.. && mkdir -p tmp && echo evil > tmp/pwn.sh".into()),
+    ];
+
+    let mut approved = Vec::new();
+    for (tag, cwd, command) in cases {
+        let out = decision(&home, &cwd, &command);
+        if out.contains("\"allow\"") {
+            approved.push(format!("{tag}: `{command}` approved with cwd {}", cwd.display()));
+        }
+    }
+    assert!(approved.is_empty(), "findings still approved:\n{}", approved.join("\n"));
+}

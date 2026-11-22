@@ -115,10 +115,15 @@ pub fn root() -> Option<String> {
     CURRENT.with(|c| {
         let b = c.borrow();
         b.root
-            .clone()
-            .filter(|r| !folder::is_unknown(r) && r != UNRESOLVED_CWD)
-            .or_else(|| b.cwd.clone().filter(|c| !folder::is_unknown(c) && c != UNRESOLVED_CWD))
+            .as_ref()
+            .or(b.cwd.as_ref())
+            .filter(|r| !folder::is_unknown(r) && *r != UNRESOLVED_CWD)
+            .cloned()
     })
+}
+
+pub(crate) fn root_is_unknown() -> bool {
+    CURRENT.with(|c| c.borrow().root.is_some() || c.borrow().cwd.is_some()) && root().is_none()
 }
 
 /// Whether the absolute, already placed `abs` lies at or below the project root as the kernel sees

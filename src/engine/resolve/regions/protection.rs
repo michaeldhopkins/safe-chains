@@ -141,11 +141,11 @@ fn in_known_workspace(path: &str, home: Option<&str>) -> bool {
     {
         return true;
     }
-    granted_in_user_config(path)
+    (granted_in_user_config(path) && granted_for_writing(path))
         || path
             .strip_prefix("/private")
             .filter(|rest| rest.starts_with("/var/") || rest.starts_with("/tmp/") || rest.starts_with("/etc/"))
-            .is_some_and(granted_in_user_config)
+            .is_some_and(|rest| granted_in_user_config(rest) && granted_for_writing(rest))
 }
 
 fn granted_in_user_config(path: &str) -> bool {
@@ -153,6 +153,7 @@ fn granted_in_user_config(path: &str) -> bool {
     let matches = |grants: &mut dyn Iterator<Item = &super::Grant>| {
         for g in grants {
             if g.source == super::GrantSource::UserConfig
+                && g.write
                 && g.matcher.specificity(&canon, false).is_some()
                 && !super::has_hidden_component(g.matcher.remainder(&canon))
             {

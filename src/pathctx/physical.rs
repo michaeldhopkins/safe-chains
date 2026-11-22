@@ -98,7 +98,10 @@ fn walk(mut done: Vec<String>, mut todo: VecDeque<(String, bool)>, follow_last: 
     let mut missing: Option<usize> = None;
     while let Some((part, from_shell)) = todo.pop_front() {
         if part == ".." {
-            if done.pop().is_some_and(|p| p.contains(crate::cst::eval::TAGGED_PREFIX)) {
+            if done
+                .pop()
+                .is_some_and(|p| p.contains(crate::cst::eval::TAGGED_PREFIX) || p == "safe-chains-unknown-workdir")
+            {
                 return unresolved();
             }
             if missing.is_some_and(|at| done.len() <= at) {

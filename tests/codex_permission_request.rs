@@ -60,6 +60,7 @@ const ALLOW: &str = r#"{"hookSpecificOutput":{"decision":{"behavior":"allow"},"h
 /// Run the codex hook under a `$HOME` of its own, for the tests that need a config in it.
 fn codex_at_home(home: &std::path::Path, payload: &str) -> String {
     use std::io::Write;
+    let payload = payload.replace(&hooks::bare_home().to_string_lossy().into_owned(), &home.to_string_lossy());
     let mut child = std::process::Command::new(hooks::binary())
         .args(["hook", "codex"])
         .env("HOME", home)

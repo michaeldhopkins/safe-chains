@@ -45,7 +45,10 @@ pub(super) fn lexical_join(base: &str, rel: &str) -> String {
         match seg {
             "" | "." => {}
             ".." => {
-                if parts.pop().is_some_and(|part| part.contains(crate::cst::eval::TAGGED_PREFIX)) {
+                if parts
+                    .pop()
+                    .is_some_and(|part| part.contains(crate::cst::eval::TAGGED_PREFIX) || part == "safe-chains-unknown-workdir")
+                {
                     return super::UNRESOLVED_CWD.to_string();
                 }
             }

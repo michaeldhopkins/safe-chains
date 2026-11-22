@@ -71,7 +71,7 @@ fn is_foreign() -> bool {
     // force, a tool that runs the folder's own code asks. Developer and workspace treat the
     // sentinel as that folder. At reads a write stays a write, so the ceiling can explain it.
     if crate::pathctx::folder::is_unknown(&cwd) {
-        return crate::pathctx::folder::level().is_none();
+        return crate::pathctx::root().is_none() || crate::pathctx::folder::level().is_none();
     }
     if !cwd.starts_with('/') {
         return false;

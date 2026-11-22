@@ -203,13 +203,16 @@ fn cwd_write_verdict(declared: Option<Anchor>, named_write: bool) -> Verdict {
 /// writing there would be approved.
 fn folder_code_verdict(declared: Option<Anchor>) -> Verdict {
     let runs = matches!(declared, Some(Anchor::ImplicitOutput | Anchor::RunsFolderCode));
-    if !runs || super::cwd().is_none_or(|cwd| is_unknown(&cwd)) {
+    if !runs {
         return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    if super::cwd().is_none_or(|cwd| is_unknown(&cwd)) {
+        return if super::root_is_unknown() { Verdict::Denied } else { Verdict::Allowed(SafetyLevel::Inert) };
     }
     if crate::engine::resolve::frozen_reach::is_unreviewed_folder(".") {
         return Verdict::Denied;
     }
-    if !super::moved_by_cd() {
+    if !super::moved_by_cd() && has_workspace() {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     let frame = FrameGuard::push(None);

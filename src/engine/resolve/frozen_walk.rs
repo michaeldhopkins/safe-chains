@@ -157,7 +157,13 @@ fn in_project(path: &str) -> bool {
 fn walk_literal(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     let Some(dir) = on_disk(base) else {
         let unplaced = base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX);
-        return if unplaced && crate::pathctx::root().is_some_and(|r| r.starts_with('/')) { vec![unlisted(base)] } else { Vec::new() };
+        if unplaced && crate::pathctx::root().is_some_and(|r| r.starts_with('/')) {
+            return vec![unlisted(base)];
+        }
+        if crate::pathctx::root_is_unknown() {
+            return cut_short(base, walk);
+        }
+        return Vec::new();
     };
     if outside_sandbox(base) {
         return Vec::new();
@@ -293,12 +299,14 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
     let trimmed = base.trim_end_matches('/');
     let (parent, pattern) = trimmed.rsplit_once('/').map_or((".", trimmed), |(p, l)| (if p.is_empty() { "/" } else { p }, l));
     if parent.contains(['*', '?', '[']) {
-        return on_disk(".").map(|_| unlisted(base)).into_iter().collect();
+        return if on_disk(".").is_some() || crate::pathctx::root_is_unknown() { cut_short(base, walk) } else { Vec::new() };
     }
     if outside_sandbox(parent) {
         return Vec::new();
     }
-    let Some(parent_path) = on_disk(parent) else { return Vec::new() };
+    let Some(parent_path) = on_disk(parent) else {
+        return if crate::pathctx::root_is_unknown() { cut_short(base, walk) } else { Vec::new() };
+    };
     let entries = match open_dir(&parent_path) {
         Opened::Entries(entries) => entries,
         Opened::Unlisted => return vec![unlisted(base)],
@@ -358,7 +366,6 @@ fn clean_in_root(target: &std::path::Path, root: Option<&std::path::Path>) -> bo
 }
 
 pub(crate) fn on_disk(base: &str) -> Option<String> {
-    let root = crate::pathctx::root().filter(|r| r.starts_with('/'))?;
     if base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX) {
         return None;
     }
@@ -367,8 +374,9 @@ pub(crate) fn on_disk(base: &str) -> Option<String> {
         return crate::pathctx::join_cwd(None, &placed).filter(|home| home != crate::pathctx::UNRESOLVED_CWD);
     }
     if placed.starts_with('/') {
-        return Some(placed.into_owned());
+        return (!crate::pathctx::folder::is_unknown(&placed) && placed != crate::pathctx::UNRESOLVED_CWD).then(|| placed.into_owned());
     }
+    let root = crate::pathctx::root().filter(|r| r.starts_with('/'))?;
     Some(if placed.is_empty() || placed == "." { root } else { format!("{root}/{placed}") })
 }
 

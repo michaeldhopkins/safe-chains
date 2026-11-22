@@ -181,9 +181,8 @@ fn codex_hook_denies_gated_command() {
 
 #[test]
 fn codex_hook_handles_optional_cwd() {
-    // A safe command with cwd present: parses fine and emits nothing (safe → run).
-    let payload = r#"{"tool_input": {"command": "git status"}, "cwd": "/Users/me/project"}"#;
-    let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
+    let payload = format!(r#"{{"tool_input": {{"command": "git status"}}, "cwd": "{}/projects/project"}}"#, hooks::bare_home().display());
+    let (stdout, _stderr, code) = run_hook(&["hook", "codex"], &payload);
     assert_eq!(code, 0);
     assert_eq!(stdout, "");
 }
@@ -236,8 +235,11 @@ fn codex_hook_gated_non_overreach_uses_generic_reason() {
 
 #[test]
 fn antigravity_hook_safe_command_allows() {
-    let payload = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"git status"}},"workspacePaths":["/tmp/proj"]}"#;
-    let (stdout, _stderr, code) = run_hook(&["hook", "antigravity"], payload);
+    let payload = format!(
+        r#"{{"toolCall":{{"name":"run_command","args":{{"CommandLine":"git status"}}}},"workspacePaths":["{}/projects/proj"]}}"#,
+        hooks::bare_home().display()
+    );
+    let (stdout, _stderr, code) = run_hook(&["hook", "antigravity"], &payload);
     assert_eq!(code, 0);
     let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
     assert_eq!(v.get("decision").and_then(|d| d.as_str()), Some("allow"));
