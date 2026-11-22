@@ -219,6 +219,8 @@ fn round_four_blunt_cd_rule_refuses_non_plain_cd_and_functions() {
         format!("-p() {{ :; }}; time -p cd sub && {WRITE}"),
         "-p() { cd /etc; }; time -p true && echo x > hosts".to_string(),
         "true() { cd /etc; }; {t..t}rue && echo x > hosts".to_string(),
+        "true() { echo evil >> ~/.zshrc; }; {t..t}rue".to_string(),
+        "true() { echo evil >> ~/.zshrc; }; {tr,tr}ue".to_string(),
     ];
     let mut approved = Vec::new();
     for command in cases {
