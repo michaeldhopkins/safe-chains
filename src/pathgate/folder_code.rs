@@ -71,7 +71,7 @@ fn is_foreign() -> bool {
     // force, a tool that runs the folder's own code asks. Developer and workspace treat the
     // sentinel as that folder. At reads a write stays a write, so the ceiling can explain it.
     if crate::pathctx::folder::is_unknown(&cwd) {
-        return crate::pathctx::root().is_none() || crate::pathctx::folder::level().is_none();
+        return matches!(crate::pathctx::root(), crate::pathctx::Root::Unknown) || crate::pathctx::folder::level().is_none();
     }
     if !cwd.starts_with('/') {
         return false;
@@ -80,8 +80,9 @@ fn is_foreign() -> bool {
     if cwd == crate::pathctx::UNRESOLVED_CWD {
         return true;
     }
-    let root = crate::pathctx::root().map(|root| crate::pathctx::physical_directory(&root));
-    if root.as_deref().is_some_and(|root| inside(&cwd, root)) {
+    if let crate::pathctx::Root::Known(root) = crate::pathctx::root()
+        && inside(&cwd, &crate::pathctx::physical_directory(&root))
+    {
         return false;
     }
     let dir = format!("{}/", cwd.trim_end_matches('/'));

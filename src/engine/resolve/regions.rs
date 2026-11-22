@@ -915,7 +915,7 @@ fn peer_kind(path: &str) -> PeerKind {
     let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/')) else {
         return PeerKind::NotPeer;
     };
-    let Some(root_raw) = crate::pathctx::root() else {
+    let crate::pathctx::Root::Known(root_raw) = crate::pathctx::root() else {
         return PeerKind::NotPeer;
     };
     let root = if root_raw == home {

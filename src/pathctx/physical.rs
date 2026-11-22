@@ -210,9 +210,13 @@ fn glob(done: &[String], pattern: &str, rest: &VecDeque<(String, bool)>, follow_
 /// project itself, so the matches can be judged together as the pattern is written. The place is
 /// judged as a write, the stricter role.
 fn stays_unprotected(real: &str) -> bool {
-    let Some(root) = super::root().filter(|r| r.starts_with('/')).map(|r| root(&r)) else {
+    let super::Root::Known(root) = super::root() else {
         return false;
     };
+    if !root.starts_with('/') {
+        return false;
+    }
+    let root = self::root(&root);
     let inside = real == root || real.starts_with(&format!("{}/", root.trim_end_matches('/')));
     inside && !real.contains(['*', '?', '[']) && crate::engine::resolve::write_target_verdict(real) != crate::verdict::Verdict::Denied
 }

@@ -35,6 +35,10 @@ pub enum GateKind {
     /// It touches something safe-chains never lets an agent through to by asking, or it cannot be
     /// read well enough to say it does not.
     Boundary,
+    /// The work budget ran out before the command could be read. Nothing found marks it as
+    /// dangerous and nothing could say it is not, so a person who sees the command can decide where
+    /// the harness can ask; a boundary found by the text checks still outranks it.
+    TooLarge,
 }
 
 /// The kind of the gated `command`, from its text and its explanation.
@@ -48,7 +52,7 @@ pub fn gate_kind(
     approved_by_default: &dyn Fn(&str) -> bool,
 ) -> GateKind {
     let Some(_guard) = crate::cst::check::ClassifyGuard::enter(command.len()) else {
-        return GateKind::Boundary;
+        return too_large_unless_named_a_boundary(command);
     };
     if text_is_opaque(command) || words_name_a_boundary(command) || reaches_a_boundary(command) {
         return GateKind::Boundary;
@@ -66,14 +70,20 @@ pub fn gate_kind(
         text_is_opaque(segment)
             || words_name_a_boundary(segment)
             || segment_kind(segment, approved, approved_by_default(segment)) == GateKind::Boundary
-    }) || crate::cst::classify_budget::classify_budget_spent();
-    if any_boundary { GateKind::Boundary } else { GateKind::NotYet }
+    });
+    if any_boundary {
+        GateKind::Boundary
+    } else if crate::cst::classify_budget::classify_budget_spent() {
+        GateKind::TooLarge
+    } else {
+        GateKind::NotYet
+    }
 }
 
 /// The kind of one refused segment, from what [`fix_for`] says would approve it.
 pub fn segment_kind(segment: &str, approved: &dyn Fn(&str) -> bool, approved_by_default: bool) -> GateKind {
     let Some(_guard) = crate::cst::check::ClassifyGuard::enter(segment.len()) else {
-        return GateKind::Boundary;
+        return too_large_unless_named_a_boundary(segment);
     };
     let kind = match fix_for(segment, approved, approved_by_default) {
         Fix::Nothing(Because::ProtectedPath { reason, .. }) if is_boundary_reason(reason) => GateKind::Boundary,
@@ -87,7 +97,14 @@ pub fn segment_kind(segment: &str, approved: &dyn Fn(&str) -> bool, approved_by_
         }
         _ => GateKind::NotYet,
     };
-    if crate::cst::classify_budget::classify_budget_spent() { GateKind::Boundary } else { kind }
+    if kind != GateKind::Boundary && crate::cst::classify_budget::classify_budget_spent() { GateKind::TooLarge } else { kind }
+}
+
+/// What a command is when the work budget is spent before the checks that need it can run: only
+/// the checks that read the text need no budget, so a boundary they find still refuses, and
+/// anything else is too large to read.
+fn too_large_unless_named_a_boundary(text: &str) -> GateKind {
+    if text_is_opaque(text) || words_name_a_boundary(text) { GateKind::Boundary } else { GateKind::TooLarge }
 }
 
 fn is_boundary_reason(reason: ReachReason) -> bool {
@@ -104,10 +121,7 @@ fn is_boundary_reason(reason: ReachReason) -> bool {
 }
 
 fn reaches_a_boundary(command: &str) -> bool {
-    crate::operands::operand_words(command).is_none()
-        || crate::cst::classify_budget::classify_budget_spent()
-        || crate::workspace_reaches(command).any(|(_, reason)| is_boundary_reason(reason))
-        || crate::cst::classify_budget::classify_budget_spent()
+    crate::operands::operand_words(command).is_none() || crate::workspace_reaches(command).any(|(_, reason)| is_boundary_reason(reason))
 }
 
 /// Whether `word`, read from the working directory, passes through a link on disk and leads to a
@@ -115,11 +129,16 @@ fn reaches_a_boundary(command: &str) -> bool {
 /// committed as a link to `~/.ssh/id_rsa` is written like any file name. A link whose end cannot
 /// be found counts as leading out.
 fn leads_out_through_a_link(word: &str) -> bool {
-    let (Some(cwd), Some(root)) = (crate::pathctx::cwd(), crate::pathctx::root()) else {
+    let Some(cwd) = crate::pathctx::cwd() else {
         return false;
     };
+    // With no known root the working directory is the most that can be taken as the workspace, so a
+    // link met in it that leads anywhere else counts as leading out.
+    let root = match crate::pathctx::root() {
+        crate::pathctx::Root::Known(root) => std::path::PathBuf::from(root),
+        crate::pathctx::Root::Unknown => std::path::PathBuf::from(&cwd),
+    };
     let expanded = expand_home(word);
-    let root = std::path::Path::new(&root);
     let full = std::path::Path::new(&cwd).join(&expanded);
     // Walked as written, so a path that ends outside the workspace is left to the other checks,
     // which judge it as written; only links met inside the workspace count. The root's own place
@@ -134,15 +153,15 @@ fn leads_out_through_a_link(word: &str) -> bool {
             std::path::Component::Normal(name) => {
                 at.push(name);
                 crossed |=
-                    at.starts_with(root) && at != root && std::fs::symlink_metadata(&at).is_ok_and(|meta| meta.file_type().is_symlink());
+                    at.starts_with(&root) && at != root && std::fs::symlink_metadata(&at).is_ok_and(|meta| meta.file_type().is_symlink());
             }
             _ => {}
         }
     }
-    if !crossed || !at.starts_with(root) {
+    if !crossed || !at.starts_with(&root) {
         return false;
     }
-    let (Ok(real), Ok(workspace)) = (std::fs::canonicalize(&full), std::fs::canonicalize(root)) else {
+    let (Ok(real), Ok(workspace)) = (std::fs::canonicalize(&full), std::fs::canonicalize(&root)) else {
         return true;
     };
     let text = real.to_string_lossy();

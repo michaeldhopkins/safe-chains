@@ -18,7 +18,9 @@ use std::cell::RefCell;
 
 pub mod anchor;
 pub mod folder;
+mod root;
 pub(crate) use folder::judging;
+pub use root::{Root, root};
 mod home;
 pub mod item_shape;
 mod lexical;
@@ -109,29 +111,13 @@ pub fn cwd() -> Option<String> {
     CURRENT.with(|c| c.borrow().cwd.clone())
 }
 
-/// The workspace ROOT (project dir), if known — falling back to `cwd` (the hook defaults root to
-/// cwd). Used by the adjacent-sibling classifier to find the workspace's parent.
-pub fn root() -> Option<String> {
-    CURRENT.with(|c| {
-        let b = c.borrow();
-        b.root
-            .as_ref()
-            .or(b.cwd.as_ref())
-            .filter(|r| !folder::is_unknown(r) && *r != UNRESOLVED_CWD)
-            .cloned()
-    })
-}
-
-pub(crate) fn root_is_unknown() -> bool {
-    CURRENT.with(|c| c.borrow().root.is_some() || c.borrow().cwd.is_some()) && root().is_none()
-}
-
 /// Whether the absolute, already placed `abs` lies at or below the project root as the kernel sees
 /// it, including a root that is itself a protected place.
 pub(crate) fn placed_in_root(abs: &str) -> bool {
-    root()
-        .filter(|root| root.starts_with('/'))
-        .is_some_and(|root| crate::engine::resolve::regions::lies_in_root(abs, &physical::root(&root)))
+    match root() {
+        Root::Known(root) if root.starts_with('/') => crate::engine::resolve::regions::lies_in_root(abs, &physical::root(&root)),
+        Root::Known(_) | Root::Unknown => false,
+    }
 }
 
 pub fn in_session_scratchpad(path: &str) -> bool {
@@ -394,6 +380,10 @@ fn declared_substitution_directory(cur: Option<&str>, expanded: &str) -> Option<
     let rel = tail.trim_start_matches('/');
     Some(if rel.is_empty() { base.to_string() } else { lexical::lexical_join(base, rel) })
 }
+
+#[cfg(test)]
+#[path = "pathctx/root_consumers_tests.rs"]
+mod root_consumers_tests;
 
 #[cfg(test)]
 mod tests {

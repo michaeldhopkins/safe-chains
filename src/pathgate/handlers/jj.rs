@@ -82,8 +82,11 @@ pub(super) fn jj_destination(tokens: &[Token]) -> bool {
 
 fn moved_from_root() -> bool {
     let cwd = crate::pathctx::cwd();
-    let trim = |p: &Option<String>| p.as_deref().map(|p| p.trim_end_matches('/').to_string());
-    cwd.is_some() && trim(&cwd) != trim(&crate::pathctx::root())
+    let Some(cwd) = cwd else { return false };
+    match crate::pathctx::root() {
+        crate::pathctx::Root::Known(root) => cwd.trim_end_matches('/') != root.trim_end_matches('/'),
+        crate::pathctx::Root::Unknown => true,
+    }
 }
 
 fn writes_a_trust_root(tokens: &[Token], moved: bool) -> bool {

@@ -424,14 +424,31 @@ fn a_home_path_after_an_at_is_a_path_part_and_a_version_range_is_not() {
 }
 
 #[test]
-fn a_spent_classification_budget_keeps_a_refusal_a_boundary() {
+fn a_spent_classification_budget_makes_a_refusal_too_large_to_read_not_a_boundary() {
     in_gate_probe(|| {
         let cmd = "zzgatetool sync";
         let explanation = crate::explain_with_coverage_at_level(cmd, None);
         let _outer = crate::enter_classify_budget(cmd);
         while crate::cst::check::charge_classify_work(1) {}
-        assert_eq!(gate_kind(cmd, &explanation, &|_| false, &|_| false), GateKind::Boundary);
-        assert_eq!(segment_kind(cmd, &|_| false, false), GateKind::Boundary);
-        assert!(reaches_a_boundary(cmd));
+        assert_eq!(gate_kind(cmd, &explanation, &|_| false, &|_| false), GateKind::TooLarge);
+        assert_eq!(segment_kind(cmd, &|_| false, false), GateKind::TooLarge);
+        let named = "zzgatetool ~/.ssh/id_rsa";
+        let explanation = crate::explain_with_coverage_at_level(named, None);
+        assert_eq!(gate_kind(named, &explanation, &|_| false, &|_| false), GateKind::Boundary);
+    });
+}
+
+/// With no usable project root the workspace is unknown, so a link met in the folder cannot be
+/// shown to stay inside it: it counts as leading out, as a link whose end cannot be found does.
+#[test]
+fn a_link_is_followed_out_when_the_project_root_is_unknown() {
+    in_linked_workspace(|root| {
+        let _ctx = enter(PathCtx { cwd: Some(root.to_string()), root: Some(crate::pathctx::UNRESOLVED_CWD.to_string()), session_id: None });
+        for word in ["key", "rc", "out/hosts"] {
+            assert!(leads_out_through_a_link(word), "{word}");
+        }
+        for word in ["a.txt", "inner", "zz-missing"] {
+            assert!(!leads_out_through_a_link(word), "{word}");
+        }
     });
 }

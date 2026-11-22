@@ -145,7 +145,10 @@ fn spelled_dir(base: &str) -> Option<String> {
 }
 
 fn in_project(path: &str) -> bool {
-    let Some(root) = crate::pathctx::root().filter(|r| r.starts_with('/')) else { return false };
+    let crate::pathctx::Root::Known(root) = crate::pathctx::root() else { return false };
+    if !root.starts_with('/') {
+        return false;
+    }
     let root = root.trim_end_matches('/');
     let path = path.trim_end_matches('/');
     std::fs::canonicalize(path)
@@ -157,13 +160,11 @@ fn in_project(path: &str) -> bool {
 fn walk_literal(base: &str, walk: Walk, seen: &mut usize) -> Vec<Reach> {
     let Some(dir) = on_disk(base) else {
         let unplaced = base.contains('$') || base.contains(crate::cst::eval::TAGGED_PREFIX);
-        if unplaced && crate::pathctx::root().is_some_and(|r| r.starts_with('/')) {
-            return vec![unlisted(base)];
-        }
-        if crate::pathctx::root_is_unknown() {
-            return cut_short(base, walk);
-        }
-        return Vec::new();
+        return match crate::pathctx::root() {
+            crate::pathctx::Root::Known(root) if unplaced && root.starts_with('/') => vec![unlisted(base)],
+            crate::pathctx::Root::Known(_) => Vec::new(),
+            crate::pathctx::Root::Unknown => cut_short(base, walk),
+        };
     };
     if outside_sandbox(base) {
         return Vec::new();
@@ -191,10 +192,10 @@ struct Walker<'a> {
 
 impl Walker<'_> {
     fn run(mut self, seen: &mut usize) -> Vec<Reach> {
-        let root = (self.walk.links != WalkLinks::Ignore)
-            .then(crate::pathctx::root)
-            .flatten()
-            .and_then(|r| std::fs::canonicalize(r).ok());
+        let root = (self.walk.links != WalkLinks::Ignore).then(crate::pathctx::root).and_then(|root| match root {
+            crate::pathctx::Root::Known(root) => std::fs::canonicalize(root).ok(),
+            crate::pathctx::Root::Unknown => None,
+        });
         let walked = std::fs::canonicalize(self.dir).unwrap_or_else(|_| self.dir.into());
         let mut entered = HashSet::new();
         let mut missed = false;
@@ -299,13 +300,17 @@ fn through_glob(base: &str, walk: Walk, seen: &mut usize, walked: Option<&str>) 
     let trimmed = base.trim_end_matches('/');
     let (parent, pattern) = trimmed.rsplit_once('/').map_or((".", trimmed), |(p, l)| (if p.is_empty() { "/" } else { p }, l));
     if parent.contains(['*', '?', '[']) {
-        return if on_disk(".").is_some() || crate::pathctx::root_is_unknown() { cut_short(base, walk) } else { Vec::new() };
+        return if on_disk(".").is_some() || matches!(crate::pathctx::root(), crate::pathctx::Root::Unknown) {
+            cut_short(base, walk)
+        } else {
+            Vec::new()
+        };
     }
     if outside_sandbox(parent) {
         return Vec::new();
     }
     let Some(parent_path) = on_disk(parent) else {
-        return if crate::pathctx::root_is_unknown() { cut_short(base, walk) } else { Vec::new() };
+        return if matches!(crate::pathctx::root(), crate::pathctx::Root::Unknown) { cut_short(base, walk) } else { Vec::new() };
     };
     let entries = match open_dir(&parent_path) {
         Opened::Entries(entries) => entries,
@@ -376,7 +381,10 @@ pub(crate) fn on_disk(base: &str) -> Option<String> {
     if placed.starts_with('/') {
         return (!crate::pathctx::folder::is_unknown(&placed) && placed != crate::pathctx::UNRESOLVED_CWD).then(|| placed.into_owned());
     }
-    let root = crate::pathctx::root().filter(|r| r.starts_with('/'))?;
+    let crate::pathctx::Root::Known(root) = crate::pathctx::root() else { return None };
+    if !root.starts_with('/') {
+        return None;
+    }
     Some(if placed.is_empty() || placed == "." { root } else { format!("{root}/{placed}") })
 }
 

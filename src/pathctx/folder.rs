@@ -82,7 +82,7 @@ pub fn is_unknown(cwd: &str) -> bool {
 /// for a read: joined onto the unknown folder it would name an ordinary directory, while the real
 /// parent of an unknown folder can be anything, another user's home included.
 fn has_workspace() -> bool {
-    super::root().is_some()
+    matches!(super::root(), super::Root::Known(root) if !root.is_empty())
 }
 
 pub(super) fn place(cwd: &str, path: &str, stated: Option<Use>) -> Option<String> {
@@ -207,7 +207,10 @@ fn folder_code_verdict(declared: Option<Anchor>) -> Verdict {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     if super::cwd().is_none_or(|cwd| is_unknown(&cwd)) {
-        return if super::root_is_unknown() { Verdict::Denied } else { Verdict::Allowed(SafetyLevel::Inert) };
+        return match super::root() {
+            super::Root::Known(_) => Verdict::Allowed(SafetyLevel::Inert),
+            super::Root::Unknown => Verdict::Denied,
+        };
     }
     if crate::engine::resolve::frozen_reach::is_unreviewed_folder(".") {
         return Verdict::Denied;
@@ -222,10 +225,13 @@ fn folder_code_verdict(declared: Option<Anchor>) -> Verdict {
 }
 
 fn within_root(cwd: &str) -> bool {
-    super::root().is_some_and(|root| {
-        let root = root.trim_end_matches('/');
-        cwd.trim_end_matches('/') == root || cwd.starts_with(&format!("{root}/"))
-    })
+    match super::root() {
+        super::Root::Known(root) if !root.is_empty() => {
+            let root = root.trim_end_matches('/');
+            cwd.trim_end_matches('/') == root || cwd.starts_with(&format!("{root}/"))
+        }
+        super::Root::Known(_) | super::Root::Unknown => false,
+    }
 }
 
 fn mark_parent_accounted() {

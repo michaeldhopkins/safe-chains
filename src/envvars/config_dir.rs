@@ -49,7 +49,10 @@ pub(super) fn in_scratch(value: &str) -> bool {
 }
 
 fn spelled_as_the_projects_parent(abs: &str) -> Option<String> {
-    let root = crate::pathctx::join_cwd(None, &crate::pathctx::root()?)?;
+    let crate::pathctx::Root::Known(root) = crate::pathctx::root() else {
+        return None;
+    };
+    let root = crate::pathctx::join_cwd(None, &root)?;
     let (parent, _) = root.trim_end_matches('/').rsplit_once('/')?;
     let head = abs.get(..parent.len())?;
     let rest = abs.get(parent.len()..)?;

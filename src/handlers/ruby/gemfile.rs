@@ -23,16 +23,19 @@ pub(crate) fn loads_a_gemfile_out_of_sight(tokens: &[Token]) -> bool {
     if names_its_gemfile {
         return false;
     }
-    if crate::pathctx::root_is_unknown() || crate::pathctx::cwd().as_deref() == Some(crate::pathctx::UNRESOLVED_CWD) {
+    if crate::pathctx::cwd().as_deref() == Some(crate::pathctx::UNRESOLVED_CWD) {
         return true;
     }
-    nearest_gemfile().is_some_and(|path| !crate::engine::resolve::execute_file_verdict(&path.to_string_lossy()).is_allowed())
+    let crate::pathctx::Root::Known(root) = crate::pathctx::root() else {
+        return true;
+    };
+    nearest_gemfile(&root).is_some_and(|path| !crate::engine::resolve::execute_file_verdict(&path.to_string_lossy()).is_allowed())
 }
 
-fn nearest_gemfile() -> Option<std::path::PathBuf> {
+fn nearest_gemfile(root: &str) -> Option<std::path::PathBuf> {
     let cwd = crate::pathctx::cwd()
         .filter(|c| c.starts_with('/') && c != crate::pathctx::UNRESOLVED_CWD && !crate::pathctx::folder::is_unknown(c))
-        .or_else(crate::pathctx::root)
+        .or_else(|| Some(root.to_string()))
         .filter(|c| c.starts_with('/'))?;
     let start = std::fs::canonicalize(cwd).ok()?;
     start
