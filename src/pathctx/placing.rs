@@ -93,10 +93,10 @@ fn through_a_link_in_the_reported_folder(cwd: &str, path: &str, follow_last: boo
     if !(below.is_empty() || below.starts_with('/')) {
         return None;
     }
-    // Compared with the reported folder itself, so a link the `cd` walked into is met too.
+    // A link anywhere on the way counts, the reported folder's own spelling included: a session
+    // that ran `cd keys`, where `keys` leads to `~/.ssh`, reports the folder by the link's name.
     let reported = super::reported_folder()?;
     let below = below.trim_start_matches('/');
     let relative = if below.is_empty() { path.to_string() } else { format!("{below}/{path}") };
-    let real = physical::resolve(&format!("{}/{relative}", reported.trim_end_matches('/')), follow_last)?;
-    (real != lexical_join(&physical::root(&reported), &relative)).then_some(real)
+    physical::resolve(&format!("{}/{relative}", reported.trim_end_matches('/')), follow_last)
 }

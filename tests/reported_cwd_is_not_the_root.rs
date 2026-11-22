@@ -261,3 +261,66 @@ fn a_link_in_a_reported_folder_that_is_not_a_workspace_is_followed() {
     }
     assert!(approved.is_empty(), "read through a link out of the folder:\n{}", approved.join("\n"));
 }
+
+fn decision_as(harness: &str, home: &std::path::Path, cwd: &std::path::Path, command: &str) -> String {
+    let payload = match harness {
+        "grok" => serde_json::json!({ "toolName": "run_terminal_command", "toolInput": { "command": command }, "cwd": cwd, "workspaceRoot": cwd }),
+        "antigravity" => serde_json::json!({ "toolCall": { "name": "run_command", "args": { "CommandLine": command } }, "workspacePaths": [cwd] }),
+        "codex" => serde_json::json!({ "hook_event_name": "PermissionRequest", "tool_name": "Bash", "tool_input": { "command": command }, "cwd": cwd }),
+        _ => serde_json::json!({ "tool_name": "Bash", "tool_input": { "command": command }, "cwd": cwd }),
+    }
+    .to_string();
+    let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["hook", harness])
+        .env_clear()
+        .env("HOME", home)
+        .env("PATH", "/usr/bin:/bin")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .expect("spawn");
+    child.stdin.take().expect("stdin").write_all(payload.as_bytes()).expect("write");
+    String::from_utf8(child.wait_with_output().expect("wait").stdout).expect("utf-8")
+}
+
+const HARNESSES: [&str; 4] = ["claude", "grok", "antigravity", "codex"];
+
+/// The reported folder can itself be a link: a session that ran `cd keys`, where `keys` leads to
+/// `~/.ssh`, reports the folder by the link's name. Every relative read there lands in `~/.ssh`.
+#[test]
+fn a_reported_folder_that_is_a_link_to_a_credential_store_reads_as_that_store() {
+    let base = tempfile::tempdir().expect("tempdir");
+    let home = base.path().join("home");
+    let ssh = home.join(".ssh");
+    let outside = base.path().join("outside");
+    for dir in [&ssh, &outside] {
+        std::fs::create_dir_all(dir).expect("mkdir");
+    }
+    std::fs::write(ssh.join("config"), "Host x").expect("write config");
+    std::fs::write(ssh.join("id_rsa"), "secret-key").expect("write id_rsa");
+    let keys = outside.join("keys");
+    std::os::unix::fs::symlink(&ssh, &keys).expect("link to .ssh");
+    let through_home = outside.join("h");
+    std::os::unix::fs::symlink(&home, &through_home).expect("link to home");
+
+    let mut approved = Vec::new();
+    for harness in HARNESSES {
+        for (cwd, command) in [
+            (keys.clone(), "cat config"),
+            (keys.clone(), "cat ./config"),
+            (keys.clone(), "grep -r x"),
+            (keys.clone(), "grep -r x ."),
+            (keys.clone(), "head *"),
+            (keys.join("."), "cat config"),
+            (through_home.join(".ssh"), "cat config"),
+            (through_home.clone(), "cat .ssh/config"),
+            (through_home.clone(), "cd .ssh && cat config"),
+        ] {
+            if decision_as(harness, &home, &cwd, command).contains("\"allow\"") {
+                approved.push(format!("{harness}: `{command}` in {}", cwd.display()));
+            }
+        }
+    }
+    assert!(approved.is_empty(), "read a credential store through the reported folder:\n{}", approved.join("\n"));
+}
