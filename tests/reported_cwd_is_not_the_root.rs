@@ -107,7 +107,7 @@ fn known_workspaces_and_user_grants_become_the_root_while_protected_or_outside_d
 
     for valid in [home.join("projects/app"), home.join(".worktrees/wt-1"), granted.clone()] {
         std::fs::create_dir_all(&valid).expect("mkdir valid");
-        for cmd in ["echo hi > out.txt", "mise set FOO=bar", "ls"] {
+        for cmd in ["echo hi > out.txt", "mise set FOO=bar", "ls", "cargo --version"] {
             let out = decision(&home, &valid, cmd);
             assert!(out.contains("\"allow\""), "`{cmd}` should approve in known workspace {}: {out}", valid.display());
         }
