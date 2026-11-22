@@ -422,3 +422,16 @@ fn a_home_path_after_an_at_is_a_path_part_and_a_version_range_is_not() {
     assert!(path_parts("--data=@key").any(|part| part == "key"));
     assert!(!path_parts("lodash@~4.17.0").any(|part| part.starts_with('~')));
 }
+
+#[test]
+fn a_spent_classification_budget_keeps_a_refusal_a_boundary() {
+    in_gate_probe(|| {
+        let cmd = "zzgatetool sync";
+        let explanation = crate::explain_with_coverage_at_level(cmd, None);
+        let _outer = crate::enter_classify_budget(cmd);
+        while crate::cst::check::charge_classify_work(1) {}
+        assert_eq!(gate_kind(cmd, &explanation, &|_| false, &|_| false), GateKind::Boundary);
+        assert_eq!(segment_kind(cmd, &|_| false, false), GateKind::Boundary);
+        assert!(reaches_a_boundary(cmd));
+    });
+}

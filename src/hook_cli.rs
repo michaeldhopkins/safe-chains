@@ -121,6 +121,7 @@ fn run_hook_on(
     // classifies denied here too). Its REAL level in `overall` is then held under the SAME `<=
     // threshold` ceiling — so a lower `level` (reader) can't have the write it just gated re-admitted.
     // At the default band both are no-ops (no engine level, coverage `<= SafeWrite`).
+    let _budget = safe_chains::enter_classify_budget(&input.command);
     let explanation = safe_chains::explain_with_coverage_at_level(&input.command, engine_level);
 
     if let Verdict::Allowed(level) = explanation.overall

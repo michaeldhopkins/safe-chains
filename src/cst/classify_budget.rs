@@ -107,3 +107,8 @@ pub(crate) fn charge_classify_work(units: u32) -> bool {
         n <= MAX_CLASSIFY_WORK
     })
 }
+
+pub(crate) fn classify_budget_spent() -> bool {
+    CLASSIFY_WORK.with(std::cell::Cell::get) > MAX_CLASSIFY_WORK
+        || CLASSIFY_BYTES.with(std::cell::Cell::get) > CLASSIFY_BYTE_LIMIT.with(std::cell::Cell::get)
+}

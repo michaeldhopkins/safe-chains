@@ -6,7 +6,7 @@ mod brace_bash_tests;
 mod budget;
 mod cd;
 pub(crate) mod check;
-mod classify_budget;
+pub(crate) mod classify_budget;
 #[cfg(test)]
 mod classify_budget_tests;
 mod cwd_flow;

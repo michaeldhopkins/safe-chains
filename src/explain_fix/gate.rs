@@ -47,6 +47,9 @@ pub fn gate_kind(
     approved: &dyn Fn(&str) -> bool,
     approved_by_default: &dyn Fn(&str) -> bool,
 ) -> GateKind {
+    let Some(_guard) = crate::cst::check::ClassifyGuard::enter(command.len()) else {
+        return GateKind::Boundary;
+    };
     if text_is_opaque(command) || words_name_a_boundary(command) || reaches_a_boundary(command) {
         return GateKind::Boundary;
     }
@@ -63,13 +66,16 @@ pub fn gate_kind(
         text_is_opaque(segment)
             || words_name_a_boundary(segment)
             || segment_kind(segment, approved, approved_by_default(segment)) == GateKind::Boundary
-    });
+    }) || crate::cst::classify_budget::classify_budget_spent();
     if any_boundary { GateKind::Boundary } else { GateKind::NotYet }
 }
 
 /// The kind of one refused segment, from what [`fix_for`] says would approve it.
 pub fn segment_kind(segment: &str, approved: &dyn Fn(&str) -> bool, approved_by_default: bool) -> GateKind {
-    match fix_for(segment, approved, approved_by_default) {
+    let Some(_guard) = crate::cst::check::ClassifyGuard::enter(segment.len()) else {
+        return GateKind::Boundary;
+    };
+    let kind = match fix_for(segment, approved, approved_by_default) {
         Fix::Nothing(Because::ProtectedPath { reason, .. }) if is_boundary_reason(reason) => GateKind::Boundary,
         Fix::Nothing(Because::RunsAnAgent { .. } | Because::Unconfined { .. }) => GateKind::Boundary,
         Fix::Nothing(Because::RunsLater { path }) => {
@@ -80,7 +86,8 @@ pub fn segment_kind(segment: &str, approved: &dyn Fn(&str) -> bool, approved_by_
             }
         }
         _ => GateKind::NotYet,
-    }
+    };
+    if crate::cst::classify_budget::classify_budget_spent() { GateKind::Boundary } else { kind }
 }
 
 fn is_boundary_reason(reason: ReachReason) -> bool {
@@ -97,7 +104,10 @@ fn is_boundary_reason(reason: ReachReason) -> bool {
 }
 
 fn reaches_a_boundary(command: &str) -> bool {
-    crate::workspace_reaches(command).any(|(_, reason)| is_boundary_reason(reason))
+    crate::operands::operand_words(command).is_none()
+        || crate::cst::classify_budget::classify_budget_spent()
+        || crate::workspace_reaches(command).any(|(_, reason)| is_boundary_reason(reason))
+        || crate::cst::classify_budget::classify_budget_spent()
 }
 
 /// Whether `word`, read from the working directory, passes through a link on disk and leads to a
