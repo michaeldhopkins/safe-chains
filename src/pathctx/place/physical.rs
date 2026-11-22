@@ -125,7 +125,7 @@ fn unresolved() -> Outcome {
     Outcome::Followed(crate::pathctx::UNRESOLVED_CWD.to_string())
 }
 
-fn system_spelling(path: String) -> String {
+pub(in crate::pathctx) fn system_spelling(path: String) -> String {
     if let Some(rest) = path.strip_prefix(DATA_VOLUME).filter(|rest| rest.starts_with('/')) {
         return system_spelling(rest.to_string());
     }

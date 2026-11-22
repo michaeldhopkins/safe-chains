@@ -384,6 +384,10 @@ fn declared_substitution_directory(cur: Option<&str>, expanded: &str) -> Option<
 }
 
 #[cfg(test)]
+#[path = "pathctx/place_tests.rs"]
+mod place_tests;
+
+#[cfg(test)]
 #[path = "pathctx/root_consumers_tests.rs"]
 mod root_consumers_tests;
 

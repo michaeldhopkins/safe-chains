@@ -773,4 +773,5 @@ owed = [
 "src/suggest/tests.rs" = "suggest's test suite"
 "src/tests.rs" = "the crate's example test suite"
 "src/userconfig/tests.rs" = "userconfig's test suite"
+"src/pathctx/place_tests.rs" = "the placing suite (#[cfg(test)] mod in pathctx.rs)"
 "src/pathctx/root_consumers_tests.rs" = "the project-root reader ratchet (#[cfg(test)] mod in pathctx.rs)"

@@ -12,7 +12,7 @@ use super::home::home_path_inside_root;
 use super::lexical::{expand_home, express_relative_to_root, lexical_join};
 use super::{CURRENT, anchor, folder};
 
-pub(super) mod physical;
+pub(in crate::pathctx) mod physical;
 
 thread_local! {
     static ON_THE_LINK: Cell<bool> = const { Cell::new(false) };
