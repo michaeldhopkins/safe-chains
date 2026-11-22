@@ -133,12 +133,32 @@ proptest! {
 fn a_recursive_operand_that_cannot_be_placed_is_refused() {
     let p = project(&["src", "sub/.git"]);
     for cmd in [
-        "chmod -R 755 \"$(pwd)\"", "chmod -R 755 \"$(pwd)/src\"", "cp -r \"$(pwd)/sub/.\" dest",
+        "chmod -R 755 \"$(pwd)\"", "chmod -R 755 \"$(pwd)/sub\"", "cp -r \"$(pwd)/sub/.\" dest",
         "for d in . ; do chmod -R 755 \"$d\"; done",
     ] {
         assert!(!at(&p, cmd).is_allowed(), "{cmd} was approved");
     }
     assert!(at(&p, "chmod -R 755 src").is_allowed());
+}
+
+/// `$(pwd)` is the folder the command runs in, which is known, so a path built on it is that path:
+/// `"$(pwd)/src"` names `src`, and approving it is what approving `src` already does. The refusal
+/// this test used to hold was the unplaced `$(pwd)`, not a property of the operand.
+#[test]
+fn a_path_built_on_pwd_is_judged_as_the_same_path_without_it() {
+    for frozen_below in [false, true] {
+        let p = project(&["src", "work"]);
+        if frozen_below {
+            std::fs::create_dir_all(format!("{}/work/.git", p.root)).expect("frozen folder");
+        }
+        for cmd in RECURSIVE_WRITES {
+            let plain = cmd.replace("BASE", "work");
+            let built = cmd.replace("BASE/", "\"$(pwd)/work/\"").replace("BASE", "\"$(pwd)/work\"");
+            // rsync refuses any `$(…)` source whatever it names, which is stricter and stays so.
+            assert!(!at(&p, &built).is_allowed() || at(&p, &plain).is_allowed(), "{built} is laxer than {plain} (frozen below: {frozen_below})");
+            assert_eq!(at(&p, &plain).is_allowed(), !frozen_below, "{plain} (frozen below: {frozen_below})");
+        }
+    }
 }
 
 #[test]

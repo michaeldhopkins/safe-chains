@@ -49,7 +49,7 @@ fn execdir_is_judged_beside_each_match() {
         r"find ../../.claude -maxdepth 0 -execdir touch settings.json \;",
         r"find ~/.zshenv -execdir touch .zshrc \;",
         r#"find "$HOME/.claude/x" -execdir touch settings.json \;"#,
-        r#"find "$(pwd)" -maxdepth 0 -execdir rm -rf w \;"#,
+        r#"find "$(pwd)" -maxdepth 0 -execdir touch ../../.zshrc \;"#,
         r"find sub/x/.. -maxdepth 0 -execdir touch ../../.zshrc \;",
         r"find sub/x/y -maxdepth 0 -execdir touch ../../.zshrc \;",
         r"find sub/.. -maxdepth 0 -execdir rm -rf {} \;",
