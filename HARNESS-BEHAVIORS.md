@@ -650,8 +650,10 @@ e2e note):
 
 So **7 of 10 give a distinct project root** (env var for 4, payload for cursor,
 agy, and Grok); Codex/Copilot give `cwd` but no root; opencode's evaluate hook
-can see the command, and safe-chains installs no plugin so nothing arrives. When a root is unavailable, the classifier must fall back to today's
-`relative == worktree` assumption — use the signal where present, never regress.
+can see the command, and safe-chains installs no plugin so nothing arrives. When a hook reports a cwd but no root, a cwd inside a known workspace becomes the
+root. When it reports neither, or a cwd that is not a known workspace, the command is
+judged in an unknown folder: reads still approve, and anything that writes or runs
+the folder's code prompts.
 Env-var roots are read from the hook *process* env (set by the harness, not the
 agent's shell), so they are reasonably tamper-resistant.
 
