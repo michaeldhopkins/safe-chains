@@ -126,8 +126,8 @@ impl HookFormat for AntigravityHookFormat {
         let command = args.command_line.ok_or_else(|| ParseError { message: "no toolCall.args.CommandLine".into() })?;
         let root = env.workspace_paths.into_iter().next();
         // `Cwd` is where the command runs. Without it nothing says where, so the folder is unknown.
-        let cwd = super::declared_cwd(Some(super::UNKNOWN_WORKDIR.to_string()), args.cwd.as_deref());
-        Ok(HookInput { command, root, cwd, session_id: None, permission_mode: None })
+        let (cwd, cwd_declared) = super::declared_cwd(Some(super::UNKNOWN_WORKDIR.to_string()), args.cwd.as_deref());
+        Ok(HookInput { command, root, cwd, cwd_declared, session_id: None, permission_mode: None })
     }
 
     fn decision_pointer(&self) -> &'static str {

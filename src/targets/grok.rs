@@ -117,6 +117,7 @@ impl HookFormat for GrokHookFormat {
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
+            cwd_declared: false,
             // The project root arrives in the payload as `workspaceRoot`; grok also exports it as
             // `GROK_WORKSPACE_ROOT` and (for Claude compat) `CLAUDE_PROJECT_DIR`.
             root: envelope

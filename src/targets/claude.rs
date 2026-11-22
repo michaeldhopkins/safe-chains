@@ -100,6 +100,7 @@ impl HookFormat for ClaudeHookFormat {
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
+            cwd_declared: false,
             root: super::env_root("CLAUDE_PROJECT_DIR"),
             session_id: envelope.session_id,
             permission_mode: None,

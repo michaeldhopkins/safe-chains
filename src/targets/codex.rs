@@ -128,6 +128,7 @@ impl HookFormat for CodexHookFormat {
         Ok(HookInput {
             command: tool_input.command,
             cwd: envelope.cwd,
+            cwd_declared: false,
             root: None, // codex sends cwd but no distinct project root (HARNESS-BEHAVIORS.md)
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,
@@ -205,7 +206,14 @@ impl HookFormat for CodexPermissionRequestFormat {
         if !bounds_a_workspace(&envelope.cwd) {
             return Err(ParseError { message: format!("no usable workspace in cwd: {}", envelope.cwd) });
         }
-        Ok(HookInput { command: envelope.tool_input.command, cwd: Some(envelope.cwd), root: None, session_id: None, permission_mode: None })
+        Ok(HookInput {
+            command: envelope.tool_input.command,
+            cwd: Some(envelope.cwd),
+            cwd_declared: false,
+            root: None,
+            session_id: None,
+            permission_mode: None,
+        })
     }
 
     /// Codex reports the turn's cwd, but `exec_command` runs in its own `workdir`, which this

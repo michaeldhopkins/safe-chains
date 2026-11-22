@@ -181,7 +181,7 @@ pub fn evaluation_dirs(format: &dyn HookFormat, input: &HookInput) -> (Option<St
     }
     match (&input.cwd, valid_cwd) {
         (Some(_), Some(cwd)) => {
-            let root = valid_root.unwrap_or_else(|| cwd.clone());
+            let root = valid_root.unwrap_or_else(|| if input.cwd_declared { UNKNOWN_WORKDIR.to_string() } else { cwd.clone() });
             (Some(cwd), Some(root))
         }
         (Some(raw), None) if valid_root.is_none() && is_a_plain_folder(raw) => (Some(raw.clone()), Some(UNKNOWN_WORKDIR.to_string())),
@@ -223,6 +223,9 @@ impl std::error::Error for ParseError {}
 pub struct HookInput {
     pub command: String,
     pub cwd: Option<String>,
+    /// True when `cwd` is an absolute directory the model named in place of the folder the harness
+    /// reported. That directory is where the command runs and never becomes the project root.
+    pub cwd_declared: bool,
     /// The project root, when the harness supplies one (HP-19) — a `*_PROJECT_DIR` env var
     /// for most, `workspace_roots` in the payload for cursor. Absent for codex/copilot.
     pub root: Option<String>,

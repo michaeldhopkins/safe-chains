@@ -7,17 +7,23 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
 fn decide(harness: &str, home: &Path, cwd: &Path, payload: &serde_json::Value) -> bool {
-    let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
-        .args(["hook", harness])
+    decide_with(harness, home, cwd, payload, &[])
+}
+
+fn decide_with(harness: &str, home: &Path, cwd: &Path, payload: &serde_json::Value, env: &[(&str, &Path)]) -> bool {
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_safe-chains"));
+    cmd.args(["hook", harness])
         .current_dir(cwd)
         .env_clear()
         .env("HOME", home)
         .env("PATH", "/usr/bin:/bin")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .stderr(Stdio::null())
-        .spawn()
-        .expect("spawn");
+        .stderr(Stdio::null());
+    for (key, value) in env {
+        cmd.env(key, value);
+    }
+    let mut child = cmd.spawn().expect("spawn");
     child.stdin.take().expect("stdin").write_all(payload.to_string().as_bytes()).expect("write");
     String::from_utf8(child.wait_with_output().expect("wait").stdout)
         .expect("utf-8")
@@ -103,5 +109,43 @@ fn gemini_and_qwen_judge_a_command_where_its_directory_argument_runs_it() {
             .filter(|c| run(c, Some(&home)) || run(c, Some(Path::new("../.."))))
             .collect();
         assert!(approved.is_empty(), "{harness} judged a command in the reported folder that runs elsewhere:\n{}", approved.join("\n"));
+    }
+}
+
+/// A directory the model names (`Cwd`, `dir_path`, `directory`) is where the command runs. It is
+/// not the project. When the harness workspace is outside the known workspace folders, or is home
+/// itself, `rm -rf src` in `~/projects/other` prompts. The same delete inside a valid workspace
+/// is still approved.
+#[test]
+fn a_declared_directory_never_becomes_the_project_root() {
+    let (base, home, proj) = fixture();
+    let other = home.join("projects/other");
+    std::fs::create_dir_all(other.join("src")).expect("mkdir");
+    let elsewhere = base.path().join("elsewhere");
+    std::fs::create_dir_all(&elsewhere).expect("mkdir");
+
+    let agy = |command: &str, cwd: &Path, workspace: &Path| {
+        let payload = serde_json::json!({
+            "toolCall": { "name": "run_command", "args": { "CommandLine": command, "Cwd": cwd } },
+            "workspacePaths": [workspace],
+        });
+        decide("antigravity", &home, workspace, &payload)
+    };
+    assert!(agy("rm -rf sub", &proj, &proj), "control: a delete inside the valid workspace is approved");
+    assert!(!agy("rm -rf src", &other, &elsewhere), "antigravity: a declared Cwd became the project root");
+
+    for (harness, field, var) in [("gemini", "dir_path", "GEMINI_PROJECT_DIR"), ("qwen", "directory", "QWEN_PROJECT_DIR")] {
+        let run = |command: &str, dir: &Path, project: &Path| {
+            let payload = serde_json::json!({
+                "tool_name": "run_shell_command",
+                "tool_input": { "command": command, field: dir },
+                "cwd": project,
+            });
+            decide_with(harness, &home, project, &payload, &[(var, project)])
+        };
+        assert!(run("rm -rf sub", &proj, &proj), "{harness} control: a delete inside the valid workspace is approved");
+        for project in [&elsewhere, &home] {
+            assert!(!run("rm -rf src", &other, project), "{harness}: a declared directory became the project root ({})", project.display());
+        }
     }
 }

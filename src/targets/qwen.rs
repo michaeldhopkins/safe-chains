@@ -108,9 +108,11 @@ impl HookFormat for QwenHookFormat {
         {
             return Err(ParseError { message: format!("not a shell tool: {name}") });
         }
+        let (cwd, cwd_declared) = super::declared_cwd(envelope.cwd, envelope.tool_input.directory.as_deref());
         Ok(HookInput {
             command: envelope.tool_input.command,
-            cwd: super::declared_cwd(envelope.cwd, envelope.tool_input.directory.as_deref()),
+            cwd,
+            cwd_declared,
             root: super::env_root("QWEN_PROJECT_DIR"),
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,
