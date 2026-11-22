@@ -370,8 +370,8 @@ contract, CLI tab: [Hooks](https://antigravity.google/docs/hooks).
   is the explanation. `overwrite` shallow-merges into `toolCall.args`. `permissionOverrides`
   is a list of resource strings.
 - **What safe-chains emits.** `decision: "allow"` for a safe command and `force_ask` for a
-  gated command. It does not emit `auto_approve`. It reads `workspacePaths[0]` as both cwd
-  and root and does not read `toolCall.args.Cwd`.
+  gated command. It does not emit `auto_approve`. It reads `workspacePaths[0]` as the root only
+  and judges the command in `toolCall.args.Cwd`; with no `Cwd` the folder is unknown.
 - **Live drive (v1.1.2, 2026-07-13).** `deny` blocked `cat /etc/hosts` and showed the reason.
   `force_ask` prompted. `ask` respected the Always Allow cache. `allow`, with and without
   `permissionOverrides`, still prompted. A missing decision prompted rather than ran.
@@ -595,6 +595,20 @@ the English source. Not driven live.
 
 Verified: qwen 0.25.3 2026-10-21
 
+#### Directory arguments on the shell tool (checked 2026-11-22)
+
+The command runs in the call's own directory, not the cwd the payload reports, so safe-chains
+reads it. An absolute directory is the cwd. A relative or empty one, or (agy) an absent `Cwd`,
+leaves the folder unknown, so a command that depends on where its relative paths point prompts.
+
+- **Gemini CLI**: `run_shell_command` takes `dir_path`, "the absolute path or relative path from
+  workspace root where the command runs"
+  ([shell tool docs](https://geminicli.com/docs/tools/shell/)).
+- **Qwen Code**: `ShellToolParams` has `directory`, used as `this.params.directory ||
+  this.config.getTargetDir()`
+  ([shell.ts at v0.25.3](https://github.com/QwenLM/qwen-code/blob/v0.25.3/packages/core/src/tools/shell.ts)).
+- **Antigravity**: `toolCall.args.Cwd` (above).
+
 ## Model-visible context injection (`additionalContext`)
 
 This is what powers the chain-explainer feedback (`cst::explain`). It injects
@@ -639,11 +653,11 @@ e2e note):
 |----------|:---------------:|:------------:|------------------|
 | Claude   | ✅ | ✅ | `CLAUDE_PROJECT_DIR` env var (hook process) |
 | Cursor   | ✅ | ✅ | `workspace_roots[]` in the payload JSON |
-| Gemini   | ✅ (also `GEMINI_CWD` env) | ✅ | `GEMINI_PROJECT_DIR` env var |
-| agy      | ✅ (`toolCall.args.Cwd`; safe-chains reads `workspacePaths[0]`) | ✅ | `workspacePaths[0]` in the payload |
+| Gemini   | ✅ (also `GEMINI_CWD` env; `tool_input.dir_path` is read as the cwd when present) | ✅ | `GEMINI_PROJECT_DIR` env var |
+| agy      | ✅ (`toolCall.args.Cwd`, read as the cwd; absent means unknown) | ✅ | `workspacePaths[0]` in the payload |
 | Grok     | ✅ | ✅ | `workspaceRoot` in the payload (also `GROK_WORKSPACE_ROOT`) |
 | Droid    | ✅ | ✅ | `FACTORY_PROJECT_DIR` env var |
-| Qwen     | ✅ | ✅ | `QWEN_PROJECT_DIR` env var |
+| Qwen     | ✅ (`tool_input.directory` is read as the cwd when present) | ✅ | `QWEN_PROJECT_DIR` env var |
 | Codex    | ✅ | ❌ | session `cwd` only — no distinct project root; `exec_command`'s workdir is omitted |
 | Copilot  | ✅ | ❌ | cwd only — no documented root field/var |
 | opencode | ❌ in safe-chains | ❌ in safe-chains | v2 `permission.evaluate` receives the shell command as a resource; safe-chains installs no plugin |
