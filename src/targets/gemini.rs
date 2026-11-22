@@ -70,6 +70,9 @@ struct GeminiHookFormat;
 #[derive(Deserialize)]
 struct ToolInput {
     command: String,
+    /// Where the command runs: absolute, or relative to the workspace root.
+    #[serde(default)]
+    dir_path: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -97,7 +100,7 @@ impl HookFormat for GeminiHookFormat {
         }
         Ok(HookInput {
             command: envelope.tool_input.command,
-            cwd: envelope.cwd,
+            cwd: super::declared_cwd(envelope.cwd, envelope.tool_input.dir_path.as_deref()),
             root: super::env_root("GEMINI_PROJECT_DIR"),
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,

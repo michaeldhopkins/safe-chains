@@ -81,6 +81,9 @@ impl QwenHookFormat {
 #[derive(Deserialize)]
 struct ToolInput {
     command: String,
+    /// Where the command runs (`ShellToolParams.directory` in qwen-code v0.25.3).
+    #[serde(default)]
+    directory: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -107,7 +110,7 @@ impl HookFormat for QwenHookFormat {
         }
         Ok(HookInput {
             command: envelope.tool_input.command,
-            cwd: envelope.cwd,
+            cwd: super::declared_cwd(envelope.cwd, envelope.tool_input.directory.as_deref()),
             root: super::env_root("QWEN_PROJECT_DIR"),
             // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
             session_id: None,

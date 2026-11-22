@@ -3,6 +3,8 @@ use std::path::{Path, PathBuf};
 use crate::verdict::{SafetyLevel, Verdict};
 
 pub mod agy;
+mod declared;
+pub(crate) use declared::declared_cwd;
 pub mod claude;
 pub mod codex;
 pub mod copilot;

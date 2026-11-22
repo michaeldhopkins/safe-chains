@@ -1,0 +1,107 @@
+//! A harness whose reported folder is not where its command runs must never let that folder decide
+//! an approval. Codex reports its session cwd while `exec_command` runs in a `workdir` it leaves out;
+//! Antigravity reports `workspacePaths` while `run_command` runs in `toolCall.args.Cwd`.
+
+use std::io::Write;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
+
+fn decide(harness: &str, home: &Path, cwd: &Path, payload: &serde_json::Value) -> bool {
+    let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))
+        .args(["hook", harness])
+        .current_dir(cwd)
+        .env_clear()
+        .env("HOME", home)
+        .env("PATH", "/usr/bin:/bin")
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn()
+        .expect("spawn");
+    child.stdin.take().expect("stdin").write_all(payload.to_string().as_bytes()).expect("write");
+    String::from_utf8(child.wait_with_output().expect("wait").stdout)
+        .expect("utf-8")
+        .contains("\"allow\"")
+}
+
+fn fixture() -> (tempfile::TempDir, PathBuf, PathBuf) {
+    let base = tempfile::tempdir_in("/Users/Shared").expect("tempdir under a non-temp folder");
+    let home = base.path().join("home");
+    let proj = home.join("projects/proj");
+    std::fs::create_dir_all(proj.join(".git")).expect("mkdir");
+    std::fs::create_dir_all(proj.join("sub")).expect("mkdir");
+    std::fs::create_dir_all(home.join("Documents")).expect("mkdir");
+    std::fs::create_dir_all(home.join(".config")).expect("mkdir");
+    std::fs::write(home.join(".config/safe-chains.toml"), "").expect("config");
+    std::fs::write(home.join("Documents/tax.pdf"), "private").expect("file");
+    std::fs::write(home.join(".zsh_history"), "history").expect("file");
+    (base, home, proj)
+}
+
+/// A link committed in the reported folder (`src -> /usr/share/man/man1`) makes a path that climbs
+/// out of the folder land somewhere harmless there. Codex runs the command in its `workdir`, where
+/// `src` is an ordinary folder and the same spelling reaches `~/Documents`. Without the link the
+/// climb is placed nowhere and prompts, so the reported folder alone turned a prompt into an allow.
+#[test]
+fn a_link_in_codex_reported_folder_does_not_place_a_climb_out_of_the_unknown_folder() {
+    let (_base, home, proj) = fixture();
+    std::os::unix::fs::symlink("/usr/share/man/man1", proj.join("src")).expect("link");
+    let codex = |c: &str| {
+        let payload = serde_json::json!({
+            "hook_event_name": "PermissionRequest",
+            "tool_name": "Bash",
+            "tool_input": { "command": c },
+            "cwd": proj,
+        });
+        decide("codex", &home, &proj, &payload)
+    };
+    assert!(!codex("cat sub/../../../Documents/tax.pdf"), "control: a climb out of the unknown folder prompts");
+    let approved: Vec<&str> =
+        ["cat src/../../../Documents/tax.pdf", "cd src && cat ../../../Documents/tax.pdf", "cat src/../../../.zsh_history"]
+            .into_iter()
+            .filter(|c| codex(c))
+            .collect();
+    assert!(approved.is_empty(), "a link in codex's reported folder placed a climb out of the unknown folder:\n{}", approved.join("\n"));
+}
+
+/// Antigravity runs `run_command` in `toolCall.args.Cwd`, not in `workspacePaths[0]`, so a relative
+/// path judged in the workspace may name a file of another folder (here, home).
+#[test]
+fn antigravity_judges_a_command_where_its_cwd_argument_runs_it() {
+    let (_base, home, proj) = fixture();
+    let agy = |c: &str, cwd: &Path| {
+        let payload = serde_json::json!({
+            "toolCall": { "name": "run_command", "args": { "CommandLine": c, "Cwd": cwd } },
+            "workspacePaths": [proj],
+        });
+        decide("antigravity", &home, &proj, &payload)
+    };
+    assert!(agy("rm -rf sub", &proj), "control: a delete in the workspace it runs in is approved");
+    let approved: Vec<&str> = ["rm -rf Documents", "echo x > .zshrc"].into_iter().filter(|c| agy(c, &home)).collect();
+    assert!(approved.is_empty(), "antigravity's workspace decided a command that runs in home:\n{}", approved.join("\n"));
+}
+
+/// Gemini CLI's `run_shell_command` takes `dir_path` (absolute, or relative to the workspace root)
+/// and Qwen's takes `directory`; the command runs there, not in the reported cwd. A name the hook
+/// cannot place leaves the folder unknown, so a relative path is never judged in the workspace.
+#[test]
+fn gemini_and_qwen_judge_a_command_where_its_directory_argument_runs_it() {
+    let (_base, home, proj) = fixture();
+    for (harness, field) in [("gemini", "dir_path"), ("qwen", "directory")] {
+        let run = |c: &str, dir: Option<&Path>| {
+            let mut input = serde_json::json!({ "command": c });
+            if let Some(dir) = dir {
+                input[field] = serde_json::json!(dir);
+            }
+            let payload = serde_json::json!({ "tool_name": "run_shell_command", "tool_input": input, "cwd": proj });
+            decide(harness, &home, &proj, &payload)
+        };
+        assert!(run("rm -rf sub", None), "{harness} control: a delete in the reported folder is approved");
+        assert!(run("rm -rf sub", Some(&proj)), "{harness} control: a named folder that is the workspace is approved");
+        let approved: Vec<&str> = ["rm -rf Documents", "echo x > .zshrc"]
+            .into_iter()
+            .filter(|c| run(c, Some(&home)) || run(c, Some(Path::new("../.."))))
+            .collect();
+        assert!(approved.is_empty(), "{harness} judged a command in the reported folder that runs elsewhere:\n{}", approved.join("\n"));
+    }
+}

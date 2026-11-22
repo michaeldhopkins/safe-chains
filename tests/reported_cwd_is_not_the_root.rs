@@ -265,7 +265,7 @@ fn a_link_in_a_reported_folder_that_is_not_a_workspace_is_followed() {
 fn decision_as(harness: &str, home: &std::path::Path, cwd: &std::path::Path, command: &str) -> String {
     let payload = match harness {
         "grok" => serde_json::json!({ "toolName": "run_terminal_command", "toolInput": { "command": command }, "cwd": cwd, "workspaceRoot": cwd }),
-        "antigravity" => serde_json::json!({ "toolCall": { "name": "run_command", "args": { "CommandLine": command } }, "workspacePaths": [cwd] }),
+        "antigravity" => serde_json::json!({ "toolCall": { "name": "run_command", "args": { "CommandLine": command, "Cwd": cwd } }, "workspacePaths": [cwd] }),
         "codex" => serde_json::json!({ "hook_event_name": "PermissionRequest", "tool_name": "Bash", "tool_input": { "command": command }, "cwd": cwd }),
         _ => serde_json::json!({ "tool_name": "Bash", "tool_input": { "command": command }, "cwd": cwd }),
     }

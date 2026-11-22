@@ -28,6 +28,7 @@ owed = [
 
 [pure]
 "src/registry/passthrough_gate.rs" = ["src/registry/tests.rs::a_passthrough_beside_any_non_policy_modifier_is_never_accepted"]
+"src/targets/declared.rs" = ["a_named_directory_is_used_only_when_absolute_and_otherwise_unknown"]
 "src/cst/cd.rs" = ["cdpath_redirects_only_an_unanchored_name"]
 "src/cst/cwd_flow.rs" = ["a_union_keeps_every_folder_or_collapses_to_unknown", "a_flow_after_an_or_starts_only_from_failures", "exactly_the_cap_of_distinct_folders_is_kept_and_one_more_collapses", "an_or_keeps_the_successes_of_both_sides_and_the_failures_of_the_last"]
 "src/cst/check.rs" = [

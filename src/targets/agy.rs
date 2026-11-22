@@ -85,6 +85,9 @@ struct AntigravityHookFormat;
 struct ToolArgs {
     #[serde(rename = "CommandLine")]
     command_line: Option<String>,
+    /// The directory `run_command` runs in. `workspacePaths` is only the root.
+    #[serde(rename = "Cwd", default)]
+    cwd: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -117,12 +120,14 @@ impl HookFormat for AntigravityHookFormat {
         {
             return Err(ParseError { message: format!("not a shell tool: {name}") });
         }
-        let command = tool_call
+        let args = tool_call
             .and_then(|t| t.args)
-            .and_then(|a| a.command_line)
             .ok_or_else(|| ParseError { message: "no toolCall.args.CommandLine".into() })?;
-        let cwd = env.workspace_paths.into_iter().next();
-        Ok(HookInput { command, root: cwd.clone(), cwd, session_id: None, permission_mode: None })
+        let command = args.command_line.ok_or_else(|| ParseError { message: "no toolCall.args.CommandLine".into() })?;
+        let root = env.workspace_paths.into_iter().next();
+        // `Cwd` is where the command runs. Without it nothing says where, so the folder is unknown.
+        let cwd = super::declared_cwd(Some(super::UNKNOWN_WORKDIR.to_string()), args.cwd.as_deref());
+        Ok(HookInput { command, root, cwd, session_id: None, permission_mode: None })
     }
 
     fn decision_pointer(&self) -> &'static str {
@@ -275,7 +280,10 @@ mod tests {
         let input = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"cat /etc/hosts"}},"workspacePaths":["/w"]}"#;
         let parsed = AntigravityHookFormat.parse_input(input).unwrap();
         assert_eq!(parsed.command, "cat /etc/hosts");
-        assert_eq!(parsed.cwd.as_deref(), Some("/w"));
+        assert_eq!(parsed.root.as_deref(), Some("/w"));
+        assert_eq!(parsed.cwd.as_deref(), Some(super::super::UNKNOWN_WORKDIR), "no Cwd argument: the folder is unknown");
+        let with_cwd = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"ls","Cwd":"/w/sub"}},"workspacePaths":["/w"]}"#;
+        assert_eq!(AntigravityHookFormat.parse_input(with_cwd).unwrap().cwd.as_deref(), Some("/w/sub"));
     }
 
     #[test]
