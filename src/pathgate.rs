@@ -581,7 +581,7 @@ fn walk_for(spec: &RoleSpec, tokens: &[Token], standalone: &dyn Fn(&str) -> bool
     }
     let last_write = matches!(spec.shape, Shape::LastWrite | Shape::Remote);
     let links = crate::engine::resolve::link_mode::Links::of(tokens);
-    let skip_first = spec.shape == Shape::SkipFirst && !crate::handlers::pattern_flags::supplies_pattern(tokens);
+    let skip_first = skip_first_adding_its_folder(spec, positional_role, tokens, &mut positionals);
     positionals.iter().enumerate().any(|(idx, &p)| {
         if skip_first && idx == 0 {
             return false;
@@ -600,6 +600,17 @@ fn walk_for(spec: &RoleSpec, tokens: &[Token], standalone: &dyn Fn(&str) -> bool
         let judged = || gate(role, p) || copy_reaches(p, &positionals, links, (last_write && role == Role::ReadTree, role == Role::Write));
         if links.on_link && role != Role::Write { crate::pathctx::on_the_link(judged) } else { judged() }
     })
+}
+
+/// Whether the first positional is the pattern rather than a path. A search given no path searches
+/// the folder it runs in, as `rg pattern` does, so that folder is added as the path it reads.
+fn skip_first_adding_its_folder(spec: &RoleSpec, role: Role, tokens: &[Token], positionals: &mut Vec<&str>) -> bool {
+    let skip_first = spec.shape == Shape::SkipFirst && !crate::handlers::pattern_flags::supplies_pattern(tokens);
+    if spec.shape == Shape::SkipFirst && role == Role::ReadTree && positionals.len() <= usize::from(skip_first) {
+        positionals.resize(usize::from(skip_first), crate::engine::resolve::locus::UNKNOWABLE_ITEM);
+        positionals.push(".");
+    }
+    skip_first
 }
 
 /// A `host:path` remote endpoint: a `:` appears before any `/`.
