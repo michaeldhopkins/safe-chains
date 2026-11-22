@@ -106,6 +106,9 @@ fn begin_resolving(name: &str) -> Option<ResolveScope> {
 /// So does a `hash` that binds a name to a path (`hash -p /bin/rm ls`, zsh's `hash ls=/bin/rm`):
 /// the shell then runs that file for the name, ahead of PATH.
 pub(super) fn call_verdict(cmd: &SimpleCmd, name: &str) -> Option<Verdict> {
+    if cmd.words[0].expand().iter().any(|alt| alt != name && ever_defined(alt)) {
+        return Some(Verdict::Denied);
+    }
     if body_unknown(name) || rebinds_a_name(cmd, name) {
         return Some(Verdict::Denied);
     }
@@ -201,4 +204,10 @@ fn may_split(word: &super::Word) -> bool {
 /// Whether any definition in this evaluation bound `name`, in scope now or not.
 pub(crate) fn ever_defined(name: &str) -> bool {
     DEFINED.with(|d| d.borrow().iter().any(|n| n == name)) || names_a_function(name)
+}
+
+pub(crate) fn any_defined() -> bool {
+    DEFINED.with(|d| !d.borrow().is_empty())
+        || FUNCTIONS.with(|f| !f.borrow().is_empty())
+        || POISONED_FUNCS.with(|p| !p.borrow().is_empty())
 }

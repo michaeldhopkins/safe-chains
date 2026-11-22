@@ -125,6 +125,9 @@ fn a_timed_cd_moves_the_shell_like_a_plain_one() {
 #[test]
 fn a_timed_cd_is_tracked_like_a_plain_one_in_both_directions() {
     let machine = Machine::new();
+    for command in ["time cd sub && ls", "time -p cd sub && ls"] {
+        assert!(machine.approves(command), "`{command}` should stay approved for reads without relative paths");
+    }
     for command in [
         "time cd sub && echo x > f",
         "time -p cd sub && echo x > f",
@@ -132,10 +135,6 @@ fn a_timed_cd_is_tracked_like_a_plain_one_in_both_directions() {
         "time cd sub && ls || echo x > f",
         &format!("time cd sub && {WRITE}"),
         &format!("time -p cd ./q && (true || {WRITE})"),
-    ] {
-        assert!(machine.approves(command), "`{command}` should be judged like the untimed form");
-    }
-    for command in [
         &format!("time cd ./q || {WRITE}"),
         &format!("time -p cd ./q; {WRITE}"),
         &format!("! time cd ./q && {WRITE}"),
@@ -204,4 +203,28 @@ fn non_literal_or_shadowed_cd_and_time_spellings_leave_the_folder_unknown() {
     ] {
         assert!(!machine.approves(&command), "`{command}` was approved");
     }
+}
+
+#[test]
+fn round_four_blunt_cd_rule_refuses_non_plain_cd_and_functions() {
+    let machine = Machine::new();
+    let cases = [
+        format!("cd -e sub && {WRITE}"),
+        format!("cd -e .. && {WRITE}"),
+        "cd -L sub && echo x > f".to_string(),
+        "cd -P sub && echo x > f".to_string(),
+        "cd -- sub && echo x > f".to_string(),
+        format!("2>/dev/null time cd sub && {WRITE}"),
+        "f() { cd /etc; }; time f && echo x > hosts".to_string(),
+        format!("-p() {{ :; }}; time -p cd sub && {WRITE}"),
+        "-p() { cd /etc; }; time -p true && echo x > hosts".to_string(),
+        "true() { cd /etc; }; {t..t}rue && echo x > hosts".to_string(),
+    ];
+    let mut approved = Vec::new();
+    for command in cases {
+        if machine.approves(&command) {
+            approved.push(command);
+        }
+    }
+    assert!(approved.is_empty(), "still approved:\n{}", approved.join("\n"));
 }

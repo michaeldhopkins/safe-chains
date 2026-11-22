@@ -34,64 +34,20 @@ pub(super) fn cd_target(pipeline: &Pipeline) -> Option<(String, bool)> {
     let [Cmd::Simple(s)] = pipeline.commands.as_slice() else {
         return None;
     };
-    if !s.env.is_empty() || super::functions::names_a_function("cd") || super::functions::ever_defined("cd") {
+    if !s.env.is_empty() || !s.redirs.is_empty() || super::functions::any_defined() {
         return None;
     }
-    let words: Vec<String> = s.words.iter().map(plain_literal).collect::<Option<_>>()?;
-    let mut words = words.into_iter().peekable();
-    if words.peek().is_some_and(|word| word == "time") {
-        if super::functions::names_a_function("time") || super::functions::ever_defined("time") {
-            return None;
-        }
-        words.next();
-        while let Some(flag) = words.peek() {
-            match flag.as_str() {
-                "-p" => {
-                    words.next();
-                }
-                "--" => {
-                    words.next();
-                    break;
-                }
-                _ => break,
-            }
-        }
-    }
-    if words.next().as_deref() != Some("cd") {
+    let [cmd, target] = s.words.as_slice() else {
+        return None;
+    };
+    if plain_literal(cmd).as_deref() != Some("cd") {
         return None;
     }
-    let mut physical = false;
-    let mut args = words;
-    let mut target = None;
-    for arg in &mut args {
-        if arg == "--" {
-            target = args.next();
-            break;
-        }
-        if let Some(flags) = arg.strip_prefix('-') {
-            if flags.is_empty() || !flags.chars().all(|c| matches!(c, 'L' | 'P' | 'e' | '@')) {
-                return None;
-            }
-            for c in flags.chars() {
-                match c {
-                    'L' => physical = false,
-                    'P' => physical = true,
-                    _ => {}
-                }
-            }
-            continue;
-        }
-        target = Some(arg);
-        break;
-    }
-    if args.next().is_some() {
+    let target = plain_literal(target)?;
+    if target.starts_with('-') || (target.starts_with('~') && target != "~" && !target.starts_with("~/")) {
         return None;
     }
-    let target = target?;
-    if target == "-" || (target.starts_with('~') && target != "~" && !target.starts_with("~/")) {
-        return None;
-    }
-    (!searches_cdpath(&target, cdpath_in_scope())).then_some((target, physical))
+    (!searches_cdpath(&target, cdpath_in_scope())).then_some((target, false))
 }
 
 pub(super) fn moves_cwd(simple: &super::SimpleCmd) -> bool {
@@ -99,12 +55,14 @@ pub(super) fn moves_cwd(simple: &super::SimpleCmd) -> bool {
     while let Some(word) = simple.words.get(idx) {
         let mut expanded = word.expand();
         let evaluated = word.eval();
+        let braced = expanded.as_slice() != [evaluated.as_str()];
         if !expanded.contains(&evaluated) {
             expanded.push(evaluated);
         }
         if expanded.iter().any(|w| {
             let base = w.rsplit('/').next().unwrap_or(w);
             matches!(base, "cd" | "pushd" | "popd")
+                || ((idx > 0 || braced) && super::functions::ever_defined(base))
                 || (base == "time" && (super::functions::names_a_function("time") || super::functions::ever_defined("time")))
                 || w.contains(['$', '*', '?'])
                 || (w.contains('[') && w.contains(']'))
@@ -126,6 +84,9 @@ pub(super) fn moves_cwd(simple: &super::SimpleCmd) -> bool {
         }
         idx += 1;
         while let Some(next) = simple.words.get(idx) {
+            if next.expand().iter().any(|w| super::functions::ever_defined(w)) {
+                return true;
+            }
             let text = next.eval();
             if text == "--" {
                 idx += 1;
