@@ -1,6 +1,9 @@
 //! `7z` reads more than its operands while it adds: names listed in a file (`@list`, `-i@list`),
 //! and paths its include switches name (`-i!path`, `-ir!path`). Each is judged as a read.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};
 

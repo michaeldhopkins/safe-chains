@@ -15,6 +15,9 @@
 //! Regenerate on purpose with `UPDATE_VERDICT_SNAPSHOT=1 cargo test --test verdict_snapshot -- --nocapture`,
 //! and read the summary it prints before committing the result.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 #[path = "verdict_snapshot/corpus.rs"]
 mod corpus;
 #[path = "verdict_snapshot/rust_examples.rs"]

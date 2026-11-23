@@ -5,6 +5,9 @@
 //! `PermissionRequest` takes an `allow` for a safe command and silence for everything else, which
 //! leaves Codex's own approval prompt in place.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 #[path = "support/hooks.rs"]
 mod hooks;
 use hooks::run_hook;

@@ -1,6 +1,9 @@
 //! A link makes its target reachable under the link's name, so making one is judged as a write to
 //! the target, wherever the link's own name sits.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 

@@ -1829,7 +1829,7 @@ fn intra_line_cd_reclassifies_later_relative_writes() {
 fn workspace_overreach_distinguishes_a_peer_from_outside() {
     use crate::ReachReason;
     use crate::pathctx::{PathCtx, enter};
-    let Ok(home) = std::env::var("HOME") else { return };
+    let Ok(home) = crate::process_home::var() else { return };
     if !home.starts_with('/') {
         return;
     }
@@ -1856,7 +1856,7 @@ fn workspace_overreach_distinguishes_a_peer_from_outside() {
 #[test]
 fn a_heredoc_body_is_never_reported_as_the_reach() {
     use crate::pathctx::{PathCtx, enter};
-    let Ok(home) = std::env::var("HOME") else { return };
+    let Ok(home) = crate::process_home::var() else { return };
     if !home.starts_with('/') {
         return;
     }
@@ -2183,7 +2183,7 @@ fn a_refusal_offers_a_grant_only_when_one_would_work() {
     use crate::engine::resolve::regions::with_grants;
 
     // (command, the path to grant). Each triggers a different ReachReason.
-    let home = std::env::var("HOME").expect("HOME");
+    let home = crate::process_home::var().expect("HOME");
     let cases: Vec<(String, String)> = vec![
         (format!("cat {home}/.ssh/id_rsa"), format!("{home}/.ssh")),
         (format!("tee {home}/.config/safe-chains.toml"), format!("{home}/.config/safe-chains.toml")),

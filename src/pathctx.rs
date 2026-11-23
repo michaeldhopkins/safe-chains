@@ -577,7 +577,7 @@ mod tests {
 
     #[test]
     fn a_home_spelled_path_inside_root_becomes_root_relative() {
-        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+        let Some(home) = crate::process_home::var().ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
             return;
         };
         let root = format!("{home}/projects/app");
@@ -607,7 +607,7 @@ mod tests {
 
     #[test]
     fn a_home_rooted_workspace_leaves_home_paths_to_the_home_classifiers() {
-        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+        let Some(home) = crate::process_home::var().ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
             return;
         };
         let _g = enter(PathCtx { cwd: Some(home.clone()), root: Some(home.clone()), ..Default::default() });
@@ -619,7 +619,7 @@ mod tests {
 
     #[test]
     fn a_home_spelled_path_is_not_resolved_from_outside_the_root_or_through_a_glob() {
-        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+        let Some(home) = crate::process_home::var().ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
             return;
         };
         let root = format!("{home}/projects/app");
@@ -634,7 +634,7 @@ mod tests {
 
     #[test]
     fn a_home_spelled_path_is_not_resolved_into_a_protected_root() {
-        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+        let Some(home) = crate::process_home::var().ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
             return;
         };
         let root = format!("{home}/.ssh");

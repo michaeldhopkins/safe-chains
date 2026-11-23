@@ -1,6 +1,9 @@
 //! Rules every workflow keeps, checked against the workflow files themselves so a new job or a
 //! copied step cannot quietly drop one.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::fs;
 use std::path::PathBuf;
 

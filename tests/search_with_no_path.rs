@@ -1,6 +1,9 @@
 //! A recursive search given no path searches the folder it runs in. That folder is judged as the
 //! tree it reads, so `cd ~/.ssh && rg x`, or a `cd` into a link that leads there, never prints a key.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};
 
@@ -25,7 +28,7 @@ fn a_search_with_no_path_is_judged_by_the_folder_it_searches() {
     let dir = tempfile::tempdir_in(env!("CARGO_TARGET_TMPDIR")).expect("scratch project");
     let root = dir.path().canonicalize().expect("canonical root").to_str().expect("utf-8 root").to_string();
     std::fs::create_dir_all(format!("{root}/src")).expect("src");
-    let home = std::env::var("HOME").expect("HOME");
+    let home = isolate_home::home().to_str().expect("utf-8 home").to_string();
     std::os::unix::fs::symlink(format!("{home}/.ssh"), format!("{root}/leak")).expect("link to .ssh");
 
     let mut refused_at_home = Vec::new();

@@ -51,7 +51,7 @@ fn listed_home() -> String {
         crate::registry::custom::config_home().to_string_lossy().into_owned()
     }
     #[cfg(not(test))]
-    std::env::var("HOME").unwrap_or_default()
+    crate::process_home::var().unwrap_or_default()
 }
 
 fn tilde(path: &str, home: &str) -> String {

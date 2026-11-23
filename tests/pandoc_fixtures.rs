@@ -1,3 +1,6 @@
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::{Path, PathBuf};
 
 const VERSIONS: &[&str] = &["3.12.1"];

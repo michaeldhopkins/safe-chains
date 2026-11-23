@@ -2,6 +2,9 @@
 //! an approval. Codex reports its session cwd while `exec_command` runs in a `workdir` it leaves out;
 //! Antigravity reports `workspacePaths` while `run_command` runs in `toolCall.args.Cwd`.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};

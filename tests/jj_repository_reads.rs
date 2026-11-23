@@ -13,6 +13,9 @@
 //! Every sub in `commands/vcs/jj.toml` must be classified here, so a sub added later is looked
 //! at before it ships.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::BTreeSet;
 
 const JJ_TOML: &str = include_str!("../commands/vcs/jj.toml");
@@ -167,7 +170,7 @@ fn a_read_never_reaches_a_credential_store_or_hides_the_sub() {
 
 fn approved_in_project(command: &str) -> bool {
     use safe_chains::pathctx::{PathCtx, enter};
-    let home = std::env::var("HOME").expect("HOME");
+    let home = isolate_home::home().to_str().expect("utf-8 home").to_string();
     let project = format!("{home}/projects/jjprobe");
     let _ctx = enter(PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
     approved(command)

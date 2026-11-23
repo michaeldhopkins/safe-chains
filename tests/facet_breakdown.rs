@@ -1,5 +1,8 @@
 //! `facet_breakdown`, the "resolved profile" part of `--explain`.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::facet_breakdown;
 
 /// `--explain`'s facet breakdown describes ONE command. A chain gets the note pointing at the

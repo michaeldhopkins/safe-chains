@@ -9,6 +9,9 @@
 //! other list its file keeps for the same tool (`MVN_LOG_FILES`, `MVN_DEFINES`), not only the one
 //! whose name ends in `_VALUED`.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::{BTreeMap, BTreeSet};
 
 const SUFFIXES: [(&str, bool); 4] = [("_STANDALONE", false), ("_NO_ARG", false), ("_VALUED", true), ("_WITH_ARG", true)];

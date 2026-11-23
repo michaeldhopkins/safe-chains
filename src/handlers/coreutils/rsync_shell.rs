@@ -200,7 +200,7 @@ mod tests {
     /// Two levels under `$HOME`, so a normalised `../` is a sibling project. The execute band admits
     /// a sibling, which is how a relative path that climbs out was approved.
     fn in_project(cmd: &str) -> bool {
-        let root = format!("{}/work/proj", std::env::var("HOME").unwrap_or_else(|_| "/Users/dev".into()));
+        let root = format!("{}/work/proj", crate::process_home::var().unwrap_or_else(|_| "/Users/dev".into()));
         command_verdict_in(cmd, PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None }).is_allowed()
     }
 

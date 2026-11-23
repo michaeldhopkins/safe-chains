@@ -2,6 +2,9 @@
 //! walking up from the folder it runs in. A project with no Gemfile of its own loads whatever
 //! Gemfile a folder above it holds, and `bundle exec` loads it before the command it runs.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::{PathCtx, enter};
 
 fn approved_in(root: &std::path::Path, command: &str) -> bool {

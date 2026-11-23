@@ -13,6 +13,9 @@
 //!
 //! An integration test because the property is about what the PROCESS prints and what exit status it
 //! leaves; a unit test cannot see either.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::process::Command;
 
 /// Well-formed TOML, each failing to BE a command definition in a different way.

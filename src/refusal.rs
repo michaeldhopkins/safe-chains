@@ -315,7 +315,7 @@ mod tests {
         // a sweep that reports green on a layer it never reached, which is the failure this whole
         // guard exists to prevent.
         let before = texts.len();
-        let home = std::env::var("HOME").unwrap_or_else(|_| "/root".to_string());
+        let home = crate::process_home::var().unwrap_or_else(|_| "/root".to_string());
         for command in [
             format!("cat {home}/.ssh/id_rsa"),
             format!("tee {home}/.config/safe-chains.toml"),

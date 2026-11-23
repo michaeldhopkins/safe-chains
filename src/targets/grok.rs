@@ -335,7 +335,7 @@ mod tests {
     #[test]
     fn a_spent_classification_budget_is_put_to_a_person_in_a_prompting_mode() {
         use super::super::GatedPolicy;
-        let project = std::env::var("HOME").unwrap_or_else(|_| "/home/tester".into()) + "/projects/budgetprobe";
+        let project = crate::process_home::var().unwrap_or_else(|_| "/home/tester".into()) + "/projects/budgetprobe";
         let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
         let cmd = "zzbudgettool sync";
         let explanation = crate::explain_with_coverage_at_level(cmd, None);

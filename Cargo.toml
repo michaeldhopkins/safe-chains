@@ -29,6 +29,9 @@ required-features = ["fuzz-gen"]
 [features]
 # Enables the gen-fuzz-corpus bin. No extra deps — it reuses toml + sha2 from the main build.
 fuzz-gen = []
+# Private homes for integration-test binaries. Off unless a test build asks, so a release binary
+# reads `$HOME` and nothing else.
+test-home = []
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
@@ -46,6 +49,9 @@ unicode-normalization = "0.1.25"
 winnow = "0.7.15"
 
 [dev-dependencies]
+# Unifies `test-home` into `cargo test`, including the `safe-chains` binary those tests spawn.
+# `cargo build` does not read dev-dependencies, so a release binary leaves the feature off.
+safe-chains = { path = ".", features = ["test-home"] }
 clap_complete = "4"
 clap_mangen = "0.2"
 expectrl = "0.8"

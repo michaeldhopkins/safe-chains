@@ -3,6 +3,9 @@
 //! must not let `jj -R ~/.claude new` through either, since a repository write reaches every file
 //! beneath, the trust file included.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 

@@ -2,6 +2,9 @@
 //! where a judge used to read a spelling, or place the same operand twice, and so landed somewhere
 //! the kernel does not.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::os::unix::fs::symlink;
 use std::process::{Command, Stdio};
@@ -20,7 +23,7 @@ fn project() -> Project {
     let root = dir.path().canonicalize().expect("canonical root").to_str().expect("utf-8 root").to_string();
     std::fs::create_dir_all(format!("{root}/sub")).expect("sub");
     std::fs::write(format!("{root}/README.md"), "read me").expect("readme");
-    let home = std::env::var("HOME").expect("HOME");
+    let home = isolate_home::home().to_str().expect("utf-8 home").to_string();
     Project { _dir: dir, root, home }
 }
 
@@ -81,10 +84,10 @@ fn hook(cwd: &std::path::Path, home: &std::path::Path, command: &str) -> String 
 
 #[test]
 fn a_glob_in_a_plain_reported_folder_lists_that_folder() {
-    // A folder named without a leading dot, under the real HOME and inside `~/projects`: a hidden
-    // component is a region of its own, and a folder outside HOME is one a glob match cannot be read
-    // from. The cargo target directory is not that folder when the checkout itself has a hidden name.
-    let home = std::path::PathBuf::from(std::env::var("HOME").expect("HOME"));
+    // A folder named without a leading dot, under the isolated home and inside `~/projects`: a hidden
+    // component is a region of its own, and a folder outside that home is one a glob match cannot be
+    // read from. The cargo target directory is not that folder when the checkout itself has a hidden name.
+    let home = isolate_home::home().to_path_buf();
     let projects = home.join("projects");
     std::fs::create_dir_all(&projects).expect("projects");
     let base = tempfile::Builder::new().prefix("plain-").tempdir_in(&projects).expect("tempdir");
@@ -94,11 +97,8 @@ fn a_glob_in_a_plain_reported_folder_lists_that_folder() {
     let control = hook(&folder, &home, "sort *");
     assert!(control.contains("\"allow\""), "control: a glob over plain names in {} is approved: {control}", folder.display());
     std::fs::write(folder.join("--output=a.txt"), "").expect("flag-shaped name");
-    for command in ["sort *", "sort * | head", "ls *"] {
+    for command in ["sort *", "sort * | head"] {
         let out = hook(&folder, &home, command);
-        if command == "ls *" {
-            continue;
-        }
         assert!(!out.contains("\"allow\""), "`{command}` expanded to a name that reads as a flag, and was approved: {out}");
     }
 }

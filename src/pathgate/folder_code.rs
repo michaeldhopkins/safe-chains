@@ -107,7 +107,7 @@ mod tests {
     const PROBES: &[&str] = &["--version", "-V", "version", "--help", "help", "-v"];
 
     fn project() -> String {
-        format!("{}/projects/scproj", std::env::var("HOME").expect("HOME"))
+        format!("{}/projects/scproj", crate::process_home::var().expect("HOME"))
     }
 
     fn judged_from(cwd: &str, command: &str) -> bool {

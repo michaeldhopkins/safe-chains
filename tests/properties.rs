@@ -12,6 +12,9 @@
 //!   looked up in the file itself.
 //! - Those suites are neither pure nor effectful code, so they go in `[test_only]` with a reason.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 

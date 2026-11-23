@@ -3,6 +3,9 @@
 //! The rules and their reasons are the house MCP ratchet. Each one here is something a weak model
 //! got wrong against another server: a description cut off, an untyped argument retried in a loop,
 //! a silently dropped argument, a result too long to be shown at all.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};

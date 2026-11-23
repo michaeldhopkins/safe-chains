@@ -16,6 +16,9 @@
 
 #![cfg(unix)]
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 use std::os::unix::process::CommandExt;

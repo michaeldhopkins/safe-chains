@@ -1,6 +1,9 @@
 //! A command `find` or `fd` runs for each match is judged where it really runs: a `..` after the
 //! match can reach above the search path, and `-execdir` runs beside each match.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::process::{Command, Stdio};
 
 fn approves(command: &str) -> bool {

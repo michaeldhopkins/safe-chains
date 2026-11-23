@@ -298,7 +298,7 @@ fn leaves_the_workspace(word: &str) -> bool {
 
 /// `word` with a leading `~` or `~/` read as the home folder, as the shell reads it.
 fn expand_home(word: &str) -> String {
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = crate::process_home::var().unwrap_or_default();
     match word.strip_prefix('~') {
         Some(rest) if rest.is_empty() || rest.starts_with('/') => format!("{home}{rest}"),
         _ => word.to_string(),
@@ -313,7 +313,7 @@ fn names_a_protected_place(word: &str) -> bool {
     } else {
         return false;
     };
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = crate::process_home::var().unwrap_or_default();
     let trimmed = path.trim_end_matches('/');
     if trimmed.is_empty() || trimmed == "~" || (!home.is_empty() && trimmed == home.trim_end_matches('/')) {
         return true;

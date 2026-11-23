@@ -41,7 +41,7 @@ impl Runner for Spawn {
     }
 
     fn home(&self) -> PathBuf {
-        std::env::var_os("HOME").map(PathBuf::from).unwrap_or_default()
+        crate::process_home::var_os().map(PathBuf::from).unwrap_or_default()
     }
 
     fn cwd(&self) -> PathBuf {

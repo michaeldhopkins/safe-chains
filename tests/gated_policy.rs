@@ -4,6 +4,9 @@
 //! is shown, and everything else is refused as before. Every other target must answer exactly what
 //! its `gated_policy` answered before the split existed, whatever the kind and the mode.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 #[path = "support/formats.rs"]
 mod formats;
 use formats::every_hook_format;

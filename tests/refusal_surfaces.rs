@@ -16,6 +16,9 @@
 //! who used them concluded safe-chains had no way to declare a readable directory — while
 //! `[[grant]]` was documented the whole time. The invariant is that all three name the path they
 //! refused over and where the remedy lives.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 

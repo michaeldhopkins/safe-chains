@@ -19,7 +19,7 @@ fn in_folder(cwd: &str, root: &str, cmd: &str) -> bool {
 }
 
 fn home_root() -> (String, String) {
-    let home = std::env::var("HOME").expect("the sibling and parent cases need HOME");
+    let home = crate::process_home::var().expect("the sibling and parent cases need HOME");
     assert!(home.starts_with('/') && home.len() > 1, "HOME must be an absolute directory: {home}");
     let parent = format!("{home}/projects");
     (format!("{parent}/proj"), parent)
@@ -27,7 +27,7 @@ fn home_root() -> (String, String) {
 
 #[test]
 fn a_config_location_in_a_normal_folder_is_allowed() {
-    let home = std::env::var("HOME").expect("the home cases need HOME");
+    let home = crate::process_home::var().expect("the home cases need HOME");
     for cmd in [
         format!("HOME={home} git log"),
         format!("HOME={home}/ git log"),
@@ -97,7 +97,7 @@ fn a_config_location_in_a_scratch_folder_is_refused() {
 /// Pandoc's user data directory is `$XDG_DATA_HOME/pandoc` when `--data-dir` is omitted.
 #[test]
 fn xdg_data_home_is_the_pandoc_data_directory() {
-    let home = std::env::var("HOME").expect("the home case needs HOME");
+    let home = crate::process_home::var().expect("the home case needs HOME");
     for cmd in [
         "XDG_DATA_HOME=/tmp/evil pandoc README.md",
         "XDG_DATA_HOME=/TMP/evil pandoc README.md",
@@ -143,7 +143,7 @@ fn a_case_variant_of_a_scratch_folder_is_refused_since_macos_folds_case() {
 
 #[test]
 fn a_folder_outside_the_project_and_home_is_refused_since_it_may_alias_a_scratch_folder() {
-    let home = std::env::var("HOME").expect("the alias cases need HOME");
+    let home = crate::process_home::var().expect("the alias cases need HOME");
     for cmd in [
         "HOME=/System/Volumes/Data/private/tmp/x git log".to_string(),
         "HOME=/System/Volumes/Data/tmp/x git log".to_string(),
@@ -245,7 +245,7 @@ proptest! {
     ) {
         let cmd = format!("{var}=/work/u/proj/{a}/{b} {tool}");
         prop_assert!(in_project(&cmd), "should be allowed: {}", cmd);
-        let home = std::env::var("HOME").expect("the home case needs HOME");
+        let home = crate::process_home::var().expect("the home case needs HOME");
         let cmd = format!("{var}={home}/.config/{a}/{b} {tool}");
         prop_assert!(in_project(&cmd), "should be allowed: {}", cmd);
     }

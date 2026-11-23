@@ -770,7 +770,7 @@ fn expand_tilde(arg0: &str) -> Option<String> {
     let Some(rest) = arg0.strip_prefix("~/") else {
         return Some(arg0.to_string());
     };
-    let home = std::env::var("HOME").ok()?;
+    let home = crate::process_home::var().ok()?;
     let home = home.trim_end_matches('/');
     if !home.starts_with('/') || home.contains('\0') {
         return None;
@@ -840,7 +840,7 @@ fn formula_bin(dirs: &[&str]) -> bool {
 }
 
 fn home_dirs() -> Option<Vec<String>> {
-    let home = std::env::var("HOME").ok()?;
+    let home = crate::process_home::var().ok()?;
     let home = home.trim_end_matches('/');
     if !home.starts_with('/') || home.contains('\0') {
         return None;
@@ -2550,7 +2550,7 @@ mod tests {
 
     #[test]
     fn a_pwd_outside_the_worktree_does_not_stand_in_for_a_file_there() {
-        let home = std::env::var("HOME").expect("HOME");
+        let home = crate::process_home::var().expect("HOME");
         let root = format!("{}/projects/app", home.trim_end_matches('/'));
         let _guard = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
         for command in
@@ -2573,7 +2573,7 @@ mod tests {
         for allowed in ["/bin/ls", "/usr/bin/grep foo file.txt", "/bin/./ls", "/usr/bin/../bin/ls", "/opt/homebrew/bin/ls"] {
             assert!(crate::is_safe_command(allowed), "known location stopped approving: {allowed}");
         }
-        let home = std::env::var("HOME").expect("HOME");
+        let home = crate::process_home::var().expect("HOME");
         let home = home.trim_end_matches('/');
         for allowed in [
             "/opt/homebrew/opt/ripgrep/bin/grep foo file.txt",

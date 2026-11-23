@@ -1,6 +1,9 @@
 //! `mise x` is mise's own short name for `mise exec`, so every line spelled with it gets the verdict
 //! the long spelling gets.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 fn approved(command: &str) -> bool {
     safe_chains::is_safe_command(command)
 }

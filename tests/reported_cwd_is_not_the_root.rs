@@ -3,6 +3,9 @@
 //! write is placed in an unknown folder and judged by name: a session reported at `~` or `~/.ssh`
 //! never gets `cp` into `authorized_keys` approved, by any spelling.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 

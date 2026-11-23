@@ -2,6 +2,9 @@
 //! File-length quality ratchet.
 //! Per-repo configuration lives in `tests/ratchets.toml`.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};

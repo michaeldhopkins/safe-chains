@@ -1,6 +1,9 @@
 //! A recursive write reaches everything below its operand, so it is judged by the write-frozen
 //! metadata (`.git`, `.jj`, `.hg`, `.sl`, `.envrc`) it would walk into, at any depth.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use proptest::prelude::*;
 use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};

@@ -3,11 +3,14 @@
 //! flag value is judged where the code comes from, so a temporary directory that is not this
 //! session's asks, while the same spelling naming a file in the project is approved.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use proptest::prelude::*;
 
 fn approved_in_project(command: &str) -> bool {
     use safe_chains::pathctx::{PathCtx, enter};
-    let project = format!("{}/projects/foreigncodeprobe", std::env::var("HOME").expect("HOME"));
+    let project = format!("{}/projects/foreigncodeprobe", isolate_home::home().to_str().expect("utf-8 home"));
     let _ctx = enter(PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
     safe_chains::is_safe_command(command)
 }
@@ -176,7 +179,7 @@ const CASES: &[&str] = &[
 
 #[test]
 fn a_flag_without_a_value_does_not_swallow_the_flag_naming_the_code() {
-    let home = std::env::var("HOME").expect("HOME");
+    let home = isolate_home::home().to_str().expect("utf-8 home").to_string();
     for command in [
         format!("rspec --fail-fast {home}/Downloads/evil_spec.rb"),
         format!("rspec --bisect {home}/Downloads/evil_spec.rb"),

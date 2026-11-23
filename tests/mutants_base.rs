@@ -5,6 +5,9 @@
 //! from the clone and `git diff <before>..` failed the job (2026-10-07). Each case here builds a real
 //! repository, so the script's git calls are exercised rather than described.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::{Path, PathBuf};
 use std::process::Command;
 

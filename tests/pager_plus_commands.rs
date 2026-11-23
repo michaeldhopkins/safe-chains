@@ -3,6 +3,9 @@
 //! so a flag the pager treats as a switch must never be listed as valued: `less --LINE-NUMBERS
 //! '+!id' a` runs `id`. Every less-family entry is checked against less's own option table.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::Path;
 
 const LESS_TAKES_AN_ARGUMENT: &[&str] = &[

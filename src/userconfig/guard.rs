@@ -62,7 +62,7 @@ pub(super) fn check_entry_name(name: &str) -> Result<(), EditError> {
 /// `.`, `..` or trailing `/`. A relative path is taken from the current directory.
 pub(super) fn normalize_path(raw: &str) -> Result<String, EditError> {
     let raw = raw.trim();
-    let home = std::env::var("HOME").map_err(|_| EditError::NoHome)?;
+    let home = crate::process_home::var().map_err(|_| EditError::NoHome)?;
     let home = home.trim_end_matches('/');
     let absolute = if raw == "~" {
         home.to_string()
@@ -99,7 +99,7 @@ pub(super) fn check_grant_path(path: &str) -> Result<(), EditError> {
     if path.contains(['*', '?', '[']) {
         return Err(EditError::Glob(path.to_string()));
     }
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = crate::process_home::var().unwrap_or_default();
     if path == "/" || path == "~" || home.starts_with(&format!("{path}/")) {
         return Err(EditError::TooBroad(path.to_string()));
     }
@@ -143,7 +143,7 @@ const SYSTEM_RUNS_LATER: &[&str] = &[
 /// one, sits inside one, or is a folder above one that a grant would sweep in (a grant does not
 /// reach through a dot directory, so `~/` does not sweep in `~/.zshrc`).
 fn runs_later(path: &str) -> bool {
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = crate::process_home::var().unwrap_or_default();
     let absolute = |p: &str| match p.strip_prefix('~') {
         Some(rest) => format!("{}{rest}", home.trim_end_matches('/')),
         None => p.to_string(),

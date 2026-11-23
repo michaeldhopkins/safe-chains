@@ -5,6 +5,9 @@
 //! binary and requires the same reply, so a parser or contract change that would answer a real
 //! grok differently fails here. `scripts/capture-grok-fixtures.sh` captures a new version.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 #[path = "support/hooks.rs"]
 mod hooks;
 

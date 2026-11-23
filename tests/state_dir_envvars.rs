@@ -3,6 +3,9 @@
 //! checksums (which decide whether a task is skipped as up to date). Pointed outside the project,
 //! they ask, as the matching write would.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::{PathCtx, enter};
 
 fn approved(command: &str) -> bool {

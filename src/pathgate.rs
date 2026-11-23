@@ -966,7 +966,7 @@ mod tests {
     /// first draft of it proved nothing.
     #[test]
     fn a_when_clause_selects_the_positional_role_by_flag_value() {
-        let home = std::env::var("HOME").expect("HOME");
+        let home = crate::process_home::var().expect("HOME");
         let witness = format!("{home}/notes.txt");
         let toks = |words: &[&str]| -> Vec<Token> { words.iter().map(|s| Token::from_test(s)).collect() };
 

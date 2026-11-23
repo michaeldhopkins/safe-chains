@@ -1371,7 +1371,7 @@ fn the_reported_loop_idiom_approves() {
 #[test]
 fn an_unconfined_interpolation_is_explained_as_such() {
     use crate::engine::facet::Anchoring;
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = crate::process_home::var().unwrap_or_default();
     if !home.starts_with('/') {
         return;
     }
@@ -1477,7 +1477,7 @@ fn no_internal_sentinel_ever_reaches_a_human() {
 /// everything as a credential.
 #[test]
 fn an_interpolated_credential_path_still_warns_as_one() {
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = crate::process_home::var().unwrap_or_default();
     if !home.starts_with('/') {
         return;
     }
@@ -1615,7 +1615,7 @@ proptest! {
         // gives the test teeth: escaping one level from a `/tmp` workspace lands in the temp root,
         // which is itself writable, so every escape looked admitted-and-fine and the property
         // passed while the hole was open. One level up from here is HOME, where a write is refused.
-        let home = std::env::var("HOME").unwrap_or_default();
+        let home = crate::process_home::var().unwrap_or_default();
         prop_assume!(home.starts_with('/'));
         let ws = format!("{home}/scproj");
         let _g = crate::pathctx::enter(crate::pathctx::PathCtx {
@@ -1671,7 +1671,7 @@ proptest! {
         name in proptest::sample::select(SHIELD_ANYWHERE.to_vec()),
         depth in 0usize..4,
     ) {
-        let Ok(home) = std::env::var("HOME") else { return Ok(()) };
+        let Ok(home) = crate::process_home::var() else { return Ok(()) };
         if !home.starts_with('/') {
             return Ok(());
         }
@@ -2187,7 +2187,7 @@ fn no_new_denylist_named_constants_in_handlers() {
 /// READS stay allowed (safe-chains reads its own config).
 #[test]
 fn trust_root_is_unwritable_by_any_command() {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/root".into());
+    let home = crate::process_home::var().unwrap_or_else(|_| "/root".into());
     let spellings = [
         "~/.config/safe-chains.toml".to_string(),
         "$HOME/.config/safe-chains.toml".to_string(),

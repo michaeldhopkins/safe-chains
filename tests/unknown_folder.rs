@@ -8,6 +8,9 @@
 //! (§6): generic names that would land in a sensitive folder if the agent ran the command there,
 //! counted per level so the docs can state the number.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::BTreeSet;
 
 use safe_chains::pathctx::anchor::{FolderLevel, GIT_HOOKS, NAMED_FILES};

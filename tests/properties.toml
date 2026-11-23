@@ -679,6 +679,7 @@ owed = [
 "src/mcp/mod.rs" = "the MCP server loop on stdin and stdout"
 "src/mcp/tools.rs" = "runs the safe-chains binary for each tool call"
 "src/mcp_cli.rs" = "starts the MCP server on stdin and stdout"
+"src/process_home.rs" = "owns the process home: $HOME, or, with the test-home feature, a directory this process creates for an integration test"
 "src/pathctx.rs" = "owns the thread-local directory context and reads HOME and TMPDIR"
 "src/pathctx/home.rs" = "reads the thread-local directory context and HOME"
 "src/pathctx/root.rs" = "reads the thread-local directory context"

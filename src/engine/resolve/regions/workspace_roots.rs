@@ -138,7 +138,7 @@ fn load() -> Vec<String> {
     if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
         return Vec::new();
     }
-    let Some(home) = std::env::var_os("HOME") else {
+    let Some(home) = crate::process_home::var_os() else {
         return Vec::new();
     };
     let Ok(source) = std::fs::read_to_string(std::path::PathBuf::from(home).join(".config/safe-chains.toml")) else {
@@ -260,7 +260,7 @@ mod tests {
 
     #[test]
     fn a_folder_is_a_workspace_root_only_while_the_config_names_it() {
-        let home = std::env::var("HOME").expect("HOME");
+        let home = crate::process_home::var().expect("HOME");
         let agent = format!("{home}/agent-workspaces/agent-1");
         let scripts = format!("{home}/scripts/job");
         let dotted = format!("{home}/work/.agents/agent-1");

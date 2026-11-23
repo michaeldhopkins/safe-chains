@@ -114,7 +114,7 @@ fn verdict_in(cwd: &str, command: &str) -> Verdict {
 }
 
 fn outside_the_workspace() -> Vec<String> {
-    let home = std::env::var("HOME").expect("HOME");
+    let home = crate::process_home::var().expect("HOME");
     vec![home.clone(), "/".to_string(), format!("{home}/.config/mise"), "/work/projects/other".to_string()]
 }
 
@@ -166,7 +166,7 @@ fn a_folder_write_after_an_unfollowable_cd_asks() {
 
 #[test]
 fn a_named_write_and_a_fixed_target_do_not_take_the_folder() {
-    let home = std::env::var("HOME").expect("HOME");
+    let home = crate::process_home::var().expect("HOME");
     for command in ["touch /tmp/x", "echo x > /tmp/y", "ls", "git --version"] {
         let line = format!("cd {home} && {command}");
         assert_eq!(verdict_in(ROOT, &line), verdict_in(&home, command), "{line}");

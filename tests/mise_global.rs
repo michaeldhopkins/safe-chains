@@ -2,6 +2,9 @@
 //! config instead of the project's, while a variable that changes what later shells run stays
 //! refused there as everywhere.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 fn approved(command: &str) -> bool {
     safe_chains::is_safe_command(command)
 }

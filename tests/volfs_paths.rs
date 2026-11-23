@@ -1,6 +1,9 @@
 //! `/.vol/<device>/<inode>` names a file by its inode. Every spelling the path normaliser already
 //! collapses is the same read.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};
 

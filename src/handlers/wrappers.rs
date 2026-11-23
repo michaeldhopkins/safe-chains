@@ -115,7 +115,7 @@ fn trusted_inner_command(arg0: &str) -> bool {
 }
 
 fn strip_env_home(s: &str) -> Option<&str> {
-    let home = std::env::var("HOME").ok()?;
+    let home = crate::process_home::var().ok()?;
     let home = home.trim_end_matches('/');
     if home.is_empty() || !home.starts_with('/') {
         return None;
@@ -358,7 +358,7 @@ mod tests {
             tilde("/runner-scripts/lib/heavy-slot.sh"),
             "$HOME/runner-scripts/lib/heavy-slot.sh".to_string(),
         ];
-        if let Ok(home) = std::env::var("HOME")
+        if let Ok(home) = crate::process_home::var()
             && home.starts_with('/')
         {
             paths.push(format!("{}/bin/heavy-slot.sh", home.trim_end_matches('/')));

@@ -12,14 +12,14 @@ thread_local! {
 }
 
 /// `$HOME` when it is absolute. A unit test can stand a fixture in for the process home, so a
-/// listing of `~/Library` or `/Users` does not open the real one. Production reads the environment
-/// only.
+/// listing of `~/Library` or `/Users` does not open the real one. Otherwise the installed test
+/// home, then the environment.
 pub(crate) fn home_dir() -> Option<String> {
     #[cfg(test)]
     if let Some(home) = HOME_OVERRIDE.with(|slot| slot.borrow().clone()).filter(|home| home.starts_with('/')) {
         return Some(home);
     }
-    std::env::var("HOME").ok().filter(|home| home.starts_with('/'))
+    crate::process_home::var().ok().filter(|home| home.starts_with('/'))
 }
 
 /// Install `home` as [`home_dir`] until the guard drops. The process `$HOME` stays what a listing
@@ -84,7 +84,7 @@ fn normalize_listing(path: &str) -> String {
 /// Production calls nothing.
 #[cfg(test)]
 pub(crate) fn guard_listing(path: &str) {
-    let real = std::env::var("HOME").ok();
+    let real = crate::process_home::var().ok();
     if !walks_real_home(path, real.as_deref()) {
         return;
     }

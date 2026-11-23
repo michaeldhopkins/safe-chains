@@ -17,7 +17,7 @@ fn in_a_normal_folder(value: &str) -> bool {
     let Some(abs) = crate::pathctx::join_cwd(None, value) else {
         return false;
     };
-    if std::env::var("HOME")
+    if crate::process_home::var()
         .ok()
         .filter(|h| h.starts_with('/') && h.len() > 1)
         .is_some_and(|h| abs == h || abs.starts_with(&format!("{}/", h.trim_end_matches('/'))))

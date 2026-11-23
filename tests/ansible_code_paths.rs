@@ -3,6 +3,9 @@
 //! ansible command that reads its inventory or loads a plugin is checked against each, by flag and
 //! by environment variable: pointed outside the project, it asks.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::{PathCtx, enter};
 
 fn approved(command: &str) -> bool {

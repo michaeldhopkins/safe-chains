@@ -3,6 +3,9 @@
 
 #![cfg(target_os = "macos")]
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};
 
@@ -11,7 +14,7 @@ fn at(cmd: &str) -> Verdict {
 }
 
 fn paths() -> Vec<String> {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/Users/me".into());
+    let home = isolate_home::home().to_str().expect("utf-8 home").to_string();
     let mut out: Vec<String> =
         [".claude.json", ".codex/auth.json", "Library/Keychains/login.keychain-db", ".s3cfg", ".aws/credentials", ".zshrc", "notes.txt"]
             .iter()
@@ -40,7 +43,7 @@ fn a_lookup_prefix_reads_as_the_path_after_it() {
 
 #[test]
 fn a_credential_store_behind_a_lookup_prefix_is_refused() {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/Users/me".into());
+    let home = isolate_home::home().to_str().expect("utf-8 home").to_string();
     for cmd in [
         format!("cat /.nofollow{home}/.claude.json"),
         format!("cat /.resolve/1{home}/.codex/auth.json"),

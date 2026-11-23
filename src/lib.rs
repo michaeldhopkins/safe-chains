@@ -76,6 +76,12 @@ pub mod parse;
 mod path_placement_tests;
 pub mod pathctx;
 pub mod pathgate;
+mod process_home;
+#[cfg(feature = "test-home")]
+#[doc(hidden)]
+pub use process_home::install_test_home;
+#[doc(hidden)]
+pub use process_home::process_home_path;
 pub mod policy;
 mod reach;
 pub mod refusal;

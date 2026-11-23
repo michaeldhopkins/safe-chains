@@ -604,6 +604,7 @@ dependencies = [
  "expectrl",
  "proc-macro2",
  "proptest",
+ "safe-chains",
  "serde",
  "serde_json",
  "sha2",

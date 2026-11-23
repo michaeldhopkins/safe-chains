@@ -86,7 +86,7 @@ fn config_root() -> Option<PathBuf> {
         Some(harness::config_home())
     }
     #[cfg(not(test))]
-    env::var_os("HOME").map(PathBuf::from)
+    crate::process_home::var_os().map(PathBuf::from)
 }
 
 fn parse_trusted(source: &str) -> Vec<TrustedEntry> {
@@ -475,7 +475,7 @@ locus_from = "cwd"
     #[test]
     fn the_loader_does_not_read_the_ambient_home() {
         let root = config_root().expect("a config root");
-        let home = PathBuf::from(env::var_os("HOME").expect("HOME"));
+        let home = PathBuf::from(crate::process_home::var_os().expect("HOME"));
         assert_ne!(root, home, "the test config root is the ambient home");
         if home.as_os_str() != "/" {
             assert!(!root.starts_with(&home), "the test config root is inside the ambient home: {}", root.display());

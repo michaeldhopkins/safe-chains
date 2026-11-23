@@ -53,7 +53,7 @@ fn settings_home() -> Option<std::path::PathBuf> {
         Some(crate::registry::custom::config_home())
     }
     #[cfg(not(test))]
-    std::env::var_os("HOME").map(std::path::PathBuf::from)
+    crate::process_home::var_os().map(std::path::PathBuf::from)
 }
 
 impl Matcher {
@@ -627,7 +627,7 @@ mod tests {
     #[test]
     fn claude_settings_are_not_read_from_the_ambient_home() {
         let home = settings_home().expect("a settings home");
-        let ambient = std::path::PathBuf::from(std::env::var_os("HOME").expect("HOME"));
+        let ambient = std::path::PathBuf::from(crate::process_home::var_os().expect("HOME"));
         assert_ne!(home, ambient, "Claude settings would be read from the ambient home");
         if ambient.as_os_str() != "/" {
             assert!(!home.starts_with(&ambient), "Claude settings would be read from inside the ambient home: {}", home.display());

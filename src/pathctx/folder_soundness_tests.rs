@@ -12,7 +12,7 @@ use crate::verdict::{SafetyLevel, Verdict};
 
 /// A project under the real home, deep enough that its siblings are peer projects.
 fn root() -> String {
-    format!("{}/sc-anchor-probe/projects/app", std::env::var("HOME").unwrap_or_else(|_| "/nonexistent-home".to_string()))
+    format!("{}/sc-anchor-probe/projects/app", crate::process_home::var().unwrap_or_else(|_| "/nonexistent-home".to_string()))
 }
 
 /// The folders each level claims to cover (§3, §6): the project root, a subdirectory, a sibling
@@ -91,7 +91,7 @@ proptest! {
             prop_assert!(locus < LocalLocus::WorktreeTrusted, "`{command}` is approved at {} with the folder unknown, and run in {anchor} it writes `{target}` at {locus:?}", level.name());
         }
         if level == FolderLevel::Developer {
-            let home = std::env::var("HOME").unwrap_or_default();
+            let home = crate::process_home::var().unwrap_or_default();
             let _ctx = crate::pathctx::enter(PathCtx { cwd: Some(home.clone()), root: Some(root()), session_id: None });
             let at_home = crate::pathctx::place(&target, None).into_judged();
             prop_assert!(!home.is_empty(), "HOME is unset, so the home check cannot run");
@@ -178,7 +178,7 @@ fn a_path_climbing_out_of_an_unknown_folder_is_placed_nowhere() {
 /// A project in ANOTHER user's home: a sibling of the real home directory, where a parent of the
 /// project is that user's files.
 fn someone_else() -> String {
-    let home = std::env::var("HOME").unwrap_or_else(|_| "/nonexistent-home".to_string());
+    let home = crate::process_home::var().unwrap_or_else(|_| "/nonexistent-home".to_string());
     let users = home.rsplit_once('/').map_or("", |(p, _)| p);
     format!("{users}/sc-someone-else/projects/app")
 }

@@ -2,6 +2,9 @@
 //! the tool on PATH. Binding a name is refused for every documented command, in bash's and zsh's
 //! spelling, so a command added later is covered without editing this file.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::command_verdict;
 
 const SPELLINGS: &[&str] = &["hash -p /tmp/x/{n} {n}", "hash {n}=/tmp/x/{n}", "hash -p ./x/{n} {n}", "hash -r; hash -p /tmp/x/{n} {n}"];

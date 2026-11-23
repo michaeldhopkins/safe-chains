@@ -1,6 +1,9 @@
 //! A mise setting that loads a file, a grep option spelled by any unambiguous prefix, and a script
 //! run from installed packages or a frozen folder are judged as what they run or read.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::{PathCtx, enter};
 
 fn approved(command: &str) -> bool {

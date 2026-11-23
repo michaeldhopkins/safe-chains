@@ -169,7 +169,7 @@ fn stand_in_home() -> &'static str {
         std::fs::write(home.join(".claude/settings.json"), "").expect("fixture file");
         std::fs::write(home.join("Library/LaunchAgents/x.plist"), "").expect("fixture file");
         let home = home.to_str().expect("utf-8 temp path").to_string();
-        let real = std::env::var("HOME").ok();
+        let real = crate::process_home::var().ok();
         assert!(!crate::pathctx::walks_real_home(&home, real.as_deref()), "the stand-in {home} is inside the real home");
         Kept(dir, home)
     });
@@ -184,13 +184,13 @@ fn stand_in_home() -> &'static str {
 #[test]
 #[should_panic(expected = "under the real home or /Users or /home")]
 fn listing_the_real_home_fails_the_test() {
-    let home = std::env::var("HOME").expect("HOME");
+    let home = crate::process_home::var().expect("HOME");
     crate::pathctx::guard_listing(&home);
 }
 
 #[test]
 fn a_fixture_listing_is_not_the_real_home() {
-    let real = std::env::var("HOME").ok();
+    let real = crate::process_home::var().ok();
     crate::pathctx::guard_listing(stand_in_home());
     crate::pathctx::guard_listing("/");
     crate::pathctx::guard_listing("/etc");

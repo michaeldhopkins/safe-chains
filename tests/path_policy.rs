@@ -9,6 +9,9 @@
 //! scratch directory are all questions about where the agent is standing, and an in-process call
 //! answers them from the developer's own cwd.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::process::Command;
 
 const CORPUS: &str = include_str!("fixtures/path_policy_corpus.tsv");

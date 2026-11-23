@@ -55,7 +55,7 @@ mod tests {
 
     #[test]
     fn a_hypothetical_grant_widens_only_while_it_is_asked_about() {
-        let home = std::env::var("HOME").unwrap_or_else(|_| "/home/tester".to_string());
+        let home = crate::process_home::var().unwrap_or_else(|_| "/home/tester".to_string());
         let path = format!("{home}/hypothetical-probe/notes.txt");
         assert!(!write_target_verdict(&path).is_allowed(), "the probe must start refused");
         let inside =
@@ -66,7 +66,7 @@ mod tests {
 
     #[test]
     fn a_hypothetical_grant_is_cleared_after_a_panic() {
-        let home = std::env::var("HOME").unwrap_or_else(|_| "/home/tester".to_string());
+        let home = crate::process_home::var().unwrap_or_else(|_| "/home/tester".to_string());
         let path = format!("{home}/hypothetical-probe/notes.txt");
         let unwound =
             std::panic::catch_unwind(|| with_hypothetical_grant(&format!("{home}/hypothetical-probe"), true, true, || panic!("boom")));
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn the_ungranted_role_ignores_grants() {
-        let home = std::env::var("HOME").unwrap_or_else(|_| "/home/tester".to_string());
+        let home = crate::process_home::var().unwrap_or_else(|_| "/home/tester".to_string());
         let ssh = format!("{home}/.ssh/id_rsa");
         assert!(ungranted_role(&ssh).reads_secret);
         let still = with_hypothetical_grant(&format!("{home}/.ssh"), true, true, || ungranted_role(&ssh).reads_secret);

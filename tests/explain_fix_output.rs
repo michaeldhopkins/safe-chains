@@ -1,5 +1,8 @@
 //! What `--explain` prints after the segments it refused: one fix per refused segment, headed by
 //! the segment only when there is more than one.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::process::{Command, Stdio};
 
 fn explain(args: &[&str], command: &str) -> String {

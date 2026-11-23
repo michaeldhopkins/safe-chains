@@ -3,7 +3,7 @@ use crate::pathctx::{PathCtx, enter};
 use proptest::prelude::*;
 
 fn home() -> String {
-    std::env::var("HOME").unwrap_or_else(|_| "/home/tester".into())
+    crate::process_home::var().unwrap_or_else(|_| "/home/tester".into())
 }
 
 fn kind(command: &str) -> GateKind {

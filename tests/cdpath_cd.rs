@@ -2,9 +2,12 @@
 //! the working directory after it is unknown and a later write there is not approved. A target
 //! starting with `/`, `~`, `.` or `..` does not search CDPATH and is tracked as before.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 fn approved_in_project(command: &str) -> bool {
     use safe_chains::pathctx::{PathCtx, enter};
-    let project = format!("{}/projects/cdpathprobe", std::env::var("HOME").expect("HOME"));
+    let project = format!("{}/projects/cdpathprobe", isolate_home::home().to_str().expect("utf-8 home"));
     let _ctx = enter(PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
     safe_chains::is_safe_command(command)
 }

@@ -219,7 +219,10 @@ fn home_dir() -> Result<PathBuf, EditError> {
         Ok(crate::registry::custom::config_home())
     }
     #[cfg(not(test))]
-    std::env::var_os("HOME").filter(|home| !home.is_empty()).map(PathBuf::from).ok_or(EditError::NoHome)
+    crate::process_home::var_os()
+        .filter(|home| !home.is_empty())
+        .map(PathBuf::from)
+        .ok_or(EditError::NoHome)
 }
 
 fn read_existing(path: &Path) -> Result<String, EditError> {

@@ -720,7 +720,7 @@ mod tests {
         // a clean path is returned untouched (borrowed)
         assert_eq!(canonicalize("~/.config/safe-chains.toml"), "~/.config/safe-chains.toml");
         // an absolute `$HOME` prefix rewrites to `~` so it hits the same node as the tilde form
-        if let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/')) {
+        if let Some(home) = crate::process_home::var().ok().filter(|h| h.starts_with('/')) {
             assert_eq!(canonicalize(&format!("{home}/.config/safe-chains.toml")), "~/.config/safe-chains.toml");
         }
     }

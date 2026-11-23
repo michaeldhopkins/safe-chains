@@ -5,6 +5,9 @@
 //! `pathctx::folder::tests::a_declared_folder_write_follows_the_working_directory`; this file probes
 //! the reported lines with the real project as `--cwd` and `--root`.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::{PathCtx, enter};
 
 fn approved(command: &str) -> bool {

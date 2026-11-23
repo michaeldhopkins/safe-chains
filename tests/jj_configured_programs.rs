@@ -9,6 +9,9 @@
 //! `commands/vcs/jj.toml` and fails on one this file has not classified, so a sub added later is
 //! looked at here before it ships.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::BTreeSet;
 
 const JJ_TOML: &str = include_str!("../commands/vcs/jj.toml");

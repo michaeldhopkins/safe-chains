@@ -13,6 +13,9 @@
 //!
 //! Integration rather than unit tests because both are about what the PROCESS does to the
 //! filesystem, and (1) is decided from the real `current_dir`.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::process::Command;
 
 /// An empty home for the spawned binary. The process home holds the machine's own config.

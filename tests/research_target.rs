@@ -10,6 +10,9 @@
 //! improvement, and refuses when anything would be added to it. `RESEARCH_TARGET_REPORT=<path>`
 //! also writes every command's state as TSV, for whatever tracks the remaining gap.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 #[path = "research_target/criteria.rs"]
 mod criteria;
 

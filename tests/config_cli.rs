@@ -2,6 +2,9 @@
 //!
 //! Every run gets an empty HOME of its own, so nothing here reads or changes the config of the
 //! person running the suite.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::Path;
 use std::process::Command;
 

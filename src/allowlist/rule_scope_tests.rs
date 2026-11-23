@@ -39,7 +39,7 @@ fn approved(command: &str) -> bool {
     // A relative `cd` with no starting directory leaves the folder unpinned, and a folder-code
     // tool there asks. These rules are about where a covered command runs in the shell, so judge
     // them from a project directory, where `cd src` stays inside the project.
-    let root = format!("{}/projects/scproj", std::env::var("HOME").expect("HOME"));
+    let root = format!("{}/projects/scproj", crate::process_home::var().expect("HOME"));
     let _scope = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(root.clone()), root: Some(root), session_id: None });
     explain_with_coverage(command, &rules()).overall.is_allowed()
 }
@@ -138,7 +138,7 @@ proptest! {
 /// foreign folder refuses: those name a place, and the rule names a command.
 #[test]
 fn a_rule_does_not_skip_a_path_gate_or_a_foreign_folder() {
-    let root = format!("{}/projects/scproj", std::env::var("HOME").expect("HOME"));
+    let root = format!("{}/projects/scproj", crate::process_home::var().expect("HOME"));
     let rules = Matcher::from_allow_patterns(&["npm test", "npm run:*", "tee:*"]);
     let under = |cwd: &str, command: &str, covered: bool| {
         let _scope =

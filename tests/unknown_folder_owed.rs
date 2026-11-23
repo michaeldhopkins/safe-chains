@@ -12,6 +12,9 @@
 //! Computed in a child process with the user's config off and HOME fixed, as the verdict snapshot
 //! is, so the answer is the same on every machine.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::BTreeSet;
 use std::fs;
 use std::path::PathBuf;

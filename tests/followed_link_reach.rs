@@ -2,6 +2,9 @@
 //! the tree leads, so it is judged as a read of that place, and a tree it cannot list in full is
 //! judged as if it held a link to a secret.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::PathCtx;
 use safe_chains::{Verdict, command_verdict_in};
 
@@ -31,7 +34,7 @@ const FOLLOWING_READS: [&str; 8] =
 
 #[test]
 fn a_link_to_a_folder_outside_the_project_is_judged_as_a_read_of_that_folder() {
-    let home = std::env::var("HOME").expect("HOME");
+    let home = isolate_home::home().to_str().expect("utf-8 home").to_string();
     for target in ["/etc", "/", home.as_str()] {
         let p = project();
         std::os::unix::fs::symlink(target, format!("{}/out", p.root)).expect("link to a folder");
@@ -154,7 +157,7 @@ fn nest_linking_to(out: &Project) -> Project {
 }
 
 fn secrets() -> [String; 2] {
-    ["/etc/ssh/not-a-real-key".to_string(), std::env::var("HOME").expect("HOME")]
+    ["/etc/ssh/not-a-real-key".to_string(), isolate_home::home().to_str().expect("utf-8 home").to_string()]
 }
 
 #[test]

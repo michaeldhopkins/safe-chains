@@ -8,6 +8,9 @@
 
 #![allow(clippy::unwrap_used)]
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 

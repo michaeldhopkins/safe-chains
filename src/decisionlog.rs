@@ -145,7 +145,7 @@ pub fn record(mode: Mode, outcome: Outcome, ctx: &Context<'_>, explanation: Opti
 /// environment reaches the hook, which is the same reason `registry::custom` refuses to honour
 /// `XDG_CONFIG_HOME` for the trust root.
 fn log_path() -> Option<PathBuf> {
-    let home = std::env::var_os("HOME")?;
+    let home = crate::process_home::var_os()?;
     if home.is_empty() {
         return None;
     }

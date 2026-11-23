@@ -5,6 +5,9 @@
 //! builds real links in a scratch project and compares the verdict through the link with the verdict
 //! for the target spelled directly.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicUsize, Ordering};

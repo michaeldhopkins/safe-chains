@@ -2,6 +2,9 @@
 //! owner's approval of the exact text. They are pinned here, where nothing renders them, until the
 //! reference lists them.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 fn approved(command: &str) -> bool {
     safe_chains::is_safe_command(command)
 }

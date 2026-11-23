@@ -7,7 +7,7 @@ const COMMENTED: &str =
     "# My rules\nlevel = \"developer\"   # the default\n\n# Every project\n[[grant]]\npath = \"~/projects\"\nread = true\nwrite = true\n";
 
 fn home() -> String {
-    std::env::var("HOME").unwrap_or_default()
+    crate::process_home::var().unwrap_or_default()
 }
 
 #[test]

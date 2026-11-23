@@ -1,5 +1,8 @@
 #![allow(clippy::unwrap_used)]
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::{SafetyLevel, Verdict, command_verdict, is_safe_command};
 
 fn check(cmd: &str) -> bool {

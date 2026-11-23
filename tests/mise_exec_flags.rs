@@ -3,6 +3,9 @@
 //! another folder, `-E` loads another environment's config. Only flags that change neither are
 //! approved before the separator, in both spellings of the sub.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::pathctx::{PathCtx, enter};
 
 fn approved(command: &str) -> bool {

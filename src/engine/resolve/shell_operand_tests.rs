@@ -538,7 +538,7 @@ fn every_write_route_refuses_an_operand_it_cannot_expand() {
             }
         }
     }
-    let secret = format!("{}/.ssh/config", std::env::var("HOME").unwrap_or_default());
+    let secret = format!("{}/.ssh/config", crate::process_home::var().unwrap_or_default());
     let climb = "../".repeat(root.matches('/').count());
     for read in [
         format!(r#"cat ./{{"{climb}{secret}",x}}"#),

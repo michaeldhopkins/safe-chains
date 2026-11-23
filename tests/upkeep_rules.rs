@@ -2,6 +2,9 @@
 //! would open pull requests nobody manages (and, in a private repository, run CI on metered
 //! minutes), and AGENTS.md has to name the job so the next agent knows where updates come from.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::PathBuf;
 
 const JOB: &str = "safe-chains-deps";

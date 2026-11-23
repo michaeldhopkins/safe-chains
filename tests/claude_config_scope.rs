@@ -12,6 +12,9 @@
 //! An integration test rather than a unit one because both bridges read `$HOME` at process start:
 //! the leak only exists in a real process with a real settings file, which is exactly what makes it
 //! easy to miss from inside the library.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 

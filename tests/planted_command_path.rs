@@ -3,6 +3,9 @@
 //! directory keeps the bare name's verdict. Enumerated over every documented example, so a command
 //! added later is covered without editing this file.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use safe_chains::command_verdict;
 use safe_chains::verdict::Verdict;
 

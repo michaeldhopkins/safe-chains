@@ -7,6 +7,9 @@
 //! (`rustup toolchain install` reads the file), and every workflow that lints also checks
 //! formatting. The fuzz workflows build on nightly with `cargo +nightly`, which is their own choice.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::fs;
 use std::path::PathBuf;
 

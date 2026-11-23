@@ -128,7 +128,7 @@ pub(crate) fn is_workspace_root(dir: &str) -> bool {
     if phys == crate::pathctx::UNRESOLVED_CWD {
         return false;
     }
-    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1);
+    let home = crate::process_home::var().ok().filter(|h| h.starts_with('/') && h.len() > 1);
     let phys_home = home.as_deref().map(crate::pathctx::physical_directory);
     let clean = |p: &str, h: Option<&str>| {
         !holds_a_home(&comparable(p), h)

@@ -7,6 +7,9 @@
 //! Homebrew spelling of `cp`, `gcp a b` would have been approved as a copy while the shell ran a
 //! cherry-pick.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::BTreeSet;
 
 const ALIASES: &str = "tests/fixtures/shell_alias_names.txt";

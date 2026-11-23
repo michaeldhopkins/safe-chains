@@ -2,6 +2,9 @@
 //! invocation must FAIL CLOSED — a non-zero exit — never exit 0 ("allowed"). Regression for the
 //! typo'd-flag fail-open: a clap parse error used to fall through to hook mode, which read empty
 //! stdin and exited 0.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 

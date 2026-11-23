@@ -6,6 +6,9 @@
 //! nobody names is never read, and a name with no file behind it fails silently. safe-chains'
 //! AGENTS.md had reached 27 KB when this went in (2026-10-04).
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::{Path, PathBuf};
 
 const INSTRUCTIONS_LIMIT: usize = 24 * 1024;

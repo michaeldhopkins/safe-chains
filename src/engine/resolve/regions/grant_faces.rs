@@ -36,7 +36,7 @@ mod tests {
     /// grant for the same directory.
     #[test]
     fn a_borrowed_read_grant_never_shadows_a_write_grant_for_the_same_directory() {
-        let Ok(home) = std::env::var("HOME") else { return };
+        let Ok(home) = crate::process_home::var() else { return };
         let ws = format!("{home}/projects/scproj");
         let _g = enter(PathCtx { cwd: Some(ws.clone()), root: Some(ws), ..Default::default() });
         let write = "touch ~/scripts/x";

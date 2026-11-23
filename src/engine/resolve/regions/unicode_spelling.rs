@@ -253,7 +253,7 @@ mod tests {
     #[cfg(target_os = "macos")]
     #[test]
     fn a_home_store_whose_parent_folders_are_spelled_outside_ascii_stays_shielded() {
-        let home = std::env::var("HOME").unwrap_or_default();
+        let home = crate::process_home::var().unwrap_or_default();
         let Some(user) = home.strip_prefix("/Users/").filter(|u| !u.is_empty() && !u.contains('/')) else { return };
         let parents = [
             format!("/U\u{17F}ers/{user}"),

@@ -1,3 +1,6 @@
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 #[test]
 fn release_notes_leave_out_todo_commits() {
     let text = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/cliff.toml")).expect("cliff.toml");

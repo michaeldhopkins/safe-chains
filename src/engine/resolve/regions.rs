@@ -368,7 +368,7 @@ fn load_user_grants() -> Vec<Grant> {
     if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
         return Vec::new();
     }
-    let Some(home) = std::env::var_os("HOME").map(std::path::PathBuf::from) else {
+    let Some(home) = crate::process_home::var_os().map(std::path::PathBuf::from) else {
         return Vec::new();
     };
     let mut grants = Vec::new();
@@ -465,7 +465,7 @@ fn claude_settings_read_grants(home: &std::path::Path) -> Vec<Grant> {
 /// The matcher(s) for a grant path: the path as written, PLUS the other spelling of a home path
 /// so a `~/` grant and a `/Users/you/` grant both cover a home file however the agent spells it.
 fn grant_matchers(path: &str) -> Vec<Matcher> {
-    let home = || std::env::var_os("HOME").and_then(|h| h.into_string().ok());
+    let home = || crate::process_home::var_os().and_then(|h| h.into_string().ok());
     let mut out = vec![Matcher::from_path(&as_subtree(path))];
     if let Some(rest) = path.strip_prefix('~') {
         if let Some(h) = home() {
@@ -1385,7 +1385,7 @@ mod tests {
     /// claimed, and the protection came off.
     #[test]
     fn a_home_anchored_node_protects_the_absolute_spelling_too() {
-        let Some(home) = std::env::var_os("HOME").and_then(|h| h.into_string().ok()) else {
+        let Some(home) = crate::process_home::var_os().and_then(|h| h.into_string().ok()) else {
             return;
         };
         let cases = [
@@ -1418,7 +1418,7 @@ mod tests {
     /// Walks the region table, so a newly declared store is covered the day it lands.
     #[test]
     fn a_home_credential_store_is_shielded_in_every_spelling_of_home() {
-        let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
+        let Some(home) = crate::process_home::var().ok().filter(|h| h.starts_with('/') && h.len() > 1) else {
             return;
         };
         let stores: Vec<String> = declared_region_paths()
@@ -1448,7 +1448,7 @@ mod tests {
     /// `/Users/someone` was recognised, so `/users/someone/notes` read out as an ordinary file.
     #[test]
     fn another_users_home_is_shielded_in_every_spelling_of_its_parent() {
-        let ours = std::env::var("HOME")
+        let ours = crate::process_home::var()
             .ok()
             .and_then(|h| h.rsplit_once('/').map(|(_, n)| n.to_string()))
             .unwrap_or_default();
@@ -1896,7 +1896,7 @@ mod tests {
 
     #[test]
     fn a_home_grant_matches_both_tilde_and_absolute_spellings() {
-        let Some(home) = std::env::var_os("HOME").and_then(|h| h.into_string().ok()) else {
+        let Some(home) = crate::process_home::var_os().and_then(|h| h.into_string().ok()) else {
             return;
         };
         with_grants(&[("~/work/", true, true)], || {

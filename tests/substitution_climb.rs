@@ -1,6 +1,9 @@
 //! A substitution whose locus is known still says nothing about where `..` after it leads, so a
 //! path that climbs out of one is judged as anywhere.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::process::{Command, Stdio};
 
 fn approves(command: &str) -> bool {

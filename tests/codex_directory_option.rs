@@ -2,6 +2,9 @@
 //! folder. A directory option (`tmux -c .`, `git -C .`, `find -execdir`) and a glob (`ls *`) name that
 //! same folder and must be judged the same way: neither may turn the reported cwd into a known one.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 

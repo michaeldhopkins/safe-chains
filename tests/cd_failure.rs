@@ -3,6 +3,9 @@
 //! folder after it. The fixture's `1` is a link to a folder outside the project, so
 //! `echo evil >> 1/.zshrc` writes outside it from here but inside it from `./q`, where no `1` exists.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 

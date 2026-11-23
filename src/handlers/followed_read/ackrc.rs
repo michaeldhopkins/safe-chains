@@ -5,7 +5,10 @@
 use std::path::{Path, PathBuf};
 
 pub(super) fn follows() -> bool {
-    let env = |name: &str| std::env::var_os(name).filter(|value| !value.is_empty());
+    let env = |name: &str| {
+        let value = if name == "HOME" { crate::process_home::var_os() } else { std::env::var_os(name) };
+        value.filter(|value| !value.is_empty())
+    };
     if env("ACK_OPTIONS").is_some_and(|options| options.to_string_lossy().split_whitespace().any(says_follow)) {
         return true;
     }

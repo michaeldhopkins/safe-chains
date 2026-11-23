@@ -169,7 +169,7 @@ fn tilde_of(path: &str) -> Option<Tilde> {
     let own = |rest: &str| if rest.is_empty() { "~".to_string() } else { format!("~/{rest}") };
     if let Some(named) = path.strip_prefix('~').filter(|r| !r.is_empty() && !r.starts_with('/')) {
         let (user, rest) = named.split_once('/').unwrap_or((named, ""));
-        let home = std::env::var("HOME").unwrap_or_default();
+        let home = crate::process_home::var().unwrap_or_default();
         let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
         Some(if user == ours {
             Tilde::Ours(own(rest))
@@ -302,7 +302,7 @@ pub(crate) mod tests {
             prefix in proptest::sample::select(vec!["ours", "+", "-", "+1", "-2", "3"]),
             rest in proptest::sample::select(vec!["", "notes.txt", "Source/x", ".ssh/id_rsa"]),
         ) {
-            let home = std::env::var("HOME").unwrap_or_default();
+            let home = crate::process_home::var().unwrap_or_default();
             let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
             prop_assume!(!ours.is_empty());
             let tail = if rest.is_empty() { String::new() } else { format!("/{rest}") };
@@ -333,7 +333,7 @@ pub(crate) mod tests {
 
     fn in_a_project<T>(body: impl FnOnce(&str) -> T) -> T {
         use crate::pathctx::{PathCtx, enter};
-        let home = std::env::var("HOME").expect("HOME");
+        let home = crate::process_home::var().expect("HOME");
         assert!(home.starts_with('/'), "HOME must be absolute for these tests: {home}");
         let ws = format!("{home}/projects/scproj");
         let _g = enter(PathCtx { cwd: Some(ws.clone()), root: Some(ws), ..Default::default() });

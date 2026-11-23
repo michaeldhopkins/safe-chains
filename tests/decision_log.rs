@@ -4,6 +4,9 @@
 //! resolves `$HOME` at write time and creates a file with a mode, so the properties that matter —
 //! that a logging fault cannot change a verdict, that the two modes differ in exactly one way, and
 //! that "off" creates nothing — only exist in a real process.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::io::Write;
 use std::process::{Command, Stdio};
 

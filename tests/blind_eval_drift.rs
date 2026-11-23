@@ -8,6 +8,9 @@
 //! instructions added, removed or changed since number at least max(3, a quarter of them).
 //! After a round, rewrite the lock with `SAFE_CHAINS_WRITE_SURFACE_LOCK=1 cargo test --test
 //! blind_eval_drift`.
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::collections::BTreeMap;
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;

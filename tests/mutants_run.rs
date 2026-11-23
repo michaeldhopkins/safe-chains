@@ -1,6 +1,9 @@
 //! `scripts/mutants-run.sh` decides the mutants job's verdict from `mutants.out/missed.txt` and
 //! keeps a run of hung mutants inside a time budget. A stand-in `cargo` plays cargo-mutants.
 
+#[path = "support/isolate_home.rs"]
+mod isolate_home;
+
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
