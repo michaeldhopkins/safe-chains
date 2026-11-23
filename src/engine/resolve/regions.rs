@@ -908,7 +908,7 @@ enum PeerKind {
 /// co-located peer of the workspace, and if so is it shielded by a hidden component? Every guard is
 /// shared so the two callers can never drift.
 fn peer_kind(path: &str) -> PeerKind {
-    let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/')) else {
+    let Some(home) = crate::pathctx::home_dir() else {
         return PeerKind::NotPeer;
     };
     let crate::pathctx::Root::Known(root_raw) = crate::pathctx::root() else {
@@ -1289,6 +1289,11 @@ mod tests {
     /// removing one leaves nothing to enumerate and it passes vacuously.
     #[test]
     fn a_trust_files_directory_cannot_be_destroyed_or_replaced() {
+        // Listing the real `~/.config` waits on a TCC prompt under launchd. The trust directories
+        // stand in a fixture home, which is what `rm -rf` walks.
+        let home = tempfile::tempdir().expect("home");
+        let home_s = home.path().to_str().expect("utf-8").to_string();
+        let _home = crate::pathctx::enter_home(home_s.clone());
         let mut checked = 0usize;
         for node in REGIONS.nodes.iter().filter(|n| n.applies_here() && n.role.frozen == Frozen::Write) {
             let Matcher::Exact(path) = &node.matcher else { continue };
@@ -1301,6 +1306,9 @@ mod tests {
             // and with it the trust root beneath it.
             if parent == "~" {
                 continue;
+            }
+            if let Some(rel) = parent.strip_prefix("~/") {
+                std::fs::create_dir_all(std::path::Path::new(&home_s).join(rel)).expect("fixture trust dir");
             }
             with_grants(&[(parent, true, true)], || {
                 for line in [format!("rm -rf {parent}"), format!("ln -s /tmp/evil {parent}")] {
@@ -1327,7 +1335,13 @@ mod tests {
     /// pass a one-sided guard while leaving the over-deny in place.
     #[test]
     fn a_trust_root_directory_is_writable_into_but_not_replaceable() {
+        // Same fixture as the trust-file test: `rm -rf ~/.config` must not list the real one.
+        let home = tempfile::tempdir().expect("home");
+        let home_s = home.path().to_str().expect("utf-8").to_string();
+        let _home = crate::pathctx::enter_home(home_s.clone());
         for dir in ["~/.config", "~/.claude"] {
+            let rel = dir.strip_prefix("~/").expect("tilde");
+            std::fs::create_dir_all(std::path::Path::new(&home_s).join(rel)).expect("fixture trust dir");
             with_grants(&[(dir, true, true)], || {
                 for allowed in [format!("cp a.toml {dir}"), format!("mv a.toml {dir}"), format!("touch {dir}/x")] {
                     assert!(crate::is_safe_command(&allowed), "{allowed} must stay allowed");

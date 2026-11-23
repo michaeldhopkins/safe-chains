@@ -848,6 +848,9 @@ fn site_witnesses(root: &str, reach: Reach) -> Vec<String> {
 /// the one pairing that mattered.
 #[test]
 fn no_abstraction_is_more_permissive_than_a_path_it_could_denote() {
+    // Roots include `~` and `~/.ssh`. Those listings must not open the process home.
+    let home = tempfile::tempdir().expect("home");
+    let _home = crate::pathctx::enter_home(home.path().to_str().expect("utf-8").to_string());
     let dir = tempfile::tempdir().expect("tempdir");
     let canonical = dir.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
     let base = match canonical.strip_prefix("/private") {
@@ -1554,11 +1557,11 @@ fn arithmetic_with_a_substitution_is_judged_by_its_inner_command() {
 /// `-delete` hard-wired to refuse, which is the state it is replacing.
 #[test]
 fn find_delete_matches_the_exec_rm_spelling_at_every_base() {
-    let home = std::env::var("HOME").unwrap_or_default();
-    if !home.starts_with('/') {
-        return;
-    }
-    let ws = format!("{home}/projects/scproj");
+    let home_dir = tempfile::tempdir().expect("home");
+    let home = home_dir.path().to_str().expect("utf-8").to_string();
+    let _home = crate::pathctx::enter_home(home);
+    let ws_dir = tempfile::tempdir().expect("workspace");
+    let ws = ws_dir.path().to_str().expect("utf-8").to_string();
     let _g = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(ws.clone()), root: Some(ws), ..Default::default() });
     let mut approved = 0;
     let mut refused = 0;

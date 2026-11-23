@@ -17,17 +17,16 @@ fn project(dirs: &[&str]) -> (tempfile::TempDir, String) {
 }
 
 fn outside_project(dirs: &[&str]) -> (tempfile::TempDir, String) {
-    let target = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("target");
-    let base = if std::fs::create_dir_all(&target)
-        .and_then(|()| target.canonicalize())
-        .is_ok_and(|p| p.to_str().is_some_and(|s| !crate::pathctx::under_temp_root(&format!("{s}/x"))))
-    {
-        target
-    } else {
-        let cache = std::path::PathBuf::from(std::env::var("HOME").expect("HOME")).join(".cache");
-        std::fs::create_dir_all(&cache).expect("cache folder");
-        cache
-    };
+    // Not the crate `target/` or `~/.cache`: both sit under the process home, and listing them
+    // is the walk a launchd test must not do. The parent of `$TMPDIR` is writable, is not the
+    // temporary root (`under_temp_root` is `$TMPDIR` itself), and is not under `$HOME`.
+    let parent = std::env::var("TMPDIR")
+        .ok()
+        .and_then(|tmpdir| std::path::PathBuf::from(tmpdir).parent().map(std::path::Path::to_path_buf));
+    let base = parent.filter(|dir| {
+        std::fs::create_dir_all(dir).is_ok() && dir.to_str().is_some_and(|s| !crate::pathctx::under_temp_root(&format!("{s}/x")))
+    });
+    let base = base.unwrap_or_else(std::env::temp_dir);
     let dir = tempfile::Builder::new().prefix("sc-").tempdir_in(base).expect("outside project");
     project_in(dir, dirs)
 }

@@ -8,6 +8,8 @@ pub(super) enum Opened {
 
 /// [`Opened::Unlisted`] when a directory cannot be listed. [`Opened::Absent`] for a missing path or a file.
 pub(super) fn open_dir(path: &str) -> Opened {
+    #[cfg(test)]
+    crate::pathctx::guard_listing(path);
     match std::fs::read_dir(path) {
         Ok(entries) => Opened::Entries(entries),
         Err(err) if dir_unreadable(&err, path) => Opened::Unlisted,

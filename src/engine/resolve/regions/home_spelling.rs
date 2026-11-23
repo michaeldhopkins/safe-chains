@@ -62,7 +62,7 @@ fn home_fold_case_insensitive(path: &str) -> Option<String> {
     if current_os() != "macos" {
         return None;
     }
-    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1)?;
+    let home = crate::pathctx::home_dir().filter(|h| h.len() > 1)?;
     let rest = strip_prefix_could_be(path, home.trim_end_matches('/'))?;
     Some(format!("~{rest}"))
 }
@@ -74,7 +74,7 @@ fn home_fold_case_insensitive(path: &str) -> Option<String> {
 /// private and `/Users/someone/notes` read out. Our OWN home never arrives here as an absolute —
 /// `canonicalize` has already folded it to `~/…`.
 pub(crate) fn absolute_other_home(path: &str) -> bool {
-    let home = std::env::var("HOME").unwrap_or_default();
+    let home = crate::pathctx::home_dir().unwrap_or_default();
     let ours = home.rsplit_once('/').map(|(_, name)| name).unwrap_or_default();
     // Both conventional roots, not just this host's: the classifier reads strings, and a Linux
     // path handed to a macOS run must not come back with a different answer. The parent matches in

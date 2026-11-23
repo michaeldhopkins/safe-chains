@@ -810,6 +810,9 @@ mod tests {
 
     #[test]
     fn loop_variable_inherits_the_list_locus() {
+        // `~/.ssh/*` is a real directory. List the stand-in, not the process home.
+        let home = tempfile::tempdir().expect("home");
+        let _home = crate::pathctx::enter_home(home.path().to_str().expect("utf-8").to_string());
         // A worktree `in`-list → the body reads/writes the worktree → allowed. The bare `$f`
         // used to fail-closed to machine; now it binds to the list, like find's `{}`→path.
         for cmd in [

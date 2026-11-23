@@ -50,6 +50,8 @@ pub(super) fn expand(word: &Word) -> Option<Vec<String>> {
             let dir = listing_dir(prefix, &cwd, absolute);
             // The folder itself must list: when it cannot (a `cd` into a folder that does not
             // exist fails, and the glob then expands wherever the shell still is), nothing is known.
+            #[cfg(test)]
+            crate::pathctx::guard_listing(&dir);
             let entries = match std::fs::read_dir(&dir) {
                 Ok(entries) => entries,
                 Err(_) if prefix.is_empty() => return None,
@@ -256,6 +258,8 @@ pub(crate) fn has_glob_character(word: &Word) -> bool {
 }
 
 fn listed(dir: &str, component: &str, seen: &mut usize) -> Option<Vec<String>> {
+    #[cfg(test)]
+    crate::pathctx::guard_listing(dir);
     let entries = std::fs::read_dir(dir).ok()?;
     let mut names = Vec::new();
     for entry in entries {

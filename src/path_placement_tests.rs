@@ -11,9 +11,10 @@ fn workspace() -> PathCtx {
 }
 
 /// The `$HOME` that `~` stands for. `None` (the guard then has nothing to probe) only where the
-/// test process has no absolute home.
+/// test process has no absolute home. A stand-in installed with [`crate::pathctx::enter_home`]
+/// wins over the process home.
 fn absolute_home() -> Option<String> {
-    std::env::var("HOME").ok().filter(|h| h.starts_with('/') && h.len() > 1)
+    crate::pathctx::home_dir().filter(|h| h.len() > 1)
 }
 
 /// Contexts that consume a path and gate differently: plain and recursive reads, a write, an
@@ -40,6 +41,7 @@ proptest! {
     /// absolute spelling was resolved against the root.
     #[test]
     fn home_and_absolute_spellings_classify_alike(rel in arb_home_relative_path(), ctx in proptest::sample::select(HOME_SPELLING_CONTEXTS.to_vec())) {
+        let _stand_in = crate::pathctx::enter_home(stand_in_home().to_string());
         let Some(home) = absolute_home() else { return Ok(()) };
         let root = format!("{home}/projects/app");
         let ws = || PathCtx { cwd: Some(root.clone()), root: Some(root.clone()), ..Default::default() };
@@ -61,6 +63,7 @@ proptest! {
 /// inside the protected place is where the user chose to work, and is not probed.
 #[test]
 fn a_root_above_a_protected_place_does_not_unprotect_it() {
+    let _stand_in = crate::pathctx::enter_home(stand_in_home().to_string());
     for os in ["linux", "macos"] {
         let failures = crate::engine::resolve::regions::with_os(os, roots_above_protected_places_unprotecting);
         assert!(failures.is_empty(), "[{os}] a root above a protected place unprotected it:\n  {}", failures.join("\n  "));
@@ -128,14 +131,88 @@ fn another_users_home_stays_shielded_from_a_root_above_it() {
 
 /// Paths under `$HOME` and `/`, including the whole home, dotfiles, credential stores, the trust
 /// files and system directories that contain protected places.
+///
+/// A glob is not appended to another user's home. Listing `/Users` or `/home` opens a real
+/// directory, and from launchd that `open` can wait forever on a TCC prompt. The names are still
+/// judged; only the directory walk is kept off the real tree.
 fn arb_sweep_target() -> impl Strategy<Value = String> {
     let first = proptest::sample::select(vec![
         "~", "~/", "~/projects", "~/.zshrc", "~/.ssh", "~/.ssh/id_rsa", "~/.config", "~/.config/safe-chains.toml",
         "~/.claude/settings.json", "~/Library", "~/Library/Keychains", "~/Library/LaunchAgents/x.plist", "/etc", "/etc/shadow",
-        "/etc/sudoers", "/Users", "/home",
+        "/etc/sudoers", "/Users/someone-else", "/Users/someone-else/notes.txt", "/home/someone-else", "/home/someone-else/notes.txt",
     ]);
     let glob = proptest::sample::select(vec!["", "/*", "/.ss?", "/x"]);
-    (first, glob).prop_map(|(f, g)| format!("{}{g}", f.trim_end_matches('/')))
+    (first, glob).prop_map(|(f, g)| {
+        let base = f.trim_end_matches('/');
+        if base.starts_with("/Users") || base.starts_with("/home") { base.to_string() } else { format!("{base}{g}") }
+    })
+}
+
+/// A home directory full of the protected-place names a real home has, under a temp directory.
+/// Listings of `~/Library/Keychains` and `~/Desktop` hit this tree.
+fn stand_in_home() -> &'static str {
+    struct Kept(tempfile::TempDir, String);
+    static FIXTURE: std::sync::OnceLock<Kept> = std::sync::OnceLock::new();
+    let kept = FIXTURE.get_or_init(|| {
+        let dir = tempfile::tempdir().expect("stand-in home");
+        let home = dir.path().join("Users").join("me");
+        for rel in [
+            "Desktop", "Documents", "Downloads", "Movies", "Music", "Pictures", "Library/Keychains", "Library/Messages", "Library/Mail",
+            "Library/Safari", "Library/Cookies", "Library/LaunchAgents", ".ssh", ".config", ".config/gh", ".claude", "projects",
+        ] {
+            std::fs::create_dir_all(home.join(rel)).expect("fixture dir");
+        }
+        std::fs::write(home.join(".zshrc"), "").expect("fixture file");
+        std::fs::write(home.join(".ssh/id_rsa"), "").expect("fixture file");
+        std::fs::write(home.join(".config/safe-chains.toml"), "").expect("fixture file");
+        std::fs::write(home.join(".config/gh/hosts.yml"), "").expect("fixture file");
+        std::fs::write(home.join(".claude/settings.json"), "").expect("fixture file");
+        std::fs::write(home.join("Library/LaunchAgents/x.plist"), "").expect("fixture file");
+        let home = home.to_str().expect("utf-8 temp path").to_string();
+        let real = std::env::var("HOME").ok();
+        assert!(!crate::pathctx::walks_real_home(&home, real.as_deref()), "the stand-in {home} is inside the real home");
+        Kept(dir, home)
+    });
+    // The directory is held so the fixture stays on disk for the whole process.
+    let _held = &kept.0;
+    kept.1.as_str()
+}
+
+/// Listing the process home fails the test. `~/Library/Keychains` is one of the directories the
+/// placement property opened; the predicate covers that path. This call stats the home directory
+/// itself, which exists and is not a TCC-protected folder, so the guard's check cannot block.
+#[test]
+#[should_panic(expected = "under the real home or /Users or /home")]
+fn listing_the_real_home_fails_the_test() {
+    let home = std::env::var("HOME").expect("HOME");
+    crate::pathctx::guard_listing(&home);
+}
+
+#[test]
+fn a_fixture_listing_is_not_the_real_home() {
+    let real = std::env::var("HOME").ok();
+    crate::pathctx::guard_listing(stand_in_home());
+    crate::pathctx::guard_listing("/");
+    crate::pathctx::guard_listing("/etc");
+    for path in [
+        "/Users", "/Users/someone-else", "//Users", "/home", "/home/someone-else", "/System/Volumes/Data/Users",
+        "/System/Volumes/Data/home",
+    ] {
+        assert!(crate::pathctx::walks_real_home(path, real.as_deref()), "{path}");
+    }
+    if cfg!(target_os = "macos") {
+        assert!(crate::pathctx::walks_real_home("/USERS", real.as_deref()));
+    }
+    if let Some(home) = real.as_deref() {
+        assert!(crate::pathctx::walks_real_home(home, Some(home)), "{home}");
+        assert!(crate::pathctx::walks_real_home(&format!("{home}/Library/Keychains"), Some(home)));
+        assert!(crate::pathctx::walks_real_home(&format!("/{home}"), Some(home)));
+    }
+    assert!(!crate::pathctx::walks_real_home(stand_in_home(), real.as_deref()));
+    assert!(!crate::pathctx::walks_real_home("/", real.as_deref()));
+    assert!(!crate::pathctx::walks_real_home("/etc", real.as_deref()));
+    assert!(!crate::pathctx::walks_real_home("/usr", real.as_deref()));
+    assert!(!crate::pathctx::walks_real_home("/System/Volumes/Data", real.as_deref()));
 }
 
 /// Contexts that sweep, persist, delete or exfiltrate. `{}` is the path slot.
@@ -149,6 +226,7 @@ proptest! {
     /// one, in any spelling of the path: `~/…`, absolute, or relative to that root.
     #[test]
     fn a_root_holding_protected_places_is_never_more_permissive(target in arb_sweep_target(), ctx in proptest::sample::select(SWEEP_CONTEXTS.to_vec()), root_pick in 0usize..3) {
+        let _stand_in = crate::pathctx::enter_home(stand_in_home().to_string());
         let Some(home) = absolute_home() else { return Ok(()) };
         let root = [home.as_str(), "/", "/Users"][root_pick].to_string();
         let absolute = match target.strip_prefix('~') {
@@ -195,6 +273,7 @@ fn a_root_holding_protected_places_is_recognised_in_every_spelling() {
 /// protected place, what is inside it, and the directories above it stay out of the worktree.
 #[test]
 fn a_project_root_holding_a_trust_file_still_writes_its_other_files() {
+    let _stand_in = crate::pathctx::enter_home(stand_in_home().to_string());
     let Some(home) = absolute_home() else { return };
     let root = format!("{home}/.claude");
     let here = PathCtx { cwd: Some(root.clone()), root: Some(root), ..Default::default() };

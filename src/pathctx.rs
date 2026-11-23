@@ -27,6 +27,9 @@ mod lexical;
 mod place;
 mod vars;
 pub use item_shape::{Binding, Facts, ItemShape, ItemShapeGuard, binding, enter_loop_shape, enter_stdin_shape, loop_shape, stdin_shape};
+pub(crate) use lexical::home_dir;
+#[cfg(test)]
+pub(crate) use lexical::{enter_home, guard_listing, walks_real_home};
 use lexical::{expand_home, lexical_join, names_no_known_directory};
 use place::physical;
 pub(crate) use place::{Here, Placed, here, on_the_link, place};

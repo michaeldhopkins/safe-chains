@@ -108,8 +108,12 @@ fn a_glob_budget_counts_entries_across_nested_directories() {
             std::fs::write(format!("{sub}/file-{f}-long-enough-to-expose-backtracking"), "").unwrap();
         }
     }
-    assert_eq!(resolve(&format!("{base}/p/d*/******."), true).as_deref(), Some(crate::pathctx::UNRESOLVED_CWD));
-    let tokens: Vec<_> = ["cargo", "--target-dir", "--output-dir=/**/******./.."]
+    let over_budget = format!("{base}/p/d*/******.");
+    assert_eq!(resolve(&over_budget, true).as_deref(), Some(crate::pathctx::UNRESOLVED_CWD));
+    // The same over-budget glob as a cargo write. A pattern that starts at `/` (`/**/…`) lists
+    // every top-level directory, `/Users` included, and that open blocks under launchd.
+    let flag = format!("--output-dir={over_budget}");
+    let tokens: Vec<_> = ["cargo", "--target-dir", flag.as_str()]
         .into_iter()
         .map(|s| crate::parse::Token::from_raw(s.to_string()))
         .collect();

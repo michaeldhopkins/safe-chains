@@ -336,7 +336,7 @@ fn firmlink_fold_impl(path: &str, fold_case: bool) -> Option<String> {
 }
 
 fn fold_spellings(path: &str) -> Cow<'_, str> {
-    let home = std::env::var("HOME").ok();
+    let home = crate::pathctx::home_dir();
     let home_abs = home
         .as_deref()
         .filter(|h| !h.is_empty() && path.strip_prefix(*h).is_some_and(|r| r.is_empty() || r.starts_with('/')));

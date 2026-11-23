@@ -41,7 +41,7 @@ pub(crate) fn keeps_absolute(abs: &str, root: &str) -> bool {
         return true;
     }
     let root_cmp = comparable(root);
-    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'));
+    let home = crate::pathctx::home_dir();
     if holds_a_home(&root_cmp, home.as_deref()) || protection_or_ancestor_covers(root) {
         return true;
     }
@@ -199,7 +199,7 @@ pub(crate) fn granted_for_writing(path: &str) -> bool {
 /// at or above a home directory contains nothing, as there.
 pub(crate) fn lies_in_root(placed: &crate::pathctx::Placed, root: &str) -> bool {
     let root = comparable(root);
-    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'));
+    let home = crate::pathctx::home_dir();
     root != "/" && !holds_a_home(&root, home.as_deref()) && under(&comparable(placed.judged()), &root)
 }
 

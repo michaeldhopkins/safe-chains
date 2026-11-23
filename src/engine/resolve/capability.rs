@@ -406,6 +406,9 @@ mod secret_read_tests {
             name in "[a-z_.*]{1,10}",
             scale in proptest::sample::select(Scale::all().to_vec()),
         ) {
+            // A glob under `~/` or `~/.ssh/` would otherwise list the process home.
+            let home = tempfile::tempdir().expect("home");
+            let _home = crate::pathctx::enter_home(home.path().to_str().expect("utf-8").to_string());
             let path = format!("{root}{name}");
             for c in [reads_path(&path, scale, "probe"), observes_path(&path, scale, "probe")] {
                 prop_assert_eq!(c.secret.level == SecretLevel::Reads, c.reversibility == Reversibility::Exposed, "{}", path);

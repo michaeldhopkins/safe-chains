@@ -205,6 +205,8 @@ fn walk(mut done: Vec<String>, mut todo: VecDeque<(String, bool)>, follow_last: 
 /// or cannot all be listed.
 fn glob(done: &[String], pattern: &str, rest: &VecDeque<(String, bool)>, follow_last: bool, budget: &mut Budget) -> Option<Outcome> {
     let dir = joined(done);
+    #[cfg(test)]
+    crate::pathctx::guard_listing(&dir);
     let entries = std::fs::read_dir(&dir).ok()?;
     let mut names = Vec::new();
     for entry in entries {

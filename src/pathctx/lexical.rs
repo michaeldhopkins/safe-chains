@@ -3,6 +3,97 @@
 
 use std::borrow::Cow;
 
+#[cfg(test)]
+use std::cell::RefCell;
+
+#[cfg(test)]
+thread_local! {
+    static HOME_OVERRIDE: RefCell<Option<String>> = const { RefCell::new(None) };
+}
+
+/// `$HOME` when it is absolute. A unit test can stand a fixture in for the process home, so a
+/// listing of `~/Library` or `/Users` does not open the real one. Production reads the environment
+/// only.
+pub(crate) fn home_dir() -> Option<String> {
+    #[cfg(test)]
+    if let Some(home) = HOME_OVERRIDE.with(|slot| slot.borrow().clone()).filter(|home| home.starts_with('/')) {
+        return Some(home);
+    }
+    std::env::var("HOME").ok().filter(|home| home.starts_with('/'))
+}
+
+/// Install `home` as [`home_dir`] until the guard drops. The process `$HOME` stays what a listing
+/// guard compares against, so the fixture is not mistaken for the real one.
+#[cfg(test)]
+#[must_use]
+pub(crate) fn enter_home(home: String) -> HomeGuard {
+    HomeGuard(HOME_OVERRIDE.with(|slot| slot.replace(Some(home))))
+}
+
+#[cfg(test)]
+pub(crate) struct HomeGuard(Option<String>);
+
+#[cfg(test)]
+impl Drop for HomeGuard {
+    fn drop(&mut self) {
+        let previous = self.0.take();
+        HOME_OVERRIDE.with(|slot| *slot.borrow_mut() = previous);
+    }
+}
+
+/// Whether listing `path` would open the process home, or a directory under `/Users` or `/home`.
+///
+/// `open` of a TCC-protected folder (`~/Library/Keychains`, `~/Desktop`, another user's home)
+/// waits for a consent prompt. A launchd job has no prompt, so the open never returns. The
+/// process home is the one in the environment, not a fixture installed with [`enter_home`].
+#[cfg(test)]
+pub(crate) fn walks_real_home(path: &str, real_home: Option<&str>) -> bool {
+    let path = normalize_listing(path);
+    if let Some(home) = real_home.map(normalize_listing).filter(|home| home.len() > 1)
+        && (path == home || path.starts_with(&format!("{home}/")))
+    {
+        return true;
+    }
+    const ROOTS: &[&str] = &["/Users", "/home", "/System/Volumes/Data/Users", "/System/Volumes/Data/home"];
+    ROOTS.iter().any(|root| listing_under(&path, root))
+}
+
+#[cfg(test)]
+fn listing_under(path: &str, root: &str) -> bool {
+    let (path, root) = if cfg!(target_os = "macos") {
+        (path.to_ascii_lowercase(), root.to_ascii_lowercase())
+    } else {
+        (path.to_string(), root.to_string())
+    };
+    path == root || path.starts_with(&format!("{root}/"))
+}
+
+#[cfg(test)]
+fn normalize_listing(path: &str) -> String {
+    let mut out = String::new();
+    for seg in path.split('/').filter(|seg| !seg.is_empty() && *seg != ".") {
+        out.push('/');
+        out.push_str(seg);
+    }
+    if out.is_empty() { "/".into() } else { out }
+}
+
+/// Fail the current test when listing `path` would open a directory under the real home, `/Users`
+/// or `/home`. A path that is not there is not such a directory: `open` returns at once. A path
+/// that is there, or that cannot be stated, is refused before `open`, which is what blocks.
+/// Production calls nothing.
+#[cfg(test)]
+pub(crate) fn guard_listing(path: &str) {
+    let real = std::env::var("HOME").ok();
+    if !walks_real_home(path, real.as_deref()) {
+        return;
+    }
+    if std::fs::symlink_metadata(path).is_err_and(|err| err.kind() == std::io::ErrorKind::NotFound) {
+        return;
+    }
+    panic!("a unit test listed {path}, under the real home or /Users or /home");
+}
+
 /// `~` / `~/rest` expanded against `$HOME`. `~user` is left alone (we cannot resolve another user's
 /// home); `None` only when `~` is used and `$HOME` is unusable.
 pub(super) fn expand_home(target: &str) -> Option<Cow<'_, str>> {
@@ -13,7 +104,7 @@ pub(super) fn expand_home(target: &str) -> Option<Cow<'_, str>> {
             None => return Some(Cow::Borrowed(target)),
         },
     };
-    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'))?;
+    let home = home_dir()?;
     Some(Cow::Owned(if rest.is_empty() { home } else { format!("{home}/{rest}") }))
 }
 

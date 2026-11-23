@@ -57,6 +57,9 @@ fn a_command_nothing_approves_yet_is_not_yet() {
 
 #[test]
 fn a_boundary_stays_a_boundary() {
+    // `~` and `~/.ssh` are real directories. Judge them against a stand-in home.
+    let home = tempfile::tempdir().expect("home");
+    let _home = crate::pathctx::enter_home(home.path().to_str().expect("utf-8").to_string());
     for command in BOUNDARY.iter().chain(DISGUISED) {
         assert_eq!(kind(command), GateKind::Boundary, "{command}");
     }
