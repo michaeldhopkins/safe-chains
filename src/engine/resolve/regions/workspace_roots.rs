@@ -120,10 +120,7 @@ fn expand(root: &str, home: Option<&str>) -> Option<String> {
 }
 
 fn too_broad(abs: &str, home: Option<&str>) -> bool {
-    if matches!(abs, "/" | "/Users" | "/home" | "/private" | "") {
-        return true;
-    }
-    home.map(|h| fold_private(h.trim_end_matches('/'))).is_some_and(|h| abs == h)
+    super::holds_a_home(&super::comparable(abs), home)
 }
 
 fn fold_private(path: &str) -> String {
@@ -190,6 +187,18 @@ mod tests {
         for root in ["/", "~", "~/", "~/..", "/home", "/Users", "/private", home, "~/../.ssh", "agent-workspaces", "$HOME/scripts"] {
             assert!(covers(&path, Some(home), &[root.to_string()]).is_none(), "{root}");
         }
+        let home = "/srv/accounts/dev";
+        let documents = format!("{home}/Documents");
+        assert!(covers(&documents, Some(home), &["/srv/accounts".to_string()]).is_none(), "/srv/accounts");
+        crate::engine::resolve::regions::with_os("macos", || {
+            for (home, root, documents) in [
+                ("/srv/Accounts/dev", "/SRV/accounts", "/SRV/accounts/dev/Documents"),
+                ("/Users/dev", "/users", "/users/dev/Documents"),
+                ("/Users/dev", "/users/dev", "/users/dev/Documents"),
+            ] {
+                assert!(covers(documents, Some(home), &[root.to_string()]).is_none(), "{root}");
+            }
+        });
     }
 
     #[test]

@@ -183,7 +183,7 @@ fn under(inner: &str, outer: &str) -> bool {
     outer == "/" || inner == outer || inner.strip_prefix(outer).is_some_and(|r| r.starts_with('/'))
 }
 
-fn holds_a_home(root: &str, home: Option<&str>) -> bool {
+pub(super) fn holds_a_home(root: &str, home: Option<&str>) -> bool {
     ["/Users", "/home", "/private"].into_iter().chain(home).map(comparable).any(|h| under(&h, root))
 }
 
@@ -209,7 +209,7 @@ fn literal_dir(path: &str) -> String {
 
 /// An absolute path in the form `keeps_absolute` compares: lexically collapsed, the
 /// `/private/{etc,var,tmp}` firmlinks folded, lowercased on macOS, no trailing slash but `/`.
-fn comparable(path: &str) -> String {
+pub(super) fn comparable(path: &str) -> String {
     let mut parts: Vec<&str> = Vec::new();
     for seg in path.split('/') {
         match seg {
