@@ -6,6 +6,9 @@ use std::sync::LazyLock;
 use super::{Frozen, Matcher, REGIONS, Role, absolute_other_home, current_os, secret_node};
 use crate::engine::facet::LocalLocus;
 
+#[path = "workspace_roots.rs"]
+mod workspace_roots;
+
 /// Whether a role is a PROTECTION (a credential/secret shield, the pinned config, or a
 /// write-freeze) rather than an admit — it makes some face stricter than an ordinary worktree.
 /// Only protection nodes are matched case-insensitively on a case-insensitive filesystem: folding
@@ -94,6 +97,9 @@ fn has_disallowed_dot_component(path: &str, home: Option<&str>) -> bool {
     let Some(norm) = crate::pathctx::join_cwd(None, path).filter(|p| p.starts_with('/')) else {
         return true;
     };
+    if let Some(disqualified) = workspace_roots::dot_disqualifies(&norm, home) {
+        return disqualified;
+    }
     if let Some(h) = home.map(|h| h.trim_end_matches('/')).filter(|h| !h.is_empty())
         && let Some(rel) = norm.strip_prefix(h).and_then(|r| r.strip_prefix('/'))
     {
@@ -135,10 +141,11 @@ pub(crate) fn is_workspace_root(dir: &str) -> bool {
 fn in_known_workspace(path: &str, home: Option<&str>) -> bool {
     if let Some(h) = home.map(|h| h.trim_end_matches('/')).filter(|h| !h.is_empty())
         && let Some(rel) = path.strip_prefix(h).and_then(|r| r.strip_prefix('/'))
-        && (rel == "projects"
-            || rel.starts_with("projects/")
-            || (rel.starts_with(".worktrees/") && !rel[".worktrees/".len()..].is_empty()))
+        && (rel == "projects" || rel.starts_with("projects/") || (rel.starts_with(".worktrees/") && !rel[".worktrees/".len()..].is_empty()))
     {
+        return true;
+    }
+    if workspace_roots::listed(path, home) {
         return true;
     }
     (granted_in_user_config(path) && granted_for_writing(path))

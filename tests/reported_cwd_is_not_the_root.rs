@@ -101,11 +101,23 @@ fn known_workspaces_and_user_grants_become_the_root_while_protected_or_outside_d
     std::fs::create_dir_all(&granted).expect("mkdir granted");
     std::fs::write(
         home.join(".config/safe-chains.toml"),
-        format!("[[grant]]\npath = \"{}\"\nread = true\nwrite = true\n", granted.display()),
+        format!(
+            "workspace_roots = [\"~/agent-workspaces\", \"~/scripts\", \"~/work/.agents\"]\n[[grant]]\npath = \"{}\"\nread = true\nwrite = true\n",
+            granted.display()
+        ),
     )
     .expect("write config");
 
-    for valid in [home.join("projects/app"), home.join(".worktrees/wt-1"), granted.clone()] {
+    for valid in [
+        home.join("projects/app"),
+        home.join(".worktrees/wt-1"),
+        home.join("agent-workspaces"),
+        home.join("agent-workspaces/agent-1"),
+        home.join("scripts"),
+        home.join("scripts/job"),
+        home.join("work/.agents/agent-1"),
+        granted.clone(),
+    ] {
         std::fs::create_dir_all(&valid).expect("mkdir valid");
         for cmd in ["echo hi > out.txt", "mise set FOO=bar", "ls", "cargo --version"] {
             let out = decision(&home, &valid, cmd);
@@ -118,6 +130,10 @@ fn known_workspaces_and_user_grants_become_the_root_while_protected_or_outside_d
         home.join(".worktrees"),
         home.join("projects/app/.hidden"),
         home.join(".worktrees/wt-1/.git"),
+        home.join("work/.agents"),
+        home.join("work/.agents/agent-1/.git"),
+        home.join("agent-workspaces/agent-1/.hidden"),
+        home.join("scripts/job/.git"),
         base.path().join("ungranted/app"),
     ] {
         std::fs::create_dir_all(&rejected).expect("mkdir rejected");
@@ -128,6 +144,38 @@ fn known_workspaces_and_user_grants_become_the_root_while_protected_or_outside_d
         let read_out = decision(&home, &rejected, "ls");
         assert!(read_out.contains("\"allow\""), "`ls` should still approve in {}: {read_out}", rejected.display());
     }
+}
+
+#[test]
+fn a_configured_workspace_root_is_a_root_only_when_the_config_names_it() {
+    let base = tempfile::tempdir().expect("tempdir");
+    let home = base.path().join("home");
+    std::fs::create_dir_all(home.join(".config")).expect("mkdir .config");
+    let folders = [home.join("agent-workspaces/agent-1"), home.join("scripts/job"), home.join("work/.agents/agent-1")];
+    for folder in &folders {
+        std::fs::create_dir_all(folder).expect("mkdir");
+        let out = decision(&home, folder, "echo hi > out.txt");
+        assert!(!out.contains("\"allow\""), "unnamed root approved a write in {}: {out}", folder.display());
+    }
+    std::fs::write(
+        home.join(".config/safe-chains.toml"),
+        "workspace_roots = [\"~/agent-workspaces\", \"~/scripts\", \"~/work/.agents\"]\n",
+    )
+    .expect("write config");
+    for folder in &folders {
+        for cmd in ["echo hi > out.txt", "mise set FOO=bar", "ls", "cargo --version"] {
+            let out = decision(&home, folder, cmd);
+            assert!(out.contains("\"allow\""), "`{cmd}` should approve in configured root {}: {out}", folder.display());
+        }
+    }
+    let parent = home.join("work/.agents");
+    std::fs::create_dir_all(&parent).expect("mkdir parent");
+    let parent_out = decision(&home, &parent, "echo hi > out.txt");
+    assert!(!parent_out.contains("\"allow\""), "the dotted root itself approved a write: {parent_out}");
+    let hidden = home.join("scripts/job/.git");
+    std::fs::create_dir_all(&hidden).expect("mkdir hidden");
+    let hidden_out = decision(&home, &hidden, "echo hi > out.txt");
+    assert!(!hidden_out.contains("\"allow\""), "a dot component below the root approved a write: {hidden_out}");
 }
 
 #[test]
