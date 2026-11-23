@@ -427,14 +427,14 @@ fn a_home_path_after_an_at_is_a_path_part_and_a_version_range_is_not() {
 }
 
 #[test]
-fn a_spent_classification_budget_makes_a_refusal_too_large_to_read_not_a_boundary() {
+fn a_spent_classification_budget_is_a_boundary_when_the_text_names_nothing() {
     in_gate_probe(|| {
         let cmd = "zzgatetool sync";
         let explanation = crate::explain_with_coverage_at_level(cmd, None);
         let _outer = crate::enter_classify_budget(cmd);
         while crate::cst::check::charge_classify_work(1) {}
-        assert_eq!(gate_kind(cmd, &explanation, &|_| false, &|_| false), GateKind::TooLarge);
-        assert_eq!(segment_kind(cmd, &|_| false, false), GateKind::TooLarge);
+        assert_eq!(gate_kind(cmd, &explanation, &|_| false, &|_| false), GateKind::Boundary);
+        assert_eq!(segment_kind(cmd, &|_| false, false), GateKind::Boundary);
         let named = "zzgatetool ~/.ssh/id_rsa";
         let explanation = crate::explain_with_coverage_at_level(named, None);
         assert_eq!(gate_kind(named, &explanation, &|_| false, &|_| false), GateKind::Boundary);
@@ -458,7 +458,7 @@ fn a_link_is_followed_out_when_the_project_root_is_unknown() {
 
 /// A hook whose folder is not a known workspace judges the command in the unknown folder, but the
 /// command runs in the folder it reported, so a link there is met by the kernel. It counts as
-/// leading out, also when the work budget is spent and only the text checks run.
+/// leading out, also when the work budget is spent before those checks can run.
 #[test]
 fn a_link_in_the_reported_folder_leads_out_from_an_unknown_one() {
     in_linked_workspace(|root| {

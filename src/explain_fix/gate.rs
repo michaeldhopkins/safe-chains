@@ -52,7 +52,7 @@ pub fn gate_kind(
     approved_by_default: &dyn Fn(&str) -> bool,
 ) -> GateKind {
     let Some(_guard) = crate::cst::check::ClassifyGuard::enter(command.len()) else {
-        return too_large_unless_named_a_boundary(command);
+        return GateKind::Boundary;
     };
     if text_is_opaque(command) || words_name_a_boundary(command) || reaches_a_boundary(command) {
         return GateKind::Boundary;
@@ -83,7 +83,7 @@ pub fn gate_kind(
 /// The kind of one refused segment, from what [`fix_for`] says would approve it.
 pub fn segment_kind(segment: &str, approved: &dyn Fn(&str) -> bool, approved_by_default: bool) -> GateKind {
     let Some(_guard) = crate::cst::check::ClassifyGuard::enter(segment.len()) else {
-        return too_large_unless_named_a_boundary(segment);
+        return GateKind::Boundary;
     };
     let kind = match fix_for(segment, approved, approved_by_default) {
         Fix::Nothing(Because::ProtectedPath { reason, .. }) if is_boundary_reason(reason) => GateKind::Boundary,
@@ -98,13 +98,6 @@ pub fn segment_kind(segment: &str, approved: &dyn Fn(&str) -> bool, approved_by_
         _ => GateKind::NotYet,
     };
     if kind != GateKind::Boundary && crate::cst::classify_budget::classify_budget_spent() { GateKind::TooLarge } else { kind }
-}
-
-/// What a command is when the work budget is spent before the checks that need it can run: only
-/// the checks that read the text need no budget, so a boundary they find still refuses, and
-/// anything else is too large to read.
-fn too_large_unless_named_a_boundary(text: &str) -> GateKind {
-    if text_is_opaque(text) || words_name_a_boundary(text) { GateKind::Boundary } else { GateKind::TooLarge }
 }
 
 fn is_boundary_reason(reason: ReachReason) -> bool {

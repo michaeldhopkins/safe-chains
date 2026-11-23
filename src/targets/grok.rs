@@ -329,11 +329,10 @@ mod tests {
         assert!(GrokHookFormat.parse_input("{}").is_err());
     }
 
-    /// An exhausted work budget is "too large to read", not "dangerous": where grok can ask, the
-    /// command goes to a person, who sees it, instead of being vetoed. Where an ask may be answered
-    /// by nobody, it stays a veto.
+    /// An exhausted work budget means the filesystem checks did not run. That is a boundary, so grok
+    /// refuses it in every mode, including the ones where a not-yet command would be asked.
     #[test]
-    fn a_spent_classification_budget_is_put_to_a_person_in_a_prompting_mode() {
+    fn a_spent_classification_budget_is_refused_in_every_mode() {
         use super::super::GatedPolicy;
         let project = crate::process_home::var().unwrap_or_else(|_| "/home/tester".into()) + "/projects/budgetprobe";
         let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx { cwd: Some(project.clone()), root: Some(project), session_id: None });
@@ -342,10 +341,7 @@ mod tests {
         let _outer = crate::enter_classify_budget(cmd);
         while crate::cst::check::charge_classify_work(1) {}
         let kind = crate::explain_fix::gate::gate_kind(cmd, &explanation, &|_| false, &|_| false);
-        for mode in ["default", "auto", "plan"] {
-            assert_eq!(GrokHookFormat.gated_policy_for(kind, Some(mode)), GatedPolicy::Ask, "{mode}");
-        }
-        for mode in [None, Some("bypassPermissions"), Some("dontAsk")] {
+        for mode in [None, Some("default"), Some("auto"), Some("plan"), Some("bypassPermissions"), Some("dontAsk")] {
             assert_eq!(GrokHookFormat.gated_policy_for(kind, mode), GatedPolicy::Deny, "{mode:?}");
         }
     }
@@ -361,6 +357,7 @@ mod tests {
             let asks = matches!(mode, Some("default" | "auto" | "plan"));
             let expected = if asks { GatedPolicy::Ask } else { GatedPolicy::Deny };
             assert_eq!(GrokHookFormat.gated_policy_for(GateKind::NotYet, mode), expected, "{mode:?}");
+            assert_eq!(GrokHookFormat.gated_policy_for(GateKind::TooLarge, mode), expected, "{mode:?}");
             assert_eq!(GrokHookFormat.gated_policy_for(GateKind::Boundary, mode), GatedPolicy::Deny, "{mode:?}");
         }
     }

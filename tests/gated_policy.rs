@@ -120,6 +120,55 @@ fn grok_asks_about_a_not_yet_command_naming_a_path_under_a_home_in_a_temporary_f
     assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(serde_json::Value::as_str), Some("ask"), "{v}");
 }
 
+/// A recursive `chmod` into a directory that holds `.git` is a boundary the text does not name.
+/// Spending the classification budget must not turn that into an ask: a check that cannot read the
+/// tree has not shown the command to be safe.
+#[test]
+fn a_recursive_chmod_into_git_is_refused_when_the_classification_budget_is_spent() {
+    use std::io::Write;
+    let home = tempfile::tempdir().expect("home");
+    let project = home.path().join("projects/probe");
+    std::fs::create_dir_all(project.join("sub/.git")).expect("git dir");
+    std::fs::create_dir_all(home.path().join(".config")).expect("config dir");
+    std::fs::write(home.path().join(".config/safe-chains.toml"), "").expect("config");
+    let run = |command: &str| {
+        let envelope = serde_json::json!({
+            "hookEventName": "pre_tool_use",
+            "toolName": "run_terminal_command",
+            "toolInput": { "command": command },
+            "cwd": &project,
+            "workspaceRoot": &project,
+            "permissionMode": "default",
+        });
+        let mut child = std::process::Command::new(hooks::binary())
+            .args(["hook", "grok"])
+            .env_clear()
+            .env("HOME", home.path())
+            .env("PATH", "/usr/bin:/bin")
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .spawn()
+            .expect("spawn safe-chains");
+        child.stdin.take().expect("stdin").write_all(envelope.to_string().as_bytes()).expect("write");
+        let out = child.wait_with_output().expect("wait");
+        let stdout = String::from_utf8_lossy(&out.stdout).into_owned();
+        let stderr = String::from_utf8_lossy(&out.stderr).into_owned();
+        let v: serde_json::Value = serde_json::from_str(&stdout).unwrap_or_default();
+        (v, out.status.code().unwrap_or(-1), stderr)
+    };
+    let mut padded = String::from("chmod -R 777 sub; for i in");
+    for n in 0..600 {
+        padded.push(' ');
+        padded.push_str(&n.to_string());
+    }
+    padded.push_str("; do :; done");
+    let (v, code, err) = run(&padded);
+    assert_eq!(code, 2, "{v} {err}");
+    assert_eq!(v.pointer("/decision").and_then(serde_json::Value::as_str), Some("deny"), "{v}");
+    assert!(v.pointer("/hookSpecificOutput/permissionDecision").is_none(), "a filesystem boundary was asked: {v}");
+}
+
 /// Under a configured level, a refused segment the default would not approve keeps its own kind:
 /// running an agent stays a boundary, refused without a prompt.
 #[test]
