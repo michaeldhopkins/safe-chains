@@ -40,6 +40,9 @@ toml = "0.8"
 # Format-preserving edits to ~/.config/safe-chains.toml (`safe-chains config`): comments, order and
 # spacing survive an add or a remove. Already in the tree as toml's own parser.
 toml_edit = "0.22"
+# NFC for path comparison. APFS treats a name and its decomposed spelling as one directory, so a
+# workspace root written in NFD has to compare as the home it names.
+unicode-normalization = "0.1.25"
 winnow = "0.7.15"
 
 [dev-dependencies]

@@ -201,6 +201,44 @@ mod tests {
         });
     }
 
+    /// `/System/Volumes/Data` is the same tree as `/` on the default macOS volume. A root spelled
+    /// that way, or as the data-volume form of `/Users` or of `$HOME`, would otherwise cover the
+    /// home and hand it out as a worktree.
+    #[test]
+    fn a_data_volume_spelling_of_a_broad_root_covers_nothing() {
+        let home = "/srv/accounts/dev";
+        let mut accepted = Vec::new();
+        for root in ["/System/Volumes/Data", "/System/Volumes/Data/Users", &format!("/System/Volumes/Data{home}")] {
+            let path = format!("{root}/agent-workspaces/agent-1");
+            if covers(&path, Some(home), &[root.to_string()]).is_some() {
+                accepted.push(root.to_string());
+            }
+        }
+        assert!(accepted.is_empty(), "accepted {accepted:?}");
+    }
+
+    /// APFS treats a name and its decomposed spelling as one directory. A root that is `$HOME`
+    /// written in NFD is the home folder, and the files under it are not a worktree.
+    #[test]
+    fn a_root_in_the_decomposed_form_of_home_covers_nothing() {
+        crate::engine::resolve::regions::with_os("macos", || {
+            let home = "/srv/accounts/caf\u{e9}";
+            let root = "/srv/accounts/cafe\u{301}";
+            let path = format!("{root}/Documents");
+            assert!(covers(&path, Some(home), &[root.to_string()]).is_none(), "{root}");
+        });
+    }
+
+    /// Case folding is a macOS volume property. Off macOS, `/SRV` is a different directory from
+    /// `/srv`, so a root there does not hold `$HOME`.
+    #[test]
+    fn a_case_variant_root_is_accepted_off_macos() {
+        crate::engine::resolve::regions::with_os("linux", || {
+            let home = "/srv/accounts/dev";
+            assert_eq!(covers("/SRV/projects/app", Some(home), &["/SRV".to_string()]).as_deref(), Some("projects/app"));
+        });
+    }
+
     #[test]
     fn an_absolute_root_covers_its_descendants_on_either_spelling_of_a_firmlink() {
         let roots = vec!["/tmp/agent-workspaces".to_string()];

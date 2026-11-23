@@ -9,6 +9,13 @@
 
 use super::metadata::glob_may_match;
 use super::{Matcher, REGIONS, Role, home_spelling, more_restrictive};
+use unicode_normalization::UnicodeNormalization;
+
+/// `text` in canonical composition. A decomposed spelling of a name is the same directory as the
+/// composed one on the default macOS volume, and an ASCII string is already composed.
+pub(super) fn nfc(text: &str) -> String {
+    if text.is_ascii() { text.to_string() } else { text.nfc().collect() }
+}
 
 /// The role of the most protective node `path` could name once each character outside ASCII may
 /// stand for any run of characters, or `None` for an ASCII path or one no protected node fits.

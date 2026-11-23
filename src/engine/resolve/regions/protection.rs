@@ -34,7 +34,8 @@ pub(super) fn role_is_protective(role: &Role) -> bool {
 ///
 /// The root comes from the harness as spelled, so paths are compared in a normal form: `.` and
 /// `..` collapsed, macOS's `/private` firmlinks folded (a session started in `/etc` reports
-/// `/private/etc`), and case folded on macOS. A folded comparison only ever finds more.
+/// `/private/etc`), a leading `/System/Volumes/Data` removed, and, on macOS, Unicode composed to
+/// NFC and case folded. A folded comparison only ever finds more.
 pub(crate) fn keeps_absolute(abs: &str, root: &str) -> bool {
     if crate::pathctx::folder::is_unknown(root) {
         return true;
@@ -208,8 +209,12 @@ fn literal_dir(path: &str) -> String {
 }
 
 /// An absolute path in the form `keeps_absolute` compares: lexically collapsed, the
-/// `/private/{etc,var,tmp}` firmlinks folded, lowercased on macOS, no trailing slash but `/`.
+/// `/private/{etc,var,tmp}` firmlinks folded, a leading `/System/Volumes/Data` removed (any ASCII
+/// case on macOS), and on macOS Unicode in NFC and lowercased. No trailing slash but `/`.
 pub(super) fn comparable(path: &str) -> String {
+    // Composition is a property of the default macOS volume. Off macOS the two forms are different
+    // directories, and folding them would treat a path outside the project as inside it.
+    let path = if current_os() == "macos" { super::unicode_spelling::nfc(path) } else { path.to_string() };
     let mut parts: Vec<&str> = Vec::new();
     for seg in path.split('/') {
         match seg {
@@ -224,6 +229,7 @@ pub(super) fn comparable(path: &str) -> String {
     if current_os() == "macos" {
         out = out.to_ascii_lowercase();
     }
+    out = strip_data_volume(out);
     for firm in ["/etc", "/var", "/tmp"] {
         let private = format!("/private{firm}");
         if out == private || out.starts_with(&format!("{private}/")) {
@@ -231,6 +237,20 @@ pub(super) fn comparable(path: &str) -> String {
         }
     }
     out
+}
+
+/// Remove a leading `/System/Volumes/Data`. On macOS the path is already lowercased, so every
+/// ASCII case of the prefix goes; elsewhere only the exact spelling does.
+fn strip_data_volume(path: String) -> String {
+    let prefix = if current_os() == "macos" { "/system/volumes/data" } else { "/System/Volumes/Data" };
+    let mut rest = path.as_str();
+    while rest == prefix || rest.strip_prefix(prefix).is_some_and(|tail| tail.starts_with('/')) {
+        rest = &rest[prefix.len()..];
+        if rest.is_empty() {
+            return "/".to_string();
+        }
+    }
+    if rest.len() == path.len() { path } else { rest.to_string() }
 }
 
 /// The literal directory or file a node is anchored at, and whether it covers what is below it
