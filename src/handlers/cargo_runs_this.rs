@@ -228,10 +228,37 @@ fn dependency_tables(manifest: &toml::Table) -> impl Iterator<Item = &toml::Tabl
 mod tests {
     use crate::is_safe_command;
 
+    fn scratch(label: &str) -> tempfile::TempDir {
+        tempfile::Builder::new().prefix(&format!("sc-cargo-run-{label}-")).tempdir().expect("scratch dir")
+    }
+
+    #[test]
+    fn the_tests_here_leave_no_folders_behind() {
+        if std::env::var_os("SC_LITTER_CHILD").is_some() {
+            return;
+        }
+        let tmp = tempfile::tempdir().expect("tmp");
+        let out = std::process::Command::new(std::env::current_exe().expect("test binary"))
+            .args(["handlers::cargo_runs_this::tests::", "--skip", "leave_no_folders_behind", "--test-threads", "4"])
+            .env("TMPDIR", tmp.path())
+            .env("SC_LITTER_CHILD", "1")
+            .output()
+            .expect("run");
+        let stdout = String::from_utf8_lossy(&out.stdout);
+        assert!(out.status.success(), "{stdout}");
+        assert!(stdout.contains("test result: ok.") && !stdout.contains(" 0 passed"), "the child ran no tests: {stdout}");
+        let left: Vec<_> = std::fs::read_dir(tmp.path())
+            .expect("read")
+            .flatten()
+            .map(|e| e.file_name())
+            .filter(|name| name.to_string_lossy().starts_with("sc-cargo-run-"))
+            .collect();
+        assert!(left.is_empty(), "left behind: {left:?}");
+    }
+
     fn in_project(name: Option<&str>, cmd: &str) -> bool {
-        static NEXT: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(0);
-        let call = NEXT.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
-        let dir = std::env::temp_dir().join(format!("sc-cargo-run-{}-{}-{call}", std::process::id(), name.unwrap_or("virtual")));
+        let scratch = scratch(name.unwrap_or("virtual"));
+        let dir = scratch.path().to_path_buf();
         std::fs::create_dir_all(dir.join("src")).expect("project dir");
         let manifest = match name {
             Some(name) => format!("[package]\nname = \"{name}\"\nversion = \"0.1.0\"\n"),
@@ -310,7 +337,8 @@ mod tests {
     /// `-C` moves the folder cargo runs in, so it picks the manifest that decides.
     #[test]
     fn a_changed_directory_picks_the_manifest_that_decides() {
-        let root = std::env::temp_dir().join(format!("sc-cargo-run-{}-chdir", std::process::id()));
+        let scratch = scratch("chdir");
+        let root = scratch.path().to_path_buf();
         let (this, other) = (root.join("this"), root.join("other"));
         for (dir, name) in [(&this, "safe-chains"), (&other, "tool")] {
             std::fs::create_dir_all(dir).expect("project dir");
@@ -345,7 +373,8 @@ mod tests {
     }
 
     fn in_manifest(label: &str, manifest: &str, cmd: &str) -> bool {
-        let dir = std::env::temp_dir().join(format!("sc-cargo-run-{}-{label}", std::process::id()));
+        let scratch = scratch(label);
+        let dir = scratch.path().to_path_buf();
         std::fs::create_dir_all(dir.join("src")).expect("project dir");
         std::fs::write(dir.join("Cargo.toml"), manifest).expect("manifest");
         let _cwd = crate::pathctx::enter_cwd(Some(dir.join("src").to_string_lossy().into_owned()));
@@ -369,8 +398,8 @@ mod tests {
     }
 
     fn in_workspace(label: &str, root: &str, members: &[(&str, &str)], cmd: &str) -> bool {
-        let dir = std::env::temp_dir().join(format!("sc-cargo-run-{}-ws-{label}", std::process::id()));
-        let _ = std::fs::remove_dir_all(&dir);
+        let scratch = scratch(&format!("ws-{label}"));
+        let dir = scratch.path().to_path_buf();
         std::fs::create_dir_all(dir.join("src")).expect("workspace dir");
         std::fs::write(dir.join("Cargo.toml"), root).expect("root manifest");
         for (path, manifest) in members {
@@ -481,7 +510,8 @@ mod tests {
 
     #[test]
     fn a_folder_is_placed_after_its_links_are_followed() {
-        let root = std::env::temp_dir().join(format!("sc-cargo-run-{}-links", std::process::id()));
+        let scratch = scratch("links");
+        let root = scratch.path().to_path_buf();
         let this = root.join("this");
         let other = root.join("other");
         std::fs::create_dir_all(this.join("src")).expect("this project");
