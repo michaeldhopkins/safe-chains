@@ -17,6 +17,8 @@ about one command is one wrong answer. A gap in the mechanism is every command t
 would have used it — which is why the backlog below is ordered by how much of the
 model a gap makes inexpressible, not by how many commands are waiting on it.
 
+`cd "$(pwd)" && echo x > out` is now refused while `echo hi > $(pwd)/out.txt` stays approved (`tests/pwd_substitution_links.rs`). Stricter, not a hole; reconcile the two spellings when that code is next touched.
+
 ## Three pipe-locus tests refuse when other tests' scratch projects share their TMPDIR
 
 On a 32-core Linux runner whose `TMPDIR` is a sibling of the checkout under `/work`, the full lib suite
