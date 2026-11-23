@@ -152,3 +152,26 @@ fn a_declared_directory_never_becomes_the_project_root() {
         }
     }
 }
+
+/// A named directory that is itself a valid workspace is still not the project. Gemini's
+/// `GEMINI_PROJECT_DIR` stays the project, and a relative command in the other workspace prompts.
+#[test]
+fn a_declared_directory_that_is_its_own_workspace_does_not_become_the_project() {
+    let (_base, home, _proj) = fixture();
+    let app = home.join("projects/app");
+    let other = home.join("projects/other");
+    std::fs::create_dir_all(app.join("src")).expect("app");
+    std::fs::create_dir_all(app.join(".git")).expect("git");
+    std::fs::create_dir_all(other.join("src")).expect("other");
+    std::fs::create_dir_all(other.join(".git")).expect("git");
+    let run = |command: &str| {
+        let payload = serde_json::json!({
+            "tool_name": "run_shell_command",
+            "tool_input": { "command": command, "dir_path": &other },
+            "cwd": &app,
+        });
+        decide_with("gemini", &home, &app, &payload, &[("GEMINI_PROJECT_DIR", app.as_path())])
+    };
+    assert!(!run("rm -rf src"), "rm -rf src in another workspace was approved");
+    assert!(!run("cargo build"), "cargo build in another workspace was approved");
+}

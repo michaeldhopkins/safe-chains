@@ -181,7 +181,7 @@ pub fn evaluation_dirs(format: &dyn HookFormat, input: &HookInput) -> (Option<St
     }
     match (&input.cwd, valid_cwd) {
         (Some(_), Some(cwd)) => {
-            let root = valid_root.unwrap_or_else(|| if input.cwd_declared { UNKNOWN_WORKDIR.to_string() } else { cwd.clone() });
+            let root = declared::project_root_beside(input.cwd_declared, &cwd, valid_root);
             (Some(cwd), Some(root))
         }
         (Some(raw), None) if valid_root.is_none() && is_a_plain_folder(raw) => (Some(raw.clone()), Some(UNKNOWN_WORKDIR.to_string())),
