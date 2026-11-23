@@ -18,8 +18,19 @@ pub(crate) fn declared_cwd(reported: Option<String>, declared: Option<&str>) -> 
 /// project is where the writes and the code land, so the project stops being the root. A named
 /// directory inside the project keeps it. The directory the harness reported keeps it too.
 pub(crate) fn project_root_beside(cwd_declared: bool, cwd: &str, project: Option<String>) -> String {
-    let inside = project.as_deref().is_some_and(|root| directory_holds(cwd, root));
+    let placed = placed_directory(cwd);
+    // Open the root the same way. A project typed through a link still holds a directory that
+    // resolves inside it; comparing the typed spelling drops that project.
+    let inside = project
+        .as_deref()
+        .is_some_and(|root| directory_holds(&placed, &crate::pathctx::physical_directory(root)));
     if cwd_declared && !inside { UNKNOWN_WORKDIR.to_string() } else { project.unwrap_or_else(|| cwd.to_string()) }
+}
+
+/// The directory `chdir(2)` opens for `cwd`. Folding `..` before the link is followed climbs
+/// from the link, and the kernel climbs from the link's target.
+fn placed_directory(cwd: &str) -> String {
+    crate::pathctx::join_cwd_chdir(None, cwd).unwrap_or_else(|| cwd.to_string())
 }
 
 fn directory_holds(dir: &str, root: &str) -> bool {
@@ -57,5 +68,43 @@ mod tests {
         assert_eq!(project_root_beside(false, "/projects/other", project.clone()), "/projects/app");
         assert_eq!(project_root_beside(true, "/projects/other", None), unknown);
         assert_eq!(project_root_beside(false, "/projects/other", None), "/projects/other");
+    }
+
+    #[test]
+    fn a_named_directory_that_climbs_out_of_the_project_drops_the_project_root() {
+        let project = Some("/projects/app".to_string());
+        let unknown = UNKNOWN_WORKDIR.to_string();
+        assert_eq!(project_root_beside(true, "/projects/app/../other", project.clone()), unknown);
+        assert_eq!(project_root_beside(true, "/projects/app/src/../lib", project), "/projects/app");
+    }
+
+    #[test]
+    fn a_named_link_to_another_workspace_drops_the_project_root() {
+        let base = tempfile::tempdir().expect("tempdir");
+        let app = base.path().join("app");
+        let other = base.path().join("other");
+        std::fs::create_dir(&app).expect("app");
+        std::fs::create_dir(&other).expect("other");
+        std::fs::create_dir(other.join("sub")).expect("sub");
+        std::os::unix::fs::symlink("../other/sub", app.join("lnk")).expect("link");
+        let app_text = app.to_str().expect("utf-8 app");
+        let link_text = app.join("lnk").to_str().expect("utf-8 link").to_string();
+        assert_eq!(project_root_beside(true, &link_text, Some(app_text.to_string())), UNKNOWN_WORKDIR.to_string());
+        // `..` climbs from the link's target (`other`), not from the link's parent (`app`).
+        let climbed = app.join("lnk").join("..");
+        let climbed_text = climbed.to_str().expect("utf-8 climbed");
+        assert_eq!(project_root_beside(true, climbed_text, Some(app_text.to_string())), UNKNOWN_WORKDIR.to_string());
+    }
+
+    #[test]
+    fn a_project_reached_through_a_link_keeps_its_root() {
+        let base = tempfile::tempdir().expect("tempdir");
+        let app = base.path().join("real").join("app");
+        std::fs::create_dir_all(app.join("src")).expect("app");
+        std::os::unix::fs::symlink("real", base.path().join("lnk")).expect("link");
+        let through = base.path().join("lnk").join("app");
+        let through_text = through.to_str().expect("utf-8 project").to_string();
+        let src_text = through.join("src").to_str().expect("utf-8 src").to_string();
+        assert_eq!(project_root_beside(true, &src_text, Some(through_text.clone())), through_text);
     }
 }
