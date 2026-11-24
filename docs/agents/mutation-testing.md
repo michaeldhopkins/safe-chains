@@ -8,7 +8,14 @@ General method is in the `rust-mutation-testing` skill. This is what is specific
   to the release tree, before the push lands:
   ```bash
   base="$(scripts/mutants-base.sh "${LAST_COVERED_BASE:-origin/main}")"
-  git diff "$base"..HEAD > mutants.diff
+  # Force a/ b/ prefixes. diff.noprefix drops them; cargo-mutants then matches
+  # no files and exits 0. Pin diff.mnemonicPrefix the same way.
+  git -c diff.mnemonicPrefix=false -c diff.noprefix=false diff "$base"..HEAD > mutants.diff
+  if [ -s mutants.diff ] && ! grep -q '^diff --git a/' mutants.diff; then
+    echo "::error::diff lacks a/ b/ prefixes — cargo-mutants would silently match nothing"
+    head -3 mutants.diff
+    exit 1
+  fi
   scripts/mutants-run.sh --no-shuffle -vV --in-diff mutants.diff
   # or directly: cargo mutants --no-shuffle -vV --in-diff mutants.diff
   ```
