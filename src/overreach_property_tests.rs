@@ -92,6 +92,27 @@ proptest! {
         let message = reach.map(|(path, reason)| reason.message(&path)).unwrap_or_default();
         prop_assert!(!message.contains("Reading and writing temp files is fine"), "{}", path);
     }
+
+    #[test]
+    fn a_temp_path_whose_loop_var_is_only_half_pinned_is_not_a_foreign_temp(
+        root in proptest::sample::select(host_scratch_roots()),
+        file in "[a-z]{1,8}\\.(sh|txt|py)",
+        verb in proptest::sample::select(vec!["cat", "bash", "head", "rm"]),
+    ) {
+        let _g = crate::pathctx::enter(PathCtx {
+            cwd: Some("/work".into()),
+            root: Some("/work".into()),
+            session_id: None,
+        });
+        let _v = crate::pathctx::enter_loop_var(
+            "f".into(),
+            "__SAFE_CHAINS_CMDSUB__".into(),
+            file,
+        );
+        let path = format!("{root}/$f");
+        let reach = workspace_overreach(&format!("{verb} {path}"));
+        prop_assert_eq!(reach, Some((path.clone(), ReachReason::Unconfined)), "{}", path);
+    }
 }
 
 #[test]

@@ -203,6 +203,65 @@ mod tests {
         assert!(dir.path().starts_with(parent), "{} is not under {configured}", dir.path().display());
     }
 
+    #[test]
+    fn qualification_checks_both_spellings_and_canonical_home() {
+        let target_root = Path::new(env!("CARGO_MANIFEST_DIR")).join("target");
+        std::fs::create_dir_all(&target_root).expect("target dir");
+        let holder = tempfile::tempdir_in(&target_root).expect("holder");
+        let base = holder.path().canonicalize().expect("canonical");
+        let outside = base.join("outside");
+        let child = outside.join("child");
+        std::fs::create_dir_all(&child).expect("mkdir");
+
+        assert!(env_path("PATH").is_some_and(|path| !path.as_os_str().is_empty()));
+        assert_eq!(env_path("SAFE_CHAINS_UNSET_OUTSIDE_TEST_VAR"), None);
+
+        assert!(qualifies(&outside, None));
+        assert!(!blocked_by_canonical_home(outside.to_str().expect("utf8"), None));
+        assert!(!blocked_by_canonical_home(outside.to_str().expect("utf8"), Some(outside.to_str().expect("utf8"))));
+
+        let created = dir_in(&outside, None).expect("dir_in outside");
+        assert!(created.path().starts_with(&outside));
+        assert!(dir_in(Path::new(""), None).is_none());
+        assert!(dir_in(Path::new("/"), None).is_none());
+
+        #[cfg(unix)]
+        {
+            let link_to_outside = base.join("link_to_outside");
+            std::os::unix::fs::symlink(&outside, &link_to_outside).expect("symlink outside");
+            assert!(qualifies(&link_to_outside, None));
+
+            let link_to_temp = base.join("link_to_temp");
+            std::os::unix::fs::symlink("/tmp", &link_to_temp).expect("symlink temp");
+            assert!(!qualifies(&link_to_temp, None));
+
+            let home_link = base.join("home_link");
+            std::os::unix::fs::symlink(&outside, &home_link).expect("symlink home");
+            assert!(blocked_by_canonical_home(child.to_str().expect("utf8"), home_link.to_str()));
+            assert!(!qualifies(&child, home_link.to_str()));
+        }
+
+        let cwd = base.join("cwd");
+        std::fs::create_dir(&cwd).expect("cwd");
+        std::fs::File::open(&cwd)
+            .expect("open cwd")
+            .set_modified(std::time::SystemTime::UNIX_EPOCH)
+            .expect("set mtime");
+        let fake_home = format!("/nonexistent/{}", home_user());
+        let mut cmd = std::process::Command::new(std::env::current_exe().expect("test exe"));
+        cmd.args(["--exact", "outside_dir::tests::probe_outside", "--nocapture", "--test-threads=1"]);
+        cmd.current_dir(&cwd);
+        cmd.env_remove("SAFE_CHAINS_REQUIRE_OUTSIDE");
+        cmd.env("SAFE_CHAINS_OUTSIDE_DIR_PROBE", "1");
+        cmd.env("SAFE_CHAINS_TEST_OUTSIDE_DIR", &outside);
+        cmd.env("HOME", &fake_home);
+        let out = cmd.output().expect("spawn");
+        let text = text_of(&out);
+        assert!(out.status.success(), "{text}");
+        assert!(text.contains("PROBE_OK=some "), "{text}");
+        assert_eq!(std::fs::metadata(&cwd).expect("cwd meta").modified().expect("cwd mtime"), std::time::SystemTime::UNIX_EPOCH);
+    }
+
     fn run_probe(test: &str, dir: Option<&str>, require: bool) -> std::process::Output {
         let mut cmd = std::process::Command::new(std::env::current_exe().expect("test exe"));
         cmd.args(["--exact", test, "--nocapture", "--test-threads=1"]);
@@ -227,6 +286,7 @@ mod tests {
         if std::env::var_os("SAFE_CHAINS_OUTSIDE_DIR_PROBE").is_none() {
             return;
         }
+        assert!(dir_in(Path::new(""), None).is_none());
         match writable_outside() {
             Some(dir) => println!("PROBE_OK=some {}", dir.path().display()),
             None => println!("PROBE_OK=none"),
