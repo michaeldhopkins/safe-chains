@@ -5,7 +5,7 @@
 //! release could turn clippy red on code nobody touched. Now the toolchain is pinned to an exact
 //! version in `rust-toolchain.toml`, every workflow on the stable channel installs exactly that
 //! (`rustup toolchain install` reads the file), and every workflow that lints also checks
-//! formatting. The fuzz workflows build on nightly with `cargo +nightly`, which is their own choice.
+//! formatting. The fuzz workflow builds on nightly with `cargo +nightly`, which is its own choice.
 
 #[path = "support/isolate_home.rs"]
 mod isolate_home;
