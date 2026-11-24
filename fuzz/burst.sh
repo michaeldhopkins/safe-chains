@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One fuzz burst: mutate a target for BUDGET seconds, then fold what it found into its corpus.
-# Run by .github/workflows/fuzz.yml, and the same way locally from the repo root:
+# Run locally from the repo root in the pre-release check:
 #
 #   fuzz/burst.sh <libfuzzer-binary> <target> <budget-seconds>
 #
@@ -27,9 +27,7 @@
 # Exit status: the fuzzer's, if it stopped on its own (a crash, timeout, oom, or leak is
 # non-zero); 0 after a clean interrupt, or after an interrupt that stalled into a timeout whose
 # unit replays in time (see below); 2 if only the merge failed; 64 on a usage error. The merge
-# runs regardless, so the corpus keeps what the burst found before a crash. Under Actions, a
-# successful merge sets the step output `merged=true`, which is what lets the workflow save the
-# corpus.
+# runs regardless, so the corpus keeps what the burst found before a crash.
 set -uo pipefail
 
 if [ "$#" -ne 3 ]; then
@@ -109,7 +107,7 @@ if ! "$BIN" -merge=1 -timeout=25 -rss_limit_mb=4096 \
   -artifact_prefix="$ARTIFACTS" \
   "$MIN" "$CORPUS" "$NEW" 2>"$LOG"; then
   tail -40 "$LOG"
-  echo "::error::merge failed; corpus left as restored and not marked for saving"
+  echo "::error::merge failed; corpus left untouched"
   [ "$RC" -ne 0 ] && exit "$RC"
   exit 2
 fi
@@ -122,6 +120,5 @@ rm -rf "$CORPUS" "$NEW"
 mv "$MIN" "$CORPUS"
 chmod 755 "$CORPUS"
 echo "Minimized corpus: $(find "$CORPUS" -type f | wc -l | tr -d ' ') inputs"
-if [ -n "${GITHUB_OUTPUT:-}" ]; then echo "merged=true" >> "$GITHUB_OUTPUT"; fi
 
 exit "$RC"

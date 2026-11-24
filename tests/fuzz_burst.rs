@@ -127,14 +127,11 @@ impl Repo {
         fs::write(p, contents).expect("burst test fixture");
     }
 
-    fn burst(&self, target: &str, budget: &str, env: &[(&str, &str)]) -> (i32, String) {
-        let output = self.root.join("github-output");
-        let _ = fs::remove_file(&output);
+    fn burst(&self, target: &str, budget: &str, env: &[(&str, &str)]) -> i32 {
         let mut cmd = Command::new("bash");
         cmd.arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/burst.sh"))
             .args(["./fake-libfuzzer", target, budget])
             .current_dir(&self.root)
-            .env("GITHUB_OUTPUT", &output)
             .env("FAKE_ARGS_LOG", self.root.join("args.log"))
             .env_remove("FAKE_CRASH")
             .env_remove("FAKE_MERGE_FAIL")
@@ -144,7 +141,7 @@ impl Repo {
         for (k, v) in env {
             cmd.env(k, v);
         }
-        (run_bounded(cmd), fs::read_to_string(&output).unwrap_or_default())
+        run_bounded(cmd)
     }
 
     /// The contents of every file in a target's corpus, sorted.
@@ -168,8 +165,8 @@ impl Repo {
 #[test]
 fn sequential_targets_keep_their_finds_apart() {
     let repo = Repo::new();
-    assert_eq!(repo.burst("alpha", "0", &[]), (0, "merged=true\n".to_string()));
-    assert_eq!(repo.burst("beta", "0", &[]), (0, "merged=true\n".to_string()));
+    assert_eq!(repo.burst("alpha", "0", &[]), 0);
+    assert_eq!(repo.burst("beta", "0", &[]), 0);
 
     assert_eq!(repo.corpus("alpha"), ["find from alpha\n"]);
     assert_eq!(repo.corpus("beta"), ["find from beta\n"], "alpha's find leaked into beta's corpus");
@@ -182,7 +179,7 @@ fn committed_seeds_keep_their_names_through_the_merge() {
     repo.write("fuzz/corpus/parse/seed-ls", "ls -la");
     repo.write("fuzz/corpus/parse/0123abcd", "git status");
 
-    assert_eq!(repo.burst("parse", "0", &[]).0, 0);
+    assert_eq!(repo.burst("parse", "0", &[]), 0);
 
     let names = repo.corpus_names("parse");
     assert!(names.contains(&"seed-ls".to_string()), "seed-ls was renamed or dropped: {names:?}");
@@ -195,10 +192,9 @@ fn a_crash_still_merges_and_keeps_the_fuzzer_status() {
     let repo = Repo::new();
     repo.write("fuzz/corpus/t/a", "prior");
 
-    let (rc, output) = repo.burst("t", "0", &[("FAKE_CRASH", "1")]);
+    let rc = repo.burst("t", "0", &[("FAKE_CRASH", "1")]);
 
     assert_eq!(rc, 1);
-    assert_eq!(output, "merged=true\n");
     assert!(repo.root.join("fuzz/artifacts/t/crash-fake").exists());
     assert_eq!(repo.corpus("t"), ["find from t\n", "prior"]);
 }
@@ -213,10 +209,9 @@ fn an_interrupt_that_stalls_into_a_timeout_is_dropped_when_the_unit_replays_in_t
     let repo = Repo::new();
     repo.write("fuzz/corpus/t/a", "prior");
 
-    let (rc, output) = repo.burst("t", "0", &[("FAKE_INTERRUPT_STALLS", "1")]);
+    let rc = repo.burst("t", "0", &[("FAKE_INTERRUPT_STALLS", "1")]);
 
     assert_eq!(rc, 0);
-    assert_eq!(output, "merged=true\n");
     assert!(!repo.root.join("fuzz/artifacts/t/timeout-0123abcd").exists(), "the stalled exit's unit was kept as a find");
     assert_eq!(replays(&repo), 1);
     assert_eq!(repo.corpus("t"), ["find from t\n", "prior"]);
@@ -226,10 +221,9 @@ fn an_interrupt_that_stalls_into_a_timeout_is_dropped_when_the_unit_replays_in_t
 fn an_interrupt_timeout_whose_unit_times_out_again_is_kept() {
     let repo = Repo::new();
 
-    let (rc, output) = repo.burst("t", "0", &[("FAKE_INTERRUPT_STALLS", "1"), ("FAKE_REPLAY_TIMEOUT", "1")]);
+    let rc = repo.burst("t", "0", &[("FAKE_INTERRUPT_STALLS", "1"), ("FAKE_REPLAY_TIMEOUT", "1")]);
 
     assert_eq!(rc, 70);
-    assert_eq!(output, "merged=true\n");
     assert!(repo.root.join("fuzz/artifacts/t/timeout-0123abcd").exists());
     assert_eq!(replays(&repo), 1);
     assert!(
@@ -242,7 +236,7 @@ fn an_interrupt_timeout_whose_unit_times_out_again_is_kept() {
 fn a_timeout_before_any_interrupt_is_kept_without_a_replay() {
     let repo = Repo::new();
 
-    let (rc, _) = repo.burst("t", "0", &[("FAKE_TIMEOUT", "1")]);
+    let rc = repo.burst("t", "0", &[("FAKE_TIMEOUT", "1")]);
 
     assert_eq!(rc, 70);
     assert!(repo.root.join("fuzz/artifacts/t/timeout-0123abcd").exists());
@@ -250,14 +244,13 @@ fn a_timeout_before_any_interrupt_is_kept_without_a_replay() {
 }
 
 #[test]
-fn a_failed_merge_leaves_the_corpus_and_is_not_marked_for_saving() {
+fn a_failed_merge_leaves_the_corpus_untouched() {
     let repo = Repo::new();
     repo.write("fuzz/corpus/t/a", "prior");
 
-    let (rc, output) = repo.burst("t", "0", &[("FAKE_MERGE_FAIL", "1")]);
+    let rc = repo.burst("t", "0", &[("FAKE_MERGE_FAIL", "1")]);
 
     assert_eq!(rc, 2);
-    assert_eq!(output, "", "a failed merge must not set merged=true");
     assert_eq!(repo.corpus("t"), ["prior"]);
 }
 
@@ -279,8 +272,8 @@ fn the_target_dictionary_is_used_when_present() {
 #[test]
 fn a_bad_budget_or_arity_is_a_usage_error() {
     let repo = Repo::new();
-    assert_eq!(repo.burst("t", "3m", &[]).0, 64);
-    assert_eq!(repo.burst("t", "", &[]).0, 64);
+    assert_eq!(repo.burst("t", "3m", &[]), 64);
+    assert_eq!(repo.burst("t", "", &[]), 64);
 
     let mut four = Command::new("bash");
     four.arg(Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/burst.sh"))
@@ -293,7 +286,7 @@ fn a_bad_budget_or_arity_is_a_usage_error() {
 #[test]
 fn a_zero_padded_budget_is_decimal_not_octal() {
     let repo = Repo::new();
-    assert_eq!(repo.burst("t", "08", &[]).0, 0);
+    assert_eq!(repo.burst("t", "08", &[]), 0);
     let log = fs::read_to_string(repo.root.join("args.log")).expect("burst test fixture");
     assert!(log.contains("-max_total_time=3608"), "{log}");
 }
