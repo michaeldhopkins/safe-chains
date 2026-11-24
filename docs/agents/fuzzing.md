@@ -32,8 +32,15 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
 - **CI and the pre-release check:** `fuzz-replay.yml` replays every target's committed
   `fuzz/corpus/<target>/seed-*` inputs from the checkout (`-runs=0`) on every push and PR — the CI
   regression gate (skipping docs-only pushes, `**.md` and `docs/**`, since nothing fuzzed reads
-  either). Discovery bursts run before each push to `main` in the pre-release check (for each target
-  whose dependencies the diff touches), never in CI after the push or on a schedule.
+  either). Discovery bursts run before each push to `main` in the pre-release check on the targets
+  the diff touches, never in CI after the push or on a schedule:
+  ```bash
+  # when `parse` or commands/**/*.toml changed, refresh the registry seeds and dictionary first:
+  cargo run --bin gen-fuzz-corpus --features fuzz-gen
+  # for each target <target> the diff touches:
+  cargo +nightly fuzz build <target>
+  fuzz/burst.sh fuzz/target/<triple>/release/<target> <target> <seconds>
+  ```
   `tests/fuzz_targets_wired.rs` keeps `fuzz-replay.yml`'s target matrix equal to `fuzz/Cargo.toml`
   and refuses a `schedule:` trigger or a post-push burst workflow.
 - **`fuzz/burst.sh` runs a timed burst and merge locally** (`fuzz/burst.sh <binary> <target> <seconds>`, from the
