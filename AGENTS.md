@@ -98,14 +98,15 @@ adding a new one — extend a corpus/table where one already fits rather than st
 
 ### Topic files: read the one that fits before starting
 
-- `docs/agents/fuzzing.md`: the fuzz targets and their properties, CI replay and burst, registry
-  seeding, regression seeds, and coverage holes. Read before adding or changing a fuzz target,
-  `fuzz/`, or the fuzz workflows.
-- `docs/agents/mutation-testing.md`: the per-change mutants job, slice sizing, the `mutants`
-  profile, exclusions and the run-failure history. Read before changing `.cargo/mutants.toml`, the mutants
-  workflow, or triaging a MISSED mutant.
-- `docs/agents/mutation-findings.md`: what past rotating slices found and the tests that killed
-  each miss. Read when a slice reports a MISSED mutant in code a past slice already covered.
+- `docs/agents/fuzzing.md`: the fuzz targets and their properties, the CI replay gate and the
+  pre-release burst, registry seeding, regression seeds, and coverage holes. Read before adding or
+  changing a fuzz target, `fuzz/`, or the fuzz replay workflow.
+- `docs/agents/mutation-testing.md`: the pre-release `--in-diff` mutants check, the `mutants`
+  profile, exclusions and the run-failure history. Read before changing `.cargo/mutants.toml` or
+  triaging a MISSED mutant.
+- `docs/agents/mutation-findings.md`: what past pre-release runs and slices found and the tests
+  that killed each miss. Read when a run reports a MISSED mutant in code a past run already
+  covered.
 - `docs/agents/research-target.md`: what "researched" means for one command, the ratcheted
   `tests/research_target.rs` and its pin, and how to work a command up to the target. Read before
   researching or revising any command.

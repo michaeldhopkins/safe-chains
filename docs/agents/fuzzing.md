@@ -29,33 +29,32 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   - `mcp_session` — one reply per request id.
 - **Not fuzzed:** `docs.rs` (no security property) and `pathctx` (proptests cover it and shrink
   better for a pure function).
-- **CI:** `fuzz-replay.yml` replays every target's cached corpus (`-runs=0`) on every push and PR —
-  the gate. `fuzz.yml` is a non-gating burst on each push to `main` (and `workflow_dispatch`, which
-  takes a larger `max_total_time` and also renders the `parse` coverage report): one job per target
-  running `fuzz/burst.sh`: 180s of single-process mutation timed from when the corpus has loaded
-  (libFuzzer's `-max_total_time` counts the load, which on a runner can exceed the whole budget),
-  then `-merge=1` into the corpus, saved as `fuzz-corpus-<target>-<run>` only when the merge
-  completed, which is the prefix the replay restores. The burst's check fails on a crash-,
-  timeout- or oom- artifact, or on a burst step that failed without one. `tests/fuzz_targets_wired.rs`
-  keeps both matrices equal to `fuzz/Cargo.toml`, holds the cache prefix and those two conditions
-  in step, and refuses a `schedule:` trigger. Both fuzz workflows skip docs-only pushes
-  (`**.md`, `docs/**`): nothing fuzzed reads either.
-- **`fuzz/burst.sh` runs the same locally** (`fuzz/burst.sh <binary> <target> <seconds>`, from the
-  repo root). Finds go to `fuzz/new/<target>`, so bursting targets one after another never merges
+- **CI and the pre-release check:** `fuzz-replay.yml` replays every target's cached corpus
+  (`-runs=0`) on every push and PR — the CI regression gate (skipping docs-only pushes, `**.md` and
+  `docs/**`, since nothing fuzzed reads either). Discovery bursts run before each push to `main` in
+  the pre-release check (for each target whose dependencies the diff touches), never in CI after the
+  push or on a schedule. `tests/fuzz_targets_wired.rs` keeps `fuzz-replay.yml`'s target matrix equal
+  to `fuzz/Cargo.toml`, checks the `fuzz-corpus-<target>-` cache prefix it restores, and refuses a
+  `schedule:` trigger or a post-push burst workflow.
+- **`fuzz/burst.sh` runs a timed burst and merge locally** (`fuzz/burst.sh <binary> <target> <seconds>`, from the
+  repo root): mutation timed from when the corpus has loaded (libFuzzer's `-max_total_time` counts
+  the load, which on a large corpus can exceed the whole budget), then `-merge=1` into the corpus.
+  Finds go to `fuzz/new/<target>`, so bursting targets one after another never merges
   one target's finds into the next; the committed `seed-*` inputs keep their names through the
   merge; `fuzz/dict/<target>.dict` is used when present. A timeout reported after its SIGINT is
   libFuzzer stalling on the way out (2026-10-05, `suggest_roundtrip`): the unit is replayed alone
   and dropped if it finishes. `tests/fuzz_burst.rs` holds all of this against a stand-in libFuzzer.
-- **No nightly (retired 2026-09-26).** It ran 05:00 UTC: three 5h shards on `parse` plus 1h on each
-  property target. Every real find came in a target's first days; after the first week of August it
-  ran seven weeks without another, and its later red nights were job timeouts (`config_load`
-  overrunning `timeout-minutes`), not findings. The burst fuzzes new code the day it lands, which is
-  when finds happen. For a deeper run after a large change, dispatch `fuzz.yml` with a bigger budget.
+- **No nightly or post-push CI burst.** The nightly (retired 2026-09-26) ran 05:00 UTC: three 5h
+  shards on `parse` plus 1h on each property target. Every real find came in a target's first days;
+  after the first week of August it ran seven weeks without another, and its later red nights were
+  job timeouts (`config_load` overrunning `timeout-minutes`), not findings. The post-push CI burst
+  was retired on 2026-11-23 in favour of the pre-release check, which fuzzes changed targets before
+  the push lands so fixes ship in the same release.
 - **Seeding is registry-derived.** `src/bin/gen_fuzz_corpus.rs` (feature `fuzz-gen`,
   `cargo run --bin gen-fuzz-corpus --features fuzz-gen`) reads `commands/**/*.toml` and emits the
   `examples_safe`/`examples_denied` invocations as seeds and the command/subcommand/flag vocabulary
   as a `-dict` for `parse`. New commands are covered automatically — **no hand-maintained fuzz
-  corpus.** The burst's build job regenerates them each run and the `parse` burst merges them in.
+  corpus.** Regenerate them before a `parse` burst so `fuzz/burst.sh` merges them in.
   Generated `gen-*` seeds and `fuzz/dict/` are git-ignored. The property targets take other input
   domains (a flag value, an envelope, a config file), so the registry seeds do not apply to them.
 - **Regression seeds are the one hand-kept input.** A minimized find is committed as `seed-*` in

@@ -1,6 +1,6 @@
-# Mutation testing: findings of past slices
+# Mutation testing: findings of past runs
 
-What each rotating slice found and which tests killed it. Add an entry when you kill a slice's misses. The job, sizing and costs are in `mutation-testing.md`.
+What past pre-release runs and earlier slices found and which tests killed each miss. Add an entry when you kill a pre-release run's misses. The pre-release check, profile and exclusions are in `mutation-testing.md`.
 
 - **Findings of the first slices (2026-09-27):** slice 128/256 had 5 MISSED of 20 viable (75%): no
   test pinned which word `sed -e`/`-l` consume, that a trailing `-l` fails closed, or that an unknown

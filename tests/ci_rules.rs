@@ -150,3 +150,53 @@ fn ci_checks_the_declared_rust_version() {
     );
     assert!(ci.lines().any(|l| l.trim() == "run: cargo +\"$MSRV\" check --locked"), "ci.yml does not check on the MSRV");
 }
+
+fn post_push_release_check_violations(workflows: &[(String, String)]) -> Vec<String> {
+    let mut problems = Vec::new();
+    for (name, text) in workflows {
+        if name == "mutants.yml" || name == "fuzz.yml" {
+            problems.push(format!("{name}: post-push release-check workflow must not exist in CI"));
+        }
+        for line in text.lines() {
+            let trimmed = line.trim();
+            if trimmed.starts_with('#') {
+                continue;
+            }
+            if trimmed.contains("cargo mutants") || trimmed.contains("scripts/mutants-run.sh") {
+                problems.push(format!("{name}: runs mutation testing in CI (`{trimmed}`)"));
+            }
+            if trimmed.contains("fuzz/burst.sh") {
+                problems.push(format!("{name}: runs a fuzz burst in CI (`{trimmed}`)"));
+            }
+        }
+    }
+    problems
+}
+
+#[test]
+fn ci_runs_no_post_push_mutants_or_fuzz_bursts() {
+    let all = workflows();
+    let problems = post_push_release_check_violations(&all);
+    assert!(problems.is_empty(), "mutation testing and fuzz bursts run before the push, never in CI:\n{}", problems.join("\n"));
+    let replay = &all
+        .iter()
+        .find(|(n, _)| n == "fuzz-replay.yml")
+        .expect("fuzz-replay.yml stays as an ordinary test")
+        .1;
+    assert!(replay.contains("-runs=0"), "fuzz-replay.yml must replay the saved corpus with `-runs=0`");
+}
+
+#[test]
+fn a_post_push_mutants_or_fuzz_burst_workflow_is_flagged() {
+    let old = vec![
+        ("mutants.yml".to_string(), "on:\n  push:\n    branches: [main]\njobs:\n  in-diff:\n    steps:\n      - run: scripts/mutants-run.sh --in-diff mutants.diff\n".to_string()),
+        ("fuzz.yml".to_string(), "on:\n  push:\n    branches: [main]\njobs:\n  burst:\n    steps:\n      - run: bash fuzz/burst.sh ./bin/parse parse 180\n".to_string()),
+    ];
+    let problems = post_push_release_check_violations(&old);
+    assert_eq!(problems.len(), 4, "{problems:?}");
+    let clean = vec![(
+        "fuzz-replay.yml".to_string(),
+        "on:\n  push:\n    branches: [main]\njobs:\n  replay:\n    steps:\n      - run: \"$BIN\" -runs=0 fuzz/corpus/parse\n".to_string(),
+    )];
+    assert!(post_push_release_check_violations(&clean).is_empty());
+}

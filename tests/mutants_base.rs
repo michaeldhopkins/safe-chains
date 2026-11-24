@@ -120,13 +120,10 @@ fn a_force_push_whose_old_tip_is_off_head_falls_back_to_the_first_parent() {
 }
 
 #[test]
-fn the_workflow_computes_its_base_with_the_script_on_full_history() {
-    let yml =
-        std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join(".github/workflows/mutants.yml")).expect("read mutants.yml");
-    let in_diff = &yml[yml.find("in-diff:").expect("in-diff job")..yml.find("slice:").expect("slice job")];
-    assert!(in_diff.contains("fetch-depth: 0"), "in-diff checkout must fetch full history");
+fn mutation_testing_runs_before_release_not_in_a_ci_workflow() {
+    let yml = Path::new(env!("CARGO_MANIFEST_DIR")).join(".github/workflows/mutants.yml");
     assert!(
-        in_diff.contains(r#"scripts/mutants-base.sh "$EVENT_NAME" "$BASE_REF" "$BEFORE""#),
-        "Compute diff must take its base from scripts/mutants-base.sh"
+        !yml.exists(),
+        "mutants.yml must not exist: mutation testing runs in the pre-release check before the push, never in CI after the push."
     );
 }

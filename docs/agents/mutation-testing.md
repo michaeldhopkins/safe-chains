@@ -2,17 +2,17 @@
 
 General method is in the `rust-mutation-testing` skill. This is what is specific to safe-chains.
 
-- **Per change** (`.github/workflows/mutants.yml`, not gating): `--in-diff` on every PR and push to
-  `main`, skipped with a warning above 7 selected mutants; and on each push to `main` one
-  **rotating slice**, `--shard (run_number % 1024)/1024`. PR runs advance the same counter, so
-  coverage is roughly one pass per 1024 runs rather than exactly one per 1024 pushes. There is no
-  whole-tree sweep: ~5,300 mutants at ~39s of runner wall clock each is ~58 hours.
-- **N = 512, from the runner.** The first CI slice (run 36363446362, slice 1/256, 21 mutants) took
+- **Pre-release check (before each push to `main`, never after the push in CI):** `cargo mutants
+  --in-diff` runs on the release's changed code (from the last covered base to the release tree)
+  before the push lands, and a MISSED mutant blocks the release until killed by a test or excluded
+  with its reason. Nothing runs in CI after the push, and the old post-push workflow (`mutants.yml`)
+  and rotating whole-tree `--shard` slices are retired (2026-11-23). There is no whole-tree sweep:
+  ~5,300 mutants at ~39s of runner wall clock each is ~58 hours.
+- **Historical runner sizing (from the former CI workflow):** The first CI slice (run 36363446362, slice 1/256, 21 mutants) took
   16.7 minutes: baseline 105s build + 98s test, then ~39s of wall clock per mutant at `-j2`, against
   a 20-minute job timeout. The `mutants` profile did apply (`--profile=mutants` in its baseline
-  log); the runner is just slower than the laptop, where slice 128/256 took 6m45s (21s build + 45s
-  test). At 512 a slice is ~10 mutants, ~10 minutes. If slices approach the timeout again, raise N
-  rather than the timeout. The in-diff cap of 20 is from the same runner rate.
+  log); the runner was slower than the laptop, where slice 128/256 took 6m45s (21s build + 45s
+  test).
 - **Test-bound, and the profile is the lever.** A mutant's rebuild is 2-5s; its test run is the full
   suite. The integration tests spawn the debug binary a few hundred times, and unoptimized each
   spawn spent ~0.4s parsing the registry TOML inside the dependencies. `.cargo/mutants.toml` selects
