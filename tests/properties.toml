@@ -778,3 +778,4 @@ owed = [
 "src/userconfig/tests.rs" = "userconfig's test suite"
 "src/pathctx/place_tests.rs" = "the placing suite (#[cfg(test)] mod in pathctx.rs)"
 "src/pathctx/root_consumers_tests.rs" = "the project-root reader ratchet (#[cfg(test)] mod in pathctx.rs)"
+"src/outside_dir.rs" = "scratch directories for tests that must sit outside the temporary root and the home"

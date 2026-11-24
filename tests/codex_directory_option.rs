@@ -4,6 +4,8 @@
 
 #[path = "support/isolate_home.rs"]
 mod isolate_home;
+#[path = "support/outside_dir.rs"]
+mod outside_dir;
 
 use std::io::Write;
 use std::process::{Command, Stdio};
@@ -35,13 +37,10 @@ fn approves(home: &std::path::Path, cwd: &std::path::Path, command: &str) -> boo
 
 #[test]
 fn a_directory_option_on_codex_reported_cwd_is_judged_like_the_plain_command() {
-    let base = tempfile::tempdir_in("/Users/Shared").expect("tempdir under a non-temp folder");
-    let home = base.path().join("home");
-    let proj = home.join("projects/proj");
-    std::fs::create_dir_all(proj.join(".git")).expect("mkdir");
-    std::fs::create_dir_all(proj.join("sub")).expect("mkdir");
-    std::fs::create_dir_all(home.join(".config")).expect("mkdir");
-    std::fs::write(home.join(".config/safe-chains.toml"), "").expect("config");
+    let Some((_base, home, proj)) = fixture(true) else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     assert!(!approves(&home, &proj, "rm -rf Documents"), "control: codex's reported cwd is not trusted for a recursive delete");
     let approved: Vec<&str> = [
         r#"tmux new-window -c . "rm -rf Documents""#,
@@ -54,8 +53,8 @@ fn a_directory_option_on_codex_reported_cwd_is_judged_like_the_plain_command() {
     assert!(approved.is_empty(), "codex's reported cwd became a known folder through a directory option:\n{}", approved.join("\n"));
 }
 
-fn fixture(project: bool) -> (tempfile::TempDir, std::path::PathBuf, std::path::PathBuf) {
-    let base = tempfile::tempdir_in("/Users/Shared").expect("tempdir under a non-temp folder");
+fn fixture(project: bool) -> Option<(tempfile::TempDir, std::path::PathBuf, std::path::PathBuf)> {
+    let base = outside_dir::writable_outside()?;
     let home = base.path().join("home");
     let folder = home.join("projects/proj");
     std::fs::create_dir_all(folder.join("sub")).expect("mkdir");
@@ -67,13 +66,16 @@ fn fixture(project: bool) -> (tempfile::TempDir, std::path::PathBuf, std::path::
     std::fs::write(home.join(".config/safe-chains.toml"), "").expect("config");
     std::fs::write(folder.join("a.txt"), "a").expect("file");
     std::fs::write(folder.join("sub/b.txt"), "b").expect("file");
-    (base, home, folder)
+    Some((base, home, folder))
 }
 
 #[test]
 fn a_glob_read_on_codex_reported_cwd_is_not_listed_there() {
     for project in [true, false] {
-        let (_base, home, folder) = fixture(project);
+        let Some((_base, home, folder)) = fixture(project) else {
+            eprintln!("{}", outside_dir::UNCOVERED);
+            return;
+        };
         for dir in [folder.clone(), folder.join("sub")] {
             let approved: Vec<&str> = ["ls *", "ls -la *", "file *", "du -sh *", "stat *"]
                 .into_iter()
@@ -86,7 +88,10 @@ fn a_glob_read_on_codex_reported_cwd_is_not_listed_there() {
 
 #[test]
 fn a_directory_option_on_codex_reported_plain_folder_is_judged_like_the_plain_command() {
-    let (_base, home, folder) = fixture(false);
+    let Some((_base, home, folder)) = fixture(false) else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     let approved: Vec<&str> = [
         r#"tmux new-window -c . "rm -rf Documents""#,
         r#"tmux new-window -c . "rm -rf *""#,
@@ -101,7 +106,10 @@ fn a_directory_option_on_codex_reported_plain_folder_is_judged_like_the_plain_co
 
 #[test]
 fn the_claude_harness_still_knows_its_folder() {
-    let (_base, home, folder) = fixture(false);
+    let Some((_base, home, folder)) = fixture(false) else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     let claude = |c: &str| {
         let payload = serde_json::json!({"tool_name":"Bash","tool_input":{"command":c},"cwd":folder,"session_id":"x"}).to_string();
         let mut child = Command::new(env!("CARGO_BIN_EXE_safe-chains"))

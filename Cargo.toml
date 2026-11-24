@@ -29,9 +29,10 @@ required-features = ["fuzz-gen"]
 [features]
 # Enables the gen-fuzz-corpus bin. No extra deps — it reuses toml + sha2 from the main build.
 fuzz-gen = []
-# Private homes for integration-test binaries. Off unless a test build asks, so a release binary
+# Private homes for integration-test binaries, and the scratch directory those tests use when
+# it must sit outside the temporary root. Off unless a test build asks, so a release binary
 # reads `$HOME` and nothing else.
-test-home = []
+test-home = ["dep:tempfile"]
 
 [dependencies]
 clap = { version = "4", features = ["derive"] }
@@ -47,6 +48,9 @@ toml_edit = "0.22"
 # workspace root written in NFD has to compare as the home it names.
 unicode-normalization = "0.1.25"
 winnow = "0.7.15"
+# Scratch directories for tests that must sit outside the temporary root. Only the test-home
+# feature, which `cargo test` turns on and a release build leaves off.
+tempfile = { version = "3", optional = true }
 
 [dev-dependencies]
 # Unifies `test-home` into `cargo test`, including the `safe-chains` binary those tests spawn.

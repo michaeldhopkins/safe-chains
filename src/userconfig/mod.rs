@@ -198,6 +198,12 @@ pub fn grantable_path(path: &str) -> Result<String, EditError> {
     Ok(path)
 }
 
+/// Whether `safe-chains config grant` would refuse absolute `path`.
+#[cfg(feature = "test-home")]
+pub(crate) fn grant_refused(path: &str) -> bool {
+    guard::check_grant_path(path).is_err()
+}
+
 /// The level an added entry gets, as the CLI spells it and as the file spells it.
 pub fn entry_level(name: &str) -> Result<&'static str, EditError> {
     match name.trim().to_ascii_lowercase().replace('_', "-").as_str() {

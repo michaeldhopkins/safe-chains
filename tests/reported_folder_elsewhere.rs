@@ -4,6 +4,8 @@
 
 #[path = "support/isolate_home.rs"]
 mod isolate_home;
+#[path = "support/outside_dir.rs"]
+mod outside_dir;
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
@@ -33,8 +35,8 @@ fn decide_with(harness: &str, home: &Path, cwd: &Path, payload: &serde_json::Val
         .contains("\"allow\"")
 }
 
-fn fixture() -> (tempfile::TempDir, PathBuf, PathBuf) {
-    let base = tempfile::tempdir_in("/Users/Shared").expect("tempdir under a non-temp folder");
+fn fixture() -> Option<(tempfile::TempDir, PathBuf, PathBuf)> {
+    let base = outside_dir::writable_outside()?;
     let home = base.path().join("home");
     let proj = home.join("projects/proj");
     std::fs::create_dir_all(proj.join(".git")).expect("mkdir");
@@ -44,7 +46,7 @@ fn fixture() -> (tempfile::TempDir, PathBuf, PathBuf) {
     std::fs::write(home.join(".config/safe-chains.toml"), "").expect("config");
     std::fs::write(home.join("Documents/tax.pdf"), "private").expect("file");
     std::fs::write(home.join(".zsh_history"), "history").expect("file");
-    (base, home, proj)
+    Some((base, home, proj))
 }
 
 /// A link committed in the reported folder (`src -> /usr/share/man/man1`) makes a path that climbs
@@ -53,7 +55,10 @@ fn fixture() -> (tempfile::TempDir, PathBuf, PathBuf) {
 /// climb is placed nowhere and prompts, so the reported folder alone turned a prompt into an allow.
 #[test]
 fn a_link_in_codex_reported_folder_does_not_place_a_climb_out_of_the_unknown_folder() {
-    let (_base, home, proj) = fixture();
+    let Some((_base, home, proj)) = fixture() else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     std::os::unix::fs::symlink("/usr/share/man/man1", proj.join("src")).expect("link");
     let codex = |c: &str| {
         let payload = serde_json::json!({
@@ -77,7 +82,10 @@ fn a_link_in_codex_reported_folder_does_not_place_a_climb_out_of_the_unknown_fol
 /// path judged in the workspace may name a file of another folder (here, home).
 #[test]
 fn antigravity_judges_a_command_where_its_cwd_argument_runs_it() {
-    let (_base, home, proj) = fixture();
+    let Some((_base, home, proj)) = fixture() else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     let agy = |c: &str, cwd: &Path| {
         let payload = serde_json::json!({
             "toolCall": { "name": "run_command", "args": { "CommandLine": c, "Cwd": cwd } },
@@ -95,7 +103,10 @@ fn antigravity_judges_a_command_where_its_cwd_argument_runs_it() {
 /// cannot place leaves the folder unknown, so a relative path is never judged in the workspace.
 #[test]
 fn gemini_and_qwen_judge_a_command_where_its_directory_argument_runs_it() {
-    let (_base, home, proj) = fixture();
+    let Some((_base, home, proj)) = fixture() else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     for (harness, field) in [("gemini", "dir_path"), ("qwen", "directory")] {
         let run = |c: &str, dir: Option<&Path>| {
             let mut input = serde_json::json!({ "command": c });
@@ -121,7 +132,10 @@ fn gemini_and_qwen_judge_a_command_where_its_directory_argument_runs_it() {
 /// is still approved.
 #[test]
 fn a_declared_directory_never_becomes_the_project_root() {
-    let (base, home, proj) = fixture();
+    let Some((base, home, proj)) = fixture() else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     let other = home.join("projects/other");
     std::fs::create_dir_all(other.join("src")).expect("mkdir");
     let elsewhere = base.path().join("elsewhere");
@@ -157,7 +171,10 @@ fn a_declared_directory_never_becomes_the_project_root() {
 /// `GEMINI_PROJECT_DIR` stays the project, and a relative command in the other workspace prompts.
 #[test]
 fn a_declared_directory_that_is_its_own_workspace_does_not_become_the_project() {
-    let (_base, home, _proj) = fixture();
+    let Some((_base, home, _proj)) = fixture() else {
+        eprintln!("{}", outside_dir::UNCOVERED);
+        return;
+    };
     let app = home.join("projects/app");
     let other = home.join("projects/other");
     std::fs::create_dir_all(app.join("src")).expect("app");

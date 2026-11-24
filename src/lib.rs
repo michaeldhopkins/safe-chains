@@ -69,6 +69,9 @@ mod handlers;
 pub mod mcp;
 pub mod netloc;
 mod operands;
+#[cfg(feature = "test-home")]
+#[doc(hidden)]
+pub mod outside_dir;
 #[cfg(test)]
 mod overreach_property_tests;
 pub mod parse;
