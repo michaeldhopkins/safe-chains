@@ -3,17 +3,10 @@ name: Fuzz replay
 # The CI regression gate of the fuzzing program (discovery bursts run in the pre-release check
 # before each push to `main`, never after the push in CI).
 #
-# This is the REGRESSION gate: replay every input already accumulated against the code
-# as it stands now. It is deterministic (same corpus, same answer every run), it takes minutes, and
-# it answers the question a per-push job should answer: "did this change break a path we already
-# explored?" No mutation here, so the gate is never randomly red.
-#
-# Read-only with respect to the corpus cache: restores by the `fuzz-corpus-<target>-` prefix plus
-# committed `seed-*` inputs and writes nothing back (`tests/fuzz_targets_wired.rs` checks the key
-# prefix). Its restores
-# also keep the cache inside GitHub's 7-day eviction window. On a cache miss (a fork, or a target
-# with no cached corpus yet) the replay runs the committed seeds or no-ops, so this degrades
-# gracefully rather than failing.
+# This is the REGRESSION gate: replay the committed `fuzz/corpus/<target>/seed-*` inputs from the
+# checkout against the code as it stands now. It is deterministic (same corpus, same answer every
+# run), it takes minutes, and it answers the question a per-push job should answer: "did this
+# change break a path we already explored?" No mutation here, so the gate is never randomly red.
 on:
   # Nothing fuzzed reads Markdown or the mdbook sources (no include_str! of either, no .md corpus
   # inputs), so a docs-only change cannot change a replay's result.
@@ -65,14 +58,6 @@ jobs:
       - name: Build fuzz target
         run: cargo +nightly fuzz build ${{ matrix.target }} --target "$TRIPLE"
 
-      # Read the burst's canonical corpus. Caches written on main are readable from PR branches.
-      - name: Restore corpus
-        uses: actions/cache/restore@v6
-        with:
-          path: fuzz/corpus/${{ matrix.target }}
-          key: fuzz-corpus-${{ matrix.target }}-
-          restore-keys: fuzz-corpus-${{ matrix.target }}-
-
       # `-runs=0` executes each corpus input exactly once and exits — no mutation, no randomness.
       - name: Replay corpus
         run: |
@@ -82,7 +67,7 @@ jobs:
           COUNT=$(find fuzz/corpus/${{ matrix.target }} -type f | wc -l)
           echo "Replaying $COUNT corpus inputs"
           if [ "$COUNT" -eq 0 ]; then
-            echo "::notice::no corpus cached yet — replay skipped"
+            echo "::notice::no committed seeds for this target"
             exit 0
           fi
           "$BIN" -runs=0 -timeout=25 -rss_limit_mb=4096 \

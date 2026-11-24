@@ -29,13 +29,13 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   - `mcp_session` — one reply per request id.
 - **Not fuzzed:** `docs.rs` (no security property) and `pathctx` (proptests cover it and shrink
   better for a pure function).
-- **CI and the pre-release check:** `fuzz-replay.yml` replays every target's cached corpus
-  (`-runs=0`) on every push and PR — the CI regression gate (skipping docs-only pushes, `**.md` and
-  `docs/**`, since nothing fuzzed reads either). Discovery bursts run before each push to `main` in
-  the pre-release check (for each target whose dependencies the diff touches), never in CI after the
-  push or on a schedule. `tests/fuzz_targets_wired.rs` keeps `fuzz-replay.yml`'s target matrix equal
-  to `fuzz/Cargo.toml`, checks the `fuzz-corpus-<target>-` cache prefix it restores, and refuses a
-  `schedule:` trigger or a post-push burst workflow.
+- **CI and the pre-release check:** `fuzz-replay.yml` replays every target's committed
+  `fuzz/corpus/<target>/seed-*` inputs from the checkout (`-runs=0`) on every push and PR — the CI
+  regression gate (skipping docs-only pushes, `**.md` and `docs/**`, since nothing fuzzed reads
+  either). Discovery bursts run before each push to `main` in the pre-release check (for each target
+  whose dependencies the diff touches), never in CI after the push or on a schedule.
+  `tests/fuzz_targets_wired.rs` keeps `fuzz-replay.yml`'s target matrix equal to `fuzz/Cargo.toml`
+  and refuses a `schedule:` trigger or a post-push burst workflow.
 - **`fuzz/burst.sh` runs a timed burst and merge locally** (`fuzz/burst.sh <binary> <target> <seconds>`, from the
   repo root): mutation timed from when the corpus has loaded (libFuzzer's `-max_total_time` counts
   the load, which on a large corpus can exceed the whole budget), then `-merge=1` into the corpus.
@@ -57,10 +57,10 @@ in the `rust-fuzzing` skill. This section is only what is specific to safe-chain
   corpus.** Regenerate them before a `parse` burst so `fuzz/burst.sh` merges them in.
   Generated `gen-*` seeds and `fuzz/dict/` are git-ignored. The property targets take other input
   domains (a flag value, an envelope, a config file), so the registry seeds do not apply to them.
-- **Regression seeds are the one hand-kept input.** A minimized find is committed as `seed-*` in
-  its target's corpus (`.gitignore` lets `seed-*` through for `parse`, `explain_render`,
-  `hook_envelope`, `level_monotonic`, `gate_prefilter`, `config_edit` and `mcp_session`), so the
-  replay holds it down. `hook_envelope/seed-codex-permission-request` is a Codex
+- **Regression seeds are the one hand-kept input.** Starting seeds and minimized finds are committed
+  as `seed-*` in each target's corpus (`.gitignore` lets `seed-*` through under
+  `fuzz/corpus/<target>/` for every target), so the replay exercises every target and holds past
+  findings down. `hook_envelope/seed-codex-permission-request` is a Codex
   `PermissionRequest` envelope (not a find) so the second Codex format is reached.
   `explain_render/seed-unclosed-brace-nest` (2026-09-26): an unclosed `{` nest parsed once as a
   brace group and again as `{`, doubling per level; `cst/budget.rs` and `cst/parse.rs` count work

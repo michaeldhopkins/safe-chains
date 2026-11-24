@@ -1,0 +1,3 @@
+[[command]]
+name = "mytool"
+max_positional = 1

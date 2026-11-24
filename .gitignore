@@ -18,20 +18,24 @@ docs/src/version-footer.js
 docs/book/
 .pstyle_dump.txt
 
-# Locally-generated corpora for the property targets. The nightly accumulates these through the
-# actions cache, one entry per target, so committing a few hundred hash-named inputs from a laptop
-# run adds noise without adding coverage. A hand-kept seed-* (a minimized regression) is committed.
-fuzz/corpus/equivalence/
+# Locally-generated corpora for the property targets. Starting seeds and minimized regressions are
+# committed as `seed-*`; hash-named inputs from local bursts are ignored.
+fuzz/corpus/equivalence/*
+!fuzz/corpus/equivalence/seed-*
 fuzz/corpus/hook_envelope/*
 !fuzz/corpus/hook_envelope/seed-*
 fuzz/corpus/explain_render/*
 !fuzz/corpus/explain_render/seed-*
-fuzz/corpus/suggest_roundtrip/
+fuzz/corpus/suggest_roundtrip/*
+!fuzz/corpus/suggest_roundtrip/seed-*
 fuzz/corpus/level_monotonic/*
 !fuzz/corpus/level_monotonic/seed-*
-fuzz/corpus/config_load/
-fuzz/corpus/setup_merge/
-fuzz/corpus/path_admit/
+fuzz/corpus/config_load/*
+!fuzz/corpus/config_load/seed-*
+fuzz/corpus/setup_merge/*
+!fuzz/corpus/setup_merge/seed-*
+fuzz/corpus/path_admit/*
+!fuzz/corpus/path_admit/seed-*
 fuzz/corpus/gate_prefilter/*
 !fuzz/corpus/gate_prefilter/seed-*
 fuzz/corpus/config_edit/*

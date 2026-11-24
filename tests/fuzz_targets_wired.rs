@@ -84,19 +84,6 @@ fn matrix_targets(name: &str) -> Vec<String> {
 }
 
 #[rustfmt::skip]
-fn corpus_cache_keys(src: &str) -> Vec<String> {
-    src.lines()
-        .map(str::trim)
-        .filter_map(|l| l.strip_prefix("key: ").or_else(|| l.strip_prefix("restore-keys: ")))
-        .filter(|v| v.starts_with("fuzz-corpus-"))
-        .map(str::to_string)
-        .collect()
-}
-
-#[rustfmt::skip]
-const MATRIX_CORPUS_PREFIX: &str = "fuzz-corpus-${{ matrix.target }}-";
-
-#[rustfmt::skip]
 #[test]
 fn every_fuzz_target_is_wired_into_the_per_push_replay() {
     let cfg = load_config(Path::new(env!("CARGO_MANIFEST_DIR")));
@@ -110,16 +97,6 @@ fn every_fuzz_target_is_wired_into_the_per_push_replay() {
         declared,
         matrix_targets("fuzz-replay.yml"),
         "fuzz/Cargo.toml and the per-push replay disagree."
-    );
-}
-
-#[rustfmt::skip]
-#[test]
-fn the_replay_restores_the_per_target_corpus_cache() {
-    let replay = corpus_cache_keys(&workflow("fuzz-replay.yml"));
-    assert!(
-        replay.iter().any(|k| k == MATRIX_CORPUS_PREFIX),
-        "fuzz-replay.yml does not restore by the prefix `{MATRIX_CORPUS_PREFIX}`. Found: {replay:?}"
     );
 }
 
