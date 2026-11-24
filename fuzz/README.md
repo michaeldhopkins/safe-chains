@@ -28,7 +28,7 @@ toolchain file inside `fuzz/` is NOT picked up. The `+nightly` override propagat
 cargo +nightly fuzz build parse                      # smoke-test: compiles + links?
 cargo +nightly fuzz run parse                        # runs until a crash or Ctrl-C
 cargo +nightly fuzz run parse -- -max_total_time=28800   # a long local run
-fuzz/burst.sh fuzz/target/aarch64-apple-darwin/release/parse parse 60   # what CI's burst runs
+fuzz/burst.sh fuzz/target/aarch64-apple-darwin/release/parse parse 60   # pre-release burst and merge
 ```
 
 The corpus lives in `fuzz/corpus/parse/`; the `seed-*` files are committed starting inputs, and
@@ -48,12 +48,10 @@ Then add the minimized input as a regression case to the `no-panic` proptest/cor
 
 ## CI
 
-`.github/workflows/fuzz-replay.yml` replays every target's cached corpus on each push and PR (the
-gate). `.github/workflows/fuzz.yml` bursts every target for 180s on each push to `main` on a Linux
-runner (ASan is happiest on Linux), merges the finds into the corpus and saves it for the replay.
-For a deeper run, trigger `fuzz.yml` from the Actions tab (`workflow_dispatch`) with a larger
-`max_total_time`; that run also renders the `parse` coverage report. There is no nightly: it was
-retired on 2026-09-26 (see docs/agents/fuzzing.md).
+`.github/workflows/fuzz-replay.yml` runs the replay gate on each push and pull request, replaying
+every target's committed `seed-*` inputs with `-runs=0`. Discovery bursts run in the pre-release
+check before each push to `main` on changed targets through `fuzz/burst.sh`, never in CI after the
+push or on a schedule (see `docs/agents/fuzzing.md`).
 
 ## Reproducibility
 
