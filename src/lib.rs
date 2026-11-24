@@ -378,11 +378,11 @@ pub(crate) fn workspace_reaches(command: &str) -> impl Iterator<Item = (String, 
             return None;
         }
         let t = if pathctx::place(&text, None).judged() == resolved { text } else { resolved.clone() };
-        // A temp path is READ/WRITE admitted, so the outside-test below never fires on it — but it
-        // is not EXECUTABLE unless it is this session's scratchpad. When the command was denied,
-        // that is the likely reason, and it is the one case where the fix is a grant rather than a
-        // correction, so surface it with those instructions.
-        if pathctx::under_temp_root(&resolved) && !pathctx::in_session_scratchpad(&resolved) {
+        // Only a path the region table admits as scratch is a foreign temp. The scratchpad is
+        // admitted on its own. Every other path keeps the reason the check below already gives.
+        let scratch = engine::resolve::locus::read_locus(&resolved) == engine::facet::LocalLocus::Temp
+            && engine::resolve::locus::write_locus(&resolved) == engine::facet::LocalLocus::Temp;
+        if scratch && !pathctx::in_session_scratchpad(&resolved) {
             return Some((t, ReachReason::ForeignTemp));
         }
         // The REBIND face is consulted too, or a granted trust-root directory denies in silence:

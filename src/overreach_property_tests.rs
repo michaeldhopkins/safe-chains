@@ -76,4 +76,35 @@ proptest! {
         let named = moved_unknown.map(|(path, _)| path);
         prop_assert!(!named.as_deref().is_some_and(crate::cst::check::is_opaque_value), "{:?}", named);
     }
+
+    /// `/var/folders` is not a scratch region. A refusal there keeps its own reason, and must not
+    /// claim that reading and writing the file is fine.
+    #[test]
+    fn a_path_under_var_folders_is_not_a_foreign_temp(
+        root in prop::sample::select(vec!["/var/folders", "/private/var/folders"]),
+        kind in prop::sample::select(vec!["T", "C", "0", "X"]),
+        file in "[a-z]{1,8}",
+        verb in prop::sample::select(vec!["cat", "bash", "rm"]),
+    ) {
+        let path = format!("{root}/xx/yy/{kind}/{file}");
+        let reach = workspace_overreach(&format!("{verb} {path}"));
+        prop_assert_ne!(reach.as_ref().map(|(_, reason)| *reason), Some(ReachReason::ForeignTemp), "{}", path);
+        let message = reach.map(|(path, reason)| reason.message(&path)).unwrap_or_default();
+        prop_assert!(!message.contains("Reading and writing temp files is fine"), "{}", path);
+    }
+}
+
+#[test]
+fn a_cat_under_var_folders_is_not_explained_as_a_foreign_temp() {
+    let path = "/var/folders/xx/yy/T/f";
+    for verb in ["cat", "bash", "rm"] {
+        let command = format!("{verb} {path}");
+        let reach = workspace_overreach(&command);
+        let message = reach.as_ref().map(|(path, reason)| reason.message(path)).unwrap_or_default();
+        assert!(!message.contains("Reading and writing temp files is fine"), "{command}: {message}");
+        assert_eq!(reach.map(|(_, reason)| reason), Some(ReachReason::OutsideWorkspace), "{command}: {message}");
+    }
+    assert!(crate::is_safe_command(&format!("cat {path}")));
+    assert!(!crate::is_safe_command(&format!("bash {path}")));
+    assert!(!crate::is_safe_command(&format!("rm {path}")));
 }

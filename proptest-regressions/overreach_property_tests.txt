@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc c5730a5a9da7150611142251900454c6b75b281fb3f7d830da388cdd6c0f6e3e # shrinks to root = "/opt", dir = "a", file = "a.sh", verb = "cat", join = "; "
+cc 05bf04d9845688df75ac6350dba1bd7afc6311f291c0567b3dcfa304cf55a675 # shrinks to root = "/var/folders", kind = "T", file = "a", verb = "cat"
