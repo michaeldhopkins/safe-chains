@@ -1,29 +1,20 @@
 #!/bin/bash
 #
-# Print the revision mutants.yml's in-diff job diffs against, and say why on stderr.
+# Print the base revision the pre-release `--in-diff` mutants check diffs against, and say why on
+# stderr.
 #
-# Usage: scripts/mutants-base.sh <event_name> <base_ref> <before>
+# Usage: scripts/mutants-base.sh [<base>]
 #
-#   event_name  github.event_name; a pull_request diffs against origin/<base_ref>
-#   base_ref    github.base_ref (empty on a push)
-#   before      github.event.before (the commit a push replaced; empty on a PR)
+#   base  last commit covered by a clean pre-release check (or the remote tip being replaced)
 #
-# A push diffs against `before` only when it is a commit in this checkout and an ancestor of HEAD.
-# Otherwise it falls back to HEAD~1: all zeros for a new branch, and a force-push that rewrote
-# history leaves `before` missing from the clone or off HEAD's ancestry (2026-10-07, where
-# `git diff <before>..` failed the job). Read-only; run from the repository root with full history.
+# Diffs against `base` only when it is a commit in this checkout and an ancestor of HEAD. Otherwise
+# it falls back to HEAD~1: empty or all zeros when no prior base is recorded, and rewritten history
+# leaves `base` missing from the clone or off HEAD's ancestry (2026-10-07, where `git diff <base>..`
+# failed). Read-only; run from the repository root with full history.
 
 set -euo pipefail
 
-event="${1:-}"
-base_ref="${2:-}"
-before="${3:-}"
-
-if [ "$event" = "pull_request" ]; then
-    echo "pull request: diffing against origin/$base_ref" >&2
-    echo "origin/$base_ref"
-    exit 0
-fi
+before="${1:-}"
 
 fallback() {
     echo "::notice::$1; diffing against HEAD~1" >&2
@@ -32,14 +23,14 @@ fallback() {
 }
 
 if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
-    fallback "no previous commit for this push (new branch)"
+    fallback "no previous base commit recorded"
 fi
 if ! git cat-file -e "$before^{commit}" 2>/dev/null; then
-    fallback "previous tip $before is not in this checkout (history rewritten by a force-push)"
+    fallback "previous base $before is not in this checkout (history rewritten)"
 fi
 if ! git merge-base --is-ancestor "$before" HEAD; then
-    fallback "previous tip $before is not an ancestor of HEAD (force-push)"
+    fallback "previous base $before is not an ancestor of HEAD (history rewritten)"
 fi
 
-echo "push: diffing against the previous tip $before" >&2
+echo "diffing against the previous base $before" >&2
 echo "$before"

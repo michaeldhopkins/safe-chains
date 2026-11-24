@@ -1,18 +1,17 @@
 #!/bin/bash
 #
-# Run `cargo mutants` for mutants.yml under a wall-clock budget, and decide the job's verdict from
-# mutants.out/missed.txt rather than from cargo-mutants' exit status.
+# Run `cargo mutants` in the pre-release check under a wall-clock budget, and decide the verdict
+# from mutants.out/missed.txt rather than from cargo-mutants' exit status.
 #
 # Usage: scripts/mutants-run.sh [cargo-mutants args...]
 #
 #   The script passes `--output .` itself, so a caller's own `--output` is a usage error.
 #
-#   MUTANTS_BUDGET         seconds cargo-mutants may run before it is stopped (default 900); the
-#                          rest of the 20-minute job (checkout, toolchain, cache restore and save,
-#                          summary, artifact) needs about five minutes
-#   MUTANTS_BUDGET_PASSES  1 when running out of budget is an acceptable result (a rotating slice,
-#                          whose remainder comes round again); default 0, where it exits 124 so a
-#                          partial changed-code run is never read as a pass
+#   MUTANTS_BUDGET         seconds cargo-mutants may run before it is stopped (default 900) so a
+#                          cluster of hung mutants cannot run unbounded
+#   MUTANTS_BUDGET_PASSES  1 when running out of budget is an acceptable result (a bounded pass
+#                          whose remainder is owed); default 0, where it exits 124 so a partial
+#                          pre-release `--in-diff` run is never read as a pass
 #   MUTANTS_GRACE          seconds between TERM and KILL when stopping at the budget (default 30)
 #   MUTANTS_STATUS         file that receives "complete" or "budget" (default mutants-run-status.txt)
 #
@@ -22,9 +21,9 @@
 # exits 2 yet reports no missed mutant.
 #
 # Why: a mutant that hangs (a `+=` made `-=` never advances its loop) runs until the test timeout,
-# and a slice holding several of them outran the 20-minute job limit, which CANCELS the job and
-# loses the run, MISSED mutants included. Exit 3 used to be mapped to 0 outright, which also
-# passed a run that had missed mutants.
+# and several of them in one diff can stall an unattended check unless bounded; stopping at the
+# budget still checks missed.txt for every mutant tested so far. Exit 3 used to be mapped to 0
+# outright, which also passed a run that had missed mutants.
 
 set -uo pipefail
 

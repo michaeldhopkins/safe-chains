@@ -1,9 +1,11 @@
-//! `scripts/mutants-base.sh` picks the revision the in-diff mutants job diffs against.
+//! `scripts/mutants-base.sh` picks the revision the pre-release `--in-diff` mutants check diffs
+//! against.
 //!
-//! A push diffs against the tip it replaced only when that tip is a commit in the checkout and an
-//! ancestor of HEAD; otherwise HEAD~1. A force-push that rewrote history left `before` missing
-//! from the clone and `git diff <before>..` failed the job (2026-10-07). Each case here builds a real
-//! repository, so the script's git calls are exercised rather than described.
+//! It diffs against the given base commit (the last covered tree or replaced tip) only when that
+//! commit is in the checkout and an ancestor of HEAD; otherwise HEAD~1. Rewritten history can leave
+//! the old base missing from the clone or off HEAD's ancestry, where `git diff <base>..` would fail
+//! (2026-10-07). Each case here builds a real repository, so the script's git calls are exercised
+//! rather than described.
 
 #[path = "support/isolate_home.rs"]
 mod isolate_home;
@@ -52,10 +54,10 @@ impl Repo {
         self.dir.path()
     }
 
-    fn base(&self, event: &str, base_ref: &str, before: &str) -> (String, String) {
+    fn base(&self, before: &str) -> (String, String) {
         let out = Command::new("bash")
             .arg(script())
-            .args([event, base_ref, before])
+            .arg(before)
             .current_dir(self.path())
             .env("GIT_CONFIG_GLOBAL", "/dev/null")
             .env("GIT_CONFIG_NOSYSTEM", "1")
@@ -67,54 +69,46 @@ impl Repo {
 }
 
 #[test]
-fn a_pull_request_diffs_against_its_base_branch() {
-    let repo = Repo::new();
-    commit(repo.path(), "a");
-    let (base, _) = repo.base("pull_request", "main", "");
-    assert_eq!(base, "origin/main");
-}
-
-#[test]
-fn a_fast_forward_push_diffs_against_the_tip_it_replaced() {
+fn an_ancestor_base_diffs_against_that_commit() {
     let repo = Repo::new();
     commit(repo.path(), "a");
     let before = commit(repo.path(), "b");
     commit(repo.path(), "c");
     commit(repo.path(), "d");
-    let (base, _) = repo.base("push", "", &before);
+    let (base, _) = repo.base(&before);
     assert_eq!(base, before);
 }
 
 #[test]
-fn a_new_branch_falls_back_to_the_first_parent() {
+fn an_empty_or_zero_base_falls_back_to_the_first_parent() {
     let repo = Repo::new();
     commit(repo.path(), "a");
     commit(repo.path(), "b");
     for before in [ZEROS, ""] {
-        let (base, why) = repo.base("push", "", before);
+        let (base, why) = repo.base(before);
         assert_eq!(base, "HEAD~1");
-        assert!(why.contains("new branch"), "{why}");
+        assert!(why.contains("no previous base"), "{why}");
     }
 }
 
 #[test]
-fn a_force_push_whose_old_tip_is_gone_falls_back_to_the_first_parent() {
+fn a_missing_base_commit_falls_back_to_the_first_parent() {
     let repo = Repo::new();
     commit(repo.path(), "a");
     commit(repo.path(), "b");
-    let (base, why) = repo.base("push", "", "6a75e161f00dfacefeedbeefcafe0123456789ab");
+    let (base, why) = repo.base("6a75e161f00dfacefeedbeefcafe0123456789ab");
     assert_eq!(base, "HEAD~1");
     assert!(why.contains("not in this checkout"), "{why}");
 }
 
 #[test]
-fn a_force_push_whose_old_tip_is_off_head_falls_back_to_the_first_parent() {
+fn a_base_off_head_falls_back_to_the_first_parent() {
     let repo = Repo::new();
     let root = commit(repo.path(), "a");
     let old_tip = commit(repo.path(), "b");
     git(repo.path(), &["reset", "-q", "--hard", &root]);
     commit(repo.path(), "c");
-    let (base, why) = repo.base("push", "", &old_tip);
+    let (base, why) = repo.base(&old_tip);
     assert_eq!(base, "HEAD~1");
     assert!(why.contains("not an ancestor"), "{why}");
 }
