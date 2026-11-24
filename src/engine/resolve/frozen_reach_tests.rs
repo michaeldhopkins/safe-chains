@@ -16,27 +16,25 @@ fn project(dirs: &[&str]) -> (tempfile::TempDir, String) {
     project_in(tempfile::tempdir().expect("scratch project"), dirs)
 }
 
-fn outside_project(dirs: &[&str]) -> (tempfile::TempDir, String) {
+fn outside_project(dirs: &[&str]) -> Option<(tempfile::TempDir, String)> {
     // Not the crate `target/` or `~/.cache`: both sit under the process home, and listing them
     // is the walk a launchd test must not do. The parent of `$TMPDIR` is writable, is not the
-    // temporary root (`under_temp_root` is `$TMPDIR` itself), and is not under `$HOME`.
-    let parent = std::env::var("TMPDIR")
-        .ok()
-        .and_then(|tmpdir| std::path::PathBuf::from(tmpdir).parent().map(std::path::Path::to_path_buf));
-    // With no `$TMPDIR` (Linux CI), `temp_dir()` is `/tmp`, a temporary root, and the crate
-    // `target/` is under the home; Linux's `/dev/shm` is neither.
+    // temporary root (`under_temp_root` is `$TMPDIR` itself), and is not under `$HOME`. Linux CI
+    // sets no `$TMPDIR`, so there it is GitHub's tool cache (`/opt/hostedtoolcache`), which is
+    // neither temporary, a home nor a device folder a grant is refused for.
     let outside_temp = |dir: &std::path::PathBuf| {
         std::fs::create_dir_all(dir).is_ok()
             && dir
                 .canonicalize()
                 .is_ok_and(|p| p.to_str().is_some_and(|s| !crate::pathctx::under_temp_root(&format!("{s}/x"))))
     };
-    let base = parent
+    let base = std::env::var("TMPDIR")
+        .ok()
+        .and_then(|tmpdir| std::path::PathBuf::from(tmpdir).parent().map(std::path::Path::to_path_buf))
         .filter(outside_temp)
-        .or_else(|| Some(std::path::PathBuf::from("/dev/shm")).filter(outside_temp))
-        .expect("a writable folder outside the temporary root and the home");
+        .or_else(|| std::env::var("RUNNER_TOOL_CACHE").ok().map(std::path::PathBuf::from).filter(outside_temp))?;
     let dir = tempfile::Builder::new().prefix("sc-").tempdir_in(base).expect("outside project");
-    project_in(dir, dirs)
+    Some(project_in(dir, dirs))
 }
 
 fn within<T>(root: &str, f: impl FnOnce() -> T) -> T {
@@ -117,7 +115,10 @@ fn an_ungranted_folder_outside_the_workspace_is_not_walked() {
     let (_d, root) = project(&["src"]);
     let (_scratch_d, scratch) = project_in(tempfile::tempdir_in("/tmp").expect("tmp project"), &[".git/hooks"]);
     assert_eq!(within(&root, || frozen_below(&scratch, true)), Some(Reach::Found(format!("{scratch}/.git/f"))));
-    let (_outside_d, outside) = outside_project(&[".git/hooks"]);
+    let Some((_outside_d, outside)) = outside_project(&[".git/hooks"]) else {
+        eprintln!("uncovered: no writable folder outside the temporary root and the home");
+        return;
+    };
     assert_eq!(within(&root, || frozen_below(&outside, true)), None);
     assert_eq!(within(&root, || frozen_below(&format!("{outside}/*"), true)), None);
     let granted = crate::engine::resolve::locus::canonicalize(&outside);
