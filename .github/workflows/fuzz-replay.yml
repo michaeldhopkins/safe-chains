@@ -1,18 +1,19 @@
 name: Fuzz replay
 
-# The gating half of the fuzzing program (`fuzz.yml`, the burst on each push to `main`, is the
-# exploring half).
+# The CI regression gate of the fuzzing program (discovery bursts run in the pre-release check
+# before each push to `main`, never after the push in CI).
 #
-# This is the REGRESSION gate: replay every input the burst has already accumulated against the code
+# This is the REGRESSION gate: replay every input already accumulated against the code
 # as it stands now. It is deterministic (same corpus, same answer every run), it takes minutes, and
 # it answers the question a per-push job should answer: "did this change break a path we already
 # explored?" No mutation here, so the gate is never randomly red.
 #
-# Read-only with respect to the corpus cache: the burst owns the canonical corpus and saves it under
-# `fuzz-corpus-<target>-<run>`; this restores by the `fuzz-corpus-<target>-` prefix and writes
-# nothing back (`tests/fuzz_targets_wired.rs` holds the two key prefixes together). Its restores
+# Read-only with respect to the corpus cache: restores by the `fuzz-corpus-<target>-` prefix plus
+# committed `seed-*` inputs and writes nothing back (`tests/fuzz_targets_wired.rs` checks the key
+# prefix). Its restores
 # also keep the cache inside GitHub's 7-day eviction window. On a cache miss (a fork, or a target
-# the burst has not run yet) the replay is a no-op, so this degrades gracefully rather than failing.
+# with no cached corpus yet) the replay runs the committed seeds or no-ops, so this degrades
+# gracefully rather than failing.
 on:
   # Nothing fuzzed reads Markdown or the mdbook sources (no include_str! of either, no .md corpus
   # inputs), so a docs-only change cannot change a replay's result.
@@ -42,9 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # EVERY target, kept in step with fuzz/Cargo.toml and the burst matrix by
-        # `tests/fuzz_targets_wired.rs`. A target only in the burst is never gated; one only here
-        # never explores. Both halves or neither.
+        # EVERY target, kept in step with fuzz/Cargo.toml by `tests/fuzz_targets_wired.rs`.
         target: [parse, equivalence, hook_envelope, explain_render, suggest_roundtrip, level_monotonic, config_load, setup_merge, path_admit, gate_prefilter, config_edit, mcp_session]
     steps:
       - uses: actions/checkout@v7
@@ -83,7 +82,7 @@ jobs:
           COUNT=$(find fuzz/corpus/${{ matrix.target }} -type f | wc -l)
           echo "Replaying $COUNT corpus inputs"
           if [ "$COUNT" -eq 0 ]; then
-            echo "::notice::no corpus cached yet (the burst on main populates it) — replay skipped"
+            echo "::notice::no corpus cached yet — replay skipped"
             exit 0
           fi
           "$BIN" -runs=0 -timeout=25 -rss_limit_mb=4096 \
