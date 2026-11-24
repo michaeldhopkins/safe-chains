@@ -143,12 +143,14 @@ pub fn in_session_scratchpad(path: &str) -> bool {
     path.split('/').any(|seg| seg == id)
 }
 
-const TEMP_ROOTS: &[&str] = &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/"];
+const TEMP_ROOTS: &[&str] = &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/", "/var/folders/", "/private/var/folders/"];
 const TEMP_ROOTS_ANY_CASE: &[&str] =
     &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/", "/var/folders/", "/private/var/folders/"];
 
 /// Whether `path` is under a temporary-filesystem root. macOS's `/tmp` is a symlink to
-/// `/private/tmp`, and harnesses report either spelling, so both are accepted (as is `$TMPDIR`).
+/// `/private/tmp`, and its per-user temporary directory is `/var/folders` or
+/// `/private/var/folders`. Harnesses report either spelling, so both pairs are accepted (as is
+/// `$TMPDIR`).
 ///
 /// The match is exact, including case. Scratchpad recognition uses this and not [`under_temp`]:
 /// folding `/TMP` into the scratchpad on a case-sensitive volume would treat a different directory
@@ -450,6 +452,8 @@ mod tests {
             format!("/tmp/{SID}/x.sh"),
             format!("/tmp/some-other-harness/{SID}/work/x.sh"),
             format!("/var/tmp/{SID}/x.sh"),
+            format!("/var/folders/xx/yy/T/{SID}/x.sh"),
+            format!("/private/var/folders/xx/yy/T/{SID}/x.sh"),
         ];
         let rejected: &[String] = &[
             // a DIFFERENT session's scratchpad — same layout, wrong id
@@ -465,11 +469,12 @@ mod tests {
             // anonymous temp files carry no id at all
             "/tmp/evil.sh".into(),
             "/private/tmp/downloaded.sh".into(),
-            // a case variant, a firmlink spelling, or /var/folders is a different directory on a
-            // case-sensitive volume, so the id there must not become this session's scratchpad
+            // a case variant or a firmlink spelling is a different directory on a case-sensitive
+            // volume, so the id there must not become this session's scratchpad
             format!("/TMP/{SID}/x.sh"),
             format!("/System/Volumes/Data/tmp/{SID}/x.sh"),
-            format!("/private/var/folders/xx/yy/T/{SID}/x.sh"),
+            format!("/VAR/folders/xx/yy/T/{SID}/x.sh"),
+            format!("/System/Volumes/Data/private/var/folders/xx/yy/T/{SID}/x.sh"),
         ];
         with_session(Some(SID), || {
             for p in matching {
@@ -509,10 +514,10 @@ mod tests {
     }
 
     #[test]
-    fn under_temp_folds_case_firmlinks_and_var_folders_without_admitting_them() {
+    fn under_temp_folds_case_and_firmlinks_without_making_them_temp_roots() {
         for path in [
             "/TMP/y", "/Tmp/y", "/PRIVATE/TMP/y", "/private/TMP/y", "/System/Volumes/Data/tmp/y", "/System/Volumes/Data/private/tmp/y",
-            "/private/var/folders/xx/yy/T/y", "/var/folders/xx/yy/T/y", "/VAR/folders/xx/yy/T/y", "/Var/Folders/xx/yy/T/y",
+            "/VAR/folders/xx/yy/T/y", "/Var/Folders/xx/yy/T/y",
         ] {
             assert!(under_temp(path), "{path}");
             assert!(crate::engine::resolve::locus::under_temp(path), "locus: {path}");
@@ -522,6 +527,17 @@ mod tests {
         assert!(under_temp_root("/tmp/y"));
         assert!(!under_temp("/etc/y"));
         assert!(!under_temp("/tmpfile/y"));
+    }
+
+    #[test]
+    fn var_folders_is_a_temp_root_in_either_spelling() {
+        for path in ["/var/folders/xx/yy/T/y", "/private/var/folders/xx/yy/T/y", "/var/folders/x", "/private/var/folders/x"] {
+            assert!(under_temp(path), "{path}");
+            assert!(under_temp_root(path), "{path}");
+        }
+        assert!(!under_temp_root("/var/folders"));
+        assert!(!under_temp_root("/private/var/folders"));
+        assert!(!under_temp_root("/var/folders-extra/y"));
     }
 
     #[test]
@@ -749,10 +765,12 @@ mod tests {
     #[test]
     fn the_fixed_temp_roots_hold_whatever_tmpdir_says() {
         for tmpdir in ["", "scratch", "/work/scratch"] {
-            for path in ["/tmp/x", "/private/tmp/x", "/var/tmp/x", "/private/var/tmp/x"] {
+            for path in ["/tmp/x", "/private/tmp/x", "/var/tmp/x", "/private/var/tmp/x", "/var/folders/x", "/private/var/folders/x"] {
                 assert!(tmpdir_verdict(tmpdir, path), "TMPDIR={tmpdir:?} path={path:?}");
             }
             assert!(!tmpdir_verdict(tmpdir, "/tmp"), "the bare root is not under itself");
+            assert!(!tmpdir_verdict(tmpdir, "/var/folders"), "the bare macOS root is not under itself");
+            assert!(!tmpdir_verdict(tmpdir, "/VAR/folders/x"), "a case variant is a different directory");
         }
     }
 }
