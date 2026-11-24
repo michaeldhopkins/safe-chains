@@ -84,7 +84,7 @@ fn spelling_ok(path: &str, home: Option<&str>) -> bool {
 
 fn inside_temp(path: &str) -> bool {
     let path = path.trim_end_matches('/');
-    !path.is_empty() && (crate::pathctx::under_temp_root(path) || crate::pathctx::under_temp_root(&format!("{path}/x")))
+    !path.is_empty() && crate::pathctx::under_temp(path)
 }
 
 fn path_under_home(path: &str, home: Option<&str>) -> bool {
@@ -136,6 +136,16 @@ mod tests {
         assert!(spelling_ok("/opt/hostedtoolcache/safe-chains-outside/x", Some("/home/runner")));
         assert!(spelling_ok("/opt/safe-chains-outside/x", Some("/home/runner")));
         assert!(spelling_ok("/usr/local/safe-chains-outside/x", Some("/Users/runner")));
+        for path in [
+            "/VAR/folders/xx/yy/T/x",
+            "/var/folders/xx/yy/C/cache",
+            "/var/folders/xx/yy/0/state",
+            "/var/folders/xx/yy/X/extra",
+            "/System/Volumes/Data/tmp/x",
+            "/System/Volumes/Data/private/var/folders/xx/yy/C/cache",
+        ] {
+            assert!(!spelling_ok(path, Some("/home/runner")), "{path}");
+        }
     }
 
     fn home_user() -> String {

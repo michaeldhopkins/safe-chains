@@ -260,7 +260,7 @@ pub(crate) fn with_os<T>(os: &'static str, f: impl FnOnce() -> T) -> T {
     f()
 }
 
-pub(super) fn current_os() -> &'static str {
+pub(crate) fn current_os() -> &'static str {
     #[cfg(test)]
     if let Some(o) = OS_OVERRIDE.with(std::cell::Cell::get) {
         return o;

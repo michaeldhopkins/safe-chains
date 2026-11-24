@@ -163,7 +163,13 @@ mod tests {
             assert!(!judged_from("/tmp/y", command), "ambient /tmp/y: {command}");
             assert!(judged_from(&root, command), "{command}");
             assert!(judged_from(&format!("{root}/sub"), command), "below the root: {command}");
-            assert!(judged_from(&format!("/private/tmp/claude-501/x/{SESSION}/scratchpad"), command), "scratchpad: {command}");
+            assert!(judged_from(&format!("/tmp/claude-501/x/{SESSION}/scratchpad"), command), "scratchpad: {command}");
+            crate::engine::resolve::regions::with_os("macos", || {
+                assert!(judged_from(&format!("/private/tmp/claude-501/x/{SESSION}/scratchpad"), command), "scratchpad: {command}");
+            });
+            crate::engine::resolve::regions::with_os("linux", || {
+                assert!(!judged_from(&format!("/private/tmp/claude-501/x/{SESSION}/scratchpad"), command), "linux: {command}");
+            });
         }
         assert!(judged_from(&root, "cd /tmp/y && cat notes.txt"), "a folder in temp is still readable");
     }

@@ -18,6 +18,7 @@ use std::cell::RefCell;
 pub mod anchor;
 pub mod folder;
 mod root;
+mod temp_root;
 pub(crate) use folder::judging;
 pub(crate) use root::folder_on_disk;
 pub use root::{Root, root};
@@ -143,20 +144,25 @@ pub fn in_session_scratchpad(path: &str) -> bool {
     path.split('/').any(|seg| seg == id)
 }
 
-const TEMP_ROOTS: &[&str] = &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/", "/var/folders/", "/private/var/folders/"];
+const TEMP_ROOTS: &[&str] = &["/tmp/", "/var/tmp/"];
+const MACOS_TEMP_ROOTS: &[&str] = &["/private/tmp/", "/private/var/tmp/"];
 const TEMP_ROOTS_ANY_CASE: &[&str] =
     &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/", "/var/folders/", "/private/var/folders/"];
 
-/// Whether `path` is under a temporary-filesystem root. macOS's `/tmp` is a symlink to
-/// `/private/tmp`, and its per-user temporary directory is `/var/folders` or
-/// `/private/var/folders`. Harnesses report either spelling, so both pairs are accepted (as is
-/// `$TMPDIR`).
+/// Whether `path` is under a temporary-filesystem root. `/tmp` and `/var/tmp` count on every
+/// platform. On macOS, so do `/private/tmp`, `/private/var/tmp`, and
+/// `/var/folders/<segment>/<segment>/T` with its `/private` spelling. `$TMPDIR` counts too.
 ///
 /// The match is exact, including case. Scratchpad recognition uses this and not [`under_temp`]:
 /// folding `/TMP` into the scratchpad on a case-sensitive volume would treat a different directory
 /// as this session's.
 pub fn under_temp_root(path: &str) -> bool {
     if TEMP_ROOTS.iter().any(|r| path.starts_with(r)) {
+        return true;
+    }
+    if crate::engine::resolve::regions::current_os() == "macos"
+        && (MACOS_TEMP_ROOTS.iter().any(|r| path.starts_with(r)) || temp_root::macos_user_temporary(path))
+    {
         return true;
     }
     std::env::var("TMPDIR").ok().is_some_and(|t| {
@@ -441,48 +447,46 @@ mod tests {
     /// session's scratchpad would hand `sandbox-scope` (and therefore EXECUTE) to foreign code. So
     /// enumerate the spoofing class rather than one example — every way a hostile or unrelated path
     /// could try to look like the scratchpad must fail, and every legitimate spelling must match.
+    /// A macOS temp root is a legitimate spelling only on macOS.
     #[test]
     fn only_this_sessions_scratchpad_is_recognized() {
         let scratch = format!("/private/tmp/claude-501/-Users-u-proj/{SID}/scratchpad");
-        let matching: &[String] = &[
+        let shared = [format!("/tmp/{SID}/x.sh"), format!("/tmp/some-other-harness/{SID}/work/x.sh"), format!("/var/tmp/{SID}/x.sh")];
+        let macos = [
             format!("{scratch}/build.sh"),
             format!("{scratch}/nested/deep/gen.py"),
-            scratch.clone(),
-            // layout around the id varies by harness/platform — the id is the anchor, not the shape
-            format!("/tmp/{SID}/x.sh"),
-            format!("/tmp/some-other-harness/{SID}/work/x.sh"),
-            format!("/var/tmp/{SID}/x.sh"),
+            scratch,
             format!("/var/folders/xx/yy/T/{SID}/x.sh"),
             format!("/private/var/folders/xx/yy/T/{SID}/x.sh"),
         ];
-        let rejected: &[String] = &[
-            // a DIFFERENT session's scratchpad — same layout, wrong id
-            "/private/tmp/claude-501/-Users-u-proj/00000000-1111-2222-3333-444444444444/scratchpad/x.sh".into(),
-            // the id as a SUBSTRING of a component, not a component (the prefix/suffix attack)
+        let rejected = [
+            "/private/tmp/claude-501/-Users-u-proj/00000000-1111-2222-3333-444444444444/scratchpad/x.sh".to_string(),
             format!("/tmp/{SID}-evil/x.sh"),
             format!("/tmp/evil-{SID}/x.sh"),
             format!("/tmp/a{SID}/x.sh"),
-            // right id, but OUTSIDE any temp root — the id must not bless arbitrary locations
             format!("/home/u/{SID}/x.sh"),
             format!("~/.ssh/{SID}/id_rsa"),
             format!("/etc/{SID}/passwd"),
-            // anonymous temp files carry no id at all
-            "/tmp/evil.sh".into(),
-            "/private/tmp/downloaded.sh".into(),
-            // a case variant or a firmlink spelling is a different directory on a case-sensitive
-            // volume, so the id there must not become this session's scratchpad
+            "/tmp/evil.sh".to_string(),
+            "/private/tmp/downloaded.sh".to_string(),
             format!("/TMP/{SID}/x.sh"),
             format!("/System/Volumes/Data/tmp/{SID}/x.sh"),
             format!("/VAR/folders/xx/yy/T/{SID}/x.sh"),
             format!("/System/Volumes/Data/private/var/folders/xx/yy/T/{SID}/x.sh"),
         ];
-        with_session(Some(SID), || {
-            for p in matching {
-                assert!(in_session_scratchpad(p), "should be recognized: {p}");
-            }
-            for p in rejected {
-                assert!(!in_session_scratchpad(p), "must NOT be recognized: {p}");
-            }
+        let recognize = |paths: &[String], yes: bool| {
+            with_session(Some(SID), || {
+                for p in paths {
+                    assert_eq!(in_session_scratchpad(p), yes, "{p}");
+                }
+            });
+        };
+        recognize(&shared, true);
+        recognize(&rejected, false);
+        crate::engine::resolve::regions::with_os("macos", || recognize(&macos, true));
+        crate::engine::resolve::regions::with_os("linux", || {
+            recognize(&shared, true);
+            recognize(&macos, false);
         });
     }
 
@@ -529,15 +533,60 @@ mod tests {
         assert!(!under_temp("/tmpfile/y"));
     }
 
+    /// `C/`, `0/` and `X/` hold caches and state. Only the per-user temporary directory is a temp
+    /// root, and only on macOS, where that directory exists.
     #[test]
-    fn var_folders_is_a_temp_root_in_either_spelling() {
+    fn only_the_user_temporary_directory_under_var_folders_is_a_temp_root() {
+        let accepted = format!("/var/folders/xx/yy/T/{SID}/x.sh");
+        let private_accepted = format!("/private/var/folders/xx/yy/T/{SID}/x.sh");
+        let cache = format!("/var/folders/xx/yy/C/{SID}/x.sh");
+        let private_cache = format!("/private/var/folders/xx/yy/C/{SID}/x.sh");
+        let rejected = [
+            cache.clone(),
+            private_cache,
+            "/var/folders/xx/yy/0/x".to_string(),
+            "/private/var/folders/xx/yy/0/x".to_string(),
+            "/var/folders/xx/yy/X/x".to_string(),
+            "/private/var/folders/xx/yy/X/x".to_string(),
+            "/var/folders/xx/T/x.sh".to_string(),
+            format!("/var/folders/xx/yy/zz/T/{SID}/x.sh"),
+        ];
+        crate::engine::resolve::regions::with_os("macos", || {
+            with_session(Some(SID), || {
+                assert!(under_temp_root(&accepted), "{accepted}");
+                assert!(in_session_scratchpad(&accepted), "{accepted}");
+                assert!(under_temp_root(&private_accepted), "{private_accepted}");
+                assert!(in_session_scratchpad(&private_accepted), "{private_accepted}");
+                for path in &rejected {
+                    assert!(!under_temp_root(path), "must not be a temp root: {path}");
+                    assert!(!in_session_scratchpad(path), "must not be a scratchpad: {path}");
+                    assert!(under_temp(path), "the broad check still sees it: {path}");
+                }
+            });
+        });
+        crate::engine::resolve::regions::with_os("linux", || {
+            with_session(Some(SID), || {
+                for path in [&accepted, &private_accepted].into_iter().chain(rejected.iter()) {
+                    assert!(!under_temp_root(path), "linux: {path}");
+                    assert!(!in_session_scratchpad(path), "linux: {path}");
+                }
+                assert!(under_temp(&accepted));
+                assert!(under_temp_root("/tmp/x"));
+                assert!(under_temp_root("/var/tmp/x"));
+                assert!(!under_temp_root("/private/tmp/x"));
+                assert!(!under_temp_root("/private/var/tmp/x"));
+            });
+        });
+    }
+
+    #[test]
+    fn a_shallow_var_folders_path_is_not_a_temp_root() {
         for path in ["/var/folders/xx/yy/T/y", "/private/var/folders/xx/yy/T/y", "/var/folders/x", "/private/var/folders/x"] {
             assert!(under_temp(path), "{path}");
-            assert!(under_temp_root(path), "{path}");
         }
-        assert!(!under_temp_root("/var/folders"));
-        assert!(!under_temp_root("/private/var/folders"));
-        assert!(!under_temp_root("/var/folders-extra/y"));
+        for path in ["/var/folders/x", "/private/var/folders/x", "/var/folders", "/private/var/folders", "/var/folders-extra/y"] {
+            assert!(!under_temp_root(path), "{path}");
+        }
     }
 
     #[test]
@@ -764,9 +813,21 @@ mod tests {
 
     #[test]
     fn the_fixed_temp_roots_hold_whatever_tmpdir_says() {
+        let mut roots = vec!["/tmp/x", "/var/tmp/x"];
+        if cfg!(target_os = "macos") {
+            roots.extend(["/private/tmp/x", "/private/var/tmp/x", "/var/folders/xx/yy/T/x"]);
+        }
         for tmpdir in ["", "scratch", "/work/scratch"] {
-            for path in ["/tmp/x", "/private/tmp/x", "/var/tmp/x", "/private/var/tmp/x", "/var/folders/x", "/private/var/folders/x"] {
+            for path in &roots {
                 assert!(tmpdir_verdict(tmpdir, path), "TMPDIR={tmpdir:?} path={path:?}");
+            }
+            for path in ["/var/folders/x", "/private/var/folders/x"] {
+                assert!(!tmpdir_verdict(tmpdir, path), "TMPDIR={tmpdir:?} path={path:?}");
+            }
+            if !cfg!(target_os = "macos") {
+                assert!(!tmpdir_verdict(tmpdir, "/private/tmp/x"), "TMPDIR={tmpdir:?}");
+                assert!(!tmpdir_verdict(tmpdir, "/private/var/tmp/x"), "TMPDIR={tmpdir:?}");
+                assert!(!tmpdir_verdict(tmpdir, "/var/folders/xx/yy/T/x"), "TMPDIR={tmpdir:?}");
             }
             assert!(!tmpdir_verdict(tmpdir, "/tmp"), "the bare root is not under itself");
             assert!(!tmpdir_verdict(tmpdir, "/var/folders"), "the bare macOS root is not under itself");
