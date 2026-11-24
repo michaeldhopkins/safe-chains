@@ -193,7 +193,15 @@ fn a_post_push_mutants_or_fuzz_burst_workflow_is_flagged() {
         ("fuzz.yml".to_string(), "on:\n  push:\n    branches: [main]\njobs:\n  burst:\n    steps:\n      - run: bash fuzz/burst.sh ./bin/parse parse 180\n".to_string()),
     ];
     let problems = post_push_release_check_violations(&old);
-    assert_eq!(problems.len(), 4, "{problems:?}");
+    assert_eq!(
+        problems,
+        [
+            "mutants.yml: post-push release-check workflow must not exist in CI",
+            "mutants.yml: runs mutation testing in CI (`- run: scripts/mutants-run.sh --in-diff mutants.diff`)",
+            "fuzz.yml: post-push release-check workflow must not exist in CI",
+            "fuzz.yml: runs a fuzz burst in CI (`- run: bash fuzz/burst.sh ./bin/parse parse 180`)",
+        ]
+    );
     let clean = vec![(
         "fuzz-replay.yml".to_string(),
         "on:\n  push:\n    branches: [main]\njobs:\n  replay:\n    steps:\n      - run: \"$BIN\" -runs=0 fuzz/corpus/parse\n".to_string(),
