@@ -38,7 +38,7 @@ fn approves(home: &std::path::Path, cwd: &std::path::Path, command: &str) -> boo
 #[test]
 fn a_directory_option_on_codex_reported_cwd_is_judged_like_the_plain_command() {
     let Some((_base, home, proj)) = fixture(true) else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     assert!(!approves(&home, &proj, "rm -rf Documents"), "control: codex's reported cwd is not trusted for a recursive delete");
@@ -73,7 +73,7 @@ fn fixture(project: bool) -> Option<(tempfile::TempDir, std::path::PathBuf, std:
 fn a_glob_read_on_codex_reported_cwd_is_not_listed_there() {
     for project in [true, false] {
         let Some((_base, home, folder)) = fixture(project) else {
-            eprintln!("{}", outside_dir::UNCOVERED);
+            outside_dir::uncovered();
             return;
         };
         for dir in [folder.clone(), folder.join("sub")] {
@@ -89,7 +89,7 @@ fn a_glob_read_on_codex_reported_cwd_is_not_listed_there() {
 #[test]
 fn a_directory_option_on_codex_reported_plain_folder_is_judged_like_the_plain_command() {
     let Some((_base, home, folder)) = fixture(false) else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     let approved: Vec<&str> = [
@@ -107,7 +107,7 @@ fn a_directory_option_on_codex_reported_plain_folder_is_judged_like_the_plain_co
 #[test]
 fn the_claude_harness_still_knows_its_folder() {
     let Some((_base, home, folder)) = fixture(false) else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     let claude = |c: &str| {

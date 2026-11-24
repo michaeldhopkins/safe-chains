@@ -56,7 +56,7 @@ fn fixture() -> Option<(tempfile::TempDir, PathBuf, PathBuf)> {
 #[test]
 fn a_link_in_codex_reported_folder_does_not_place_a_climb_out_of_the_unknown_folder() {
     let Some((_base, home, proj)) = fixture() else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     std::os::unix::fs::symlink("/usr/share/man/man1", proj.join("src")).expect("link");
@@ -83,7 +83,7 @@ fn a_link_in_codex_reported_folder_does_not_place_a_climb_out_of_the_unknown_fol
 #[test]
 fn antigravity_judges_a_command_where_its_cwd_argument_runs_it() {
     let Some((_base, home, proj)) = fixture() else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     let agy = |c: &str, cwd: &Path| {
@@ -104,7 +104,7 @@ fn antigravity_judges_a_command_where_its_cwd_argument_runs_it() {
 #[test]
 fn gemini_and_qwen_judge_a_command_where_its_directory_argument_runs_it() {
     let Some((_base, home, proj)) = fixture() else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     for (harness, field) in [("gemini", "dir_path"), ("qwen", "directory")] {
@@ -133,7 +133,7 @@ fn gemini_and_qwen_judge_a_command_where_its_directory_argument_runs_it() {
 #[test]
 fn a_declared_directory_never_becomes_the_project_root() {
     let Some((base, home, proj)) = fixture() else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     let other = home.join("projects/other");
@@ -172,7 +172,7 @@ fn a_declared_directory_never_becomes_the_project_root() {
 #[test]
 fn a_declared_directory_that_is_its_own_workspace_does_not_become_the_project() {
     let Some((_base, home, _proj)) = fixture() else {
-        eprintln!("{}", outside_dir::UNCOVERED);
+        outside_dir::uncovered();
         return;
     };
     let app = home.join("projects/app");

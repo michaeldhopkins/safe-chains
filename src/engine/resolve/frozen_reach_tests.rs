@@ -99,7 +99,7 @@ fn an_ungranted_folder_outside_the_workspace_is_not_walked() {
     let (_scratch_d, scratch) = project_in(tempfile::tempdir_in("/tmp").expect("tmp project"), &[".git/hooks"]);
     assert_eq!(within(&root, || frozen_below(&scratch, true)), Some(Reach::Found(format!("{scratch}/.git/f"))));
     let Some((_outside_d, outside)) = outside_project(&[".git/hooks"]) else {
-        eprintln!("{}", crate::outside_dir::UNCOVERED);
+        crate::outside_dir::uncovered();
         return;
     };
     assert_eq!(within(&root, || frozen_below(&outside, true)), None);
