@@ -62,8 +62,34 @@ jobs:
       - name: cargo check
         run: cargo check --locked
 
+      # Linux keeps this under the tool cache, which is outside /tmp and /home.
+      # macOS cannot use /Users/Shared: a grant treats Shared as another user, so the
+      # runner creates /usr/local/safe-chains-outside instead.
+      - name: Prepare a directory outside temp and home
+        shell: bash
+        run: |
+          set -eu
+          case "$(uname -s)" in
+            Linux)
+              base="${RUNNER_TOOL_CACHE:-/opt}"
+              dir="${base}/safe-chains-outside"
+              mkdir -p "$dir"
+              ;;
+            Darwin)
+              dir="/usr/local/safe-chains-outside"
+              mkdir -p "$dir"
+              ;;
+            *)
+              echo "no directory outside temp and home on $(uname -s)" >&2
+              exit 1
+              ;;
+          esac
+          echo "SAFE_CHAINS_TEST_OUTSIDE_DIR=${dir}" >> "$GITHUB_ENV"
+
       - name: cargo test
         run: cargo test --locked
+        env:
+          SAFE_CHAINS_REQUIRE_OUTSIDE: "1"
 
       - name: cargo clippy
         run: cargo clippy --locked --all-targets -- -D warnings
