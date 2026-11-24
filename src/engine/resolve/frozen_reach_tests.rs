@@ -23,10 +23,18 @@ fn outside_project(dirs: &[&str]) -> (tempfile::TempDir, String) {
     let parent = std::env::var("TMPDIR")
         .ok()
         .and_then(|tmpdir| std::path::PathBuf::from(tmpdir).parent().map(std::path::Path::to_path_buf));
-    let base = parent.filter(|dir| {
-        std::fs::create_dir_all(dir).is_ok() && dir.to_str().is_some_and(|s| !crate::pathctx::under_temp_root(&format!("{s}/x")))
-    });
-    let base = base.unwrap_or_else(std::env::temp_dir);
+    // With no `$TMPDIR` (Linux CI), `temp_dir()` is `/tmp`, a temporary root, and the crate
+    // `target/` is under the home; Linux's `/dev/shm` is neither.
+    let outside_temp = |dir: &std::path::PathBuf| {
+        std::fs::create_dir_all(dir).is_ok()
+            && dir
+                .canonicalize()
+                .is_ok_and(|p| p.to_str().is_some_and(|s| !crate::pathctx::under_temp_root(&format!("{s}/x"))))
+    };
+    let base = parent
+        .filter(outside_temp)
+        .or_else(|| Some(std::path::PathBuf::from("/dev/shm")).filter(outside_temp))
+        .expect("a writable folder outside the temporary root and the home");
     let dir = tempfile::Builder::new().prefix("sc-").tempdir_in(base).expect("outside project");
     project_in(dir, dirs)
 }
