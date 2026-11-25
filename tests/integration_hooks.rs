@@ -26,9 +26,8 @@ use formats::every_hook_format;
 /// Run the claude hook with a temp `$HOME` carrying `level = "<level>"` in the user config, and
 /// `cwd` a project in that home (never `$HOME` itself) so `./f` is a worktree path. Returns (stdout, exit).
 fn hook_at_level(level: &str, command: &str) -> (String, i32) {
-    use std::sync::atomic::{AtomicU32, Ordering};
-    static N: AtomicU32 = AtomicU32::new(0);
-    let home = std::env::temp_dir().join(format!("sc-lvl-{}-{}", std::process::id(), N.fetch_add(1, Ordering::Relaxed)));
+    let _guard = tempfile::Builder::new().prefix("sc-lvl-").tempdir().unwrap();
+    let home = _guard.path().to_path_buf();
     [home.join(".config"), home.join("projects/proj")]
         .iter()
         .try_for_each(std::fs::create_dir_all)

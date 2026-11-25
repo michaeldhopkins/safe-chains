@@ -158,9 +158,8 @@ fn an_entry_without_an_explanation_is_still_well_formed() {
 #[test]
 fn rotation_shifts_generations_and_drops_only_the_oldest() {
     const KEEP: usize = 3;
-    let dir = std::env::temp_dir().join(format!("sc-rotate-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).expect("temp dir");
+    let _guard = tempfile::Builder::new().prefix("sc-rotate-").tempdir().expect("temp dir");
+    let dir = _guard.path().to_path_buf();
     let path = dir.join("log.jsonl");
     let nth = |n: usize| dir.join(format!("log.jsonl.{n}"));
     let read = |p: &std::path::Path| std::fs::read_to_string(p).ok();
@@ -192,7 +191,6 @@ fn rotation_shifts_generations_and_drops_only_the_oldest() {
     // A missing file is not an error — the first write of a fresh install goes through this.
     let _ = std::fs::remove_file(&path);
     rotate_at(&path, 1, KEEP);
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[test]
@@ -252,9 +250,8 @@ fn an_outcome_displays_as_its_log_name() {
 
 #[test]
 fn a_file_exactly_at_the_cap_rotates_and_one_byte_under_does_not() {
-    let dir = std::env::temp_dir().join(format!("sc-rotate-edge-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).expect("temp dir");
+    let _guard = tempfile::Builder::new().prefix("sc-rotate-").tempdir().expect("temp dir");
+    let dir = _guard.path().to_path_buf();
     let path = dir.join("log.jsonl");
     std::fs::write(&path, vec![b'x'; 1023]).expect("write");
     rotate_at(&path, 1024, 2);
@@ -262,21 +259,18 @@ fn a_file_exactly_at_the_cap_rotates_and_one_byte_under_does_not() {
     std::fs::write(&path, vec![b'x'; 1024]).expect("write");
     rotate_at(&path, 1024, 2);
     assert!(!path.exists() && dir.join("log.jsonl.1").exists(), "a file at the cap rotates");
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 /// The real cap, reached with a sparse file so the test writes almost nothing to disk.
 #[test]
 fn appending_to_a_full_log_starts_a_fresh_one() {
-    let dir = std::env::temp_dir().join(format!("sc-rotate-full-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).expect("temp dir");
+    let _guard = tempfile::Builder::new().prefix("sc-rotate-").tempdir().expect("temp dir");
+    let dir = _guard.path().to_path_buf();
     let path = dir.join("log.jsonl");
     std::fs::File::create(&path).and_then(|f| f.set_len(ROTATE_AT_BYTES)).expect("sparse file");
     append_line(&path, "{}");
     assert_eq!(std::fs::read_to_string(&path).ok().as_deref(), Some("{}\n"));
     assert_eq!(std::fs::metadata(dir.join("log.jsonl.1")).map(|m| m.len()).ok(), Some(ROTATE_AT_BYTES));
-    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[test]

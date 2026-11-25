@@ -68,11 +68,11 @@ fn hook_env(command: &str, home: Option<&std::path::Path>, flags: &[&str]) -> Ru
     Run { stdout: String::from_utf8_lossy(&out.stdout).into_owned(), exit: out.status.code().unwrap_or(-1) }
 }
 
-fn tmp_home(tag: &str) -> std::path::PathBuf {
-    let dir = std::env::temp_dir().join(format!("safe-chains-log-{tag}-{}", std::process::id()));
-    let _ = std::fs::remove_dir_all(&dir);
-    std::fs::create_dir_all(&dir).expect("create the temp home");
-    dir
+fn tmp_home(tag: &str) -> tempfile::TempDir {
+    tempfile::Builder::new()
+        .prefix(&format!("safe-chains-log-{tag}-"))
+        .tempdir()
+        .expect("create the temp home")
 }
 
 fn log_lines(home: &std::path::Path) -> Vec<serde_json::Value> {
@@ -90,9 +90,11 @@ fn log_lines(home: &std::path::Path) -> Vec<serde_json::Value> {
 /// byte-identical: same stdout, same exit code.
 #[test]
 fn logging_never_changes_the_decision() {
-    let good = tmp_home("nochange-good");
+    let _good_guard = tmp_home("nochange-good");
+    let good = _good_guard.path().to_path_buf();
     // A `$HOME` that cannot be written into, and one that does not exist at all.
-    let readonly = tmp_home("nochange-ro");
+    let _readonly_guard = tmp_home("nochange-ro");
+    let readonly = _readonly_guard.path().to_path_buf();
     let mut perms = std::fs::metadata(&readonly).expect("stat").permissions();
     #[cfg(unix)]
     {
@@ -100,13 +102,13 @@ fn logging_never_changes_the_decision() {
         perms.set_mode(0o555);
     }
     std::fs::set_permissions(&readonly, perms).expect("make the home read-only");
-    let missing = std::env::temp_dir().join("safe-chains-log-does-not-exist-anywhere");
-    let _ = std::fs::remove_dir_all(&missing);
+    let missing = good.join("does-not-exist-anywhere");
     // A home where the directory tree is fine but the log PATH itself cannot be opened, because
     // something else already occupies it as a directory. Without this the guard was VACUOUS for the
     // whole write half: `create_dir_all` returns first on a read-only home, so the open, the write
     // and the rotate were never reached — replacing the open with an `expect` left it green.
-    let blocked = tmp_home("nochange-blocked");
+    let _blocked_guard = tmp_home("nochange-blocked");
+    let blocked = _blocked_guard.path().to_path_buf();
     std::fs::create_dir_all(blocked.join(".local/state/safe-chains/log.jsonl")).expect("occupy the log path with a directory");
 
     for command in all_classes() {
@@ -138,7 +140,8 @@ fn logging_never_changes_the_decision() {
 /// Off means off: no file, no directory, nothing to find later.
 #[test]
 fn without_a_flag_nothing_is_written() {
-    let home = tmp_home("off");
+    let _home_guard = tmp_home("off");
+    let home = _home_guard.path().to_path_buf();
     for command in all_classes() {
         hook(command, &home, &[]);
     }
@@ -150,8 +153,10 @@ fn without_a_flag_nothing_is_written() {
 /// dropping them under `--log-everything` silently defeats the flag.
 #[test]
 fn the_modes_differ_only_on_approvals() {
-    let quiet = tmp_home("mode-quiet");
-    let loud = tmp_home("mode-loud");
+    let _quiet_guard = tmp_home("mode-quiet");
+    let quiet = _quiet_guard.path().to_path_buf();
+    let _loud_guard = tmp_home("mode-loud");
+    let loud = _loud_guard.path().to_path_buf();
     for command in all_classes() {
         hook(command, &quiet, &["--log"]);
         hook(command, &loud, &["--log-everything"]);
@@ -181,7 +186,8 @@ fn the_modes_differ_only_on_approvals() {
 /// issue, a classification is a judgement call, a parse failure is a parser signal.
 #[test]
 fn every_outcome_class_is_recorded_with_its_triage() {
-    let home = tmp_home("classes");
+    let _home_guard = tmp_home("classes");
+    let home = _home_guard.path().to_path_buf();
     for command in all_classes() {
         hook(command, &home, &["--log-everything"]);
     }
@@ -220,7 +226,8 @@ fn every_outcome_class_is_recorded_with_its_triage() {
 /// in is not reproducible — the exact gap that made the existing hand-kept backlog hard to triage.
 #[test]
 fn harness_context_reaches_the_entry() {
-    let home = tmp_home("context");
+    let _home_guard = tmp_home("context");
+    let home = _home_guard.path().to_path_buf();
     hook(UNKNOWN, &home, &["--log"]);
     let e = &log_lines(&home)[0];
     assert_eq!(e["cwd"], "/work");
@@ -235,7 +242,8 @@ fn harness_context_reaches_the_entry() {
 /// entry, so the obvious way to check that logging worked quietly proved it did not.
 #[test]
 fn the_cli_path_logs_too() {
-    let home = tmp_home("cli");
+    let _home_guard = tmp_home("cli");
+    let home = _home_guard.path().to_path_buf();
     for (command, flags) in [(UNKNOWN, vec!["--log"]), (ALLOWED, vec!["--log"]), (ALLOWED, vec!["--log-everything"])] {
         let mut cmd = Command::new(env!("CARGO_BIN_EXE_safe-chains"));
         for f in &flags {
@@ -259,7 +267,8 @@ fn the_cli_path_logs_too() {
 /// all, so the field table advertised a value the code could never emit.
 #[test]
 fn a_blank_command_records_an_abstain() {
-    let home = tmp_home("abstain");
+    let _home_guard = tmp_home("abstain");
+    let home = _home_guard.path().to_path_buf();
     hook("", &home, &["--log"]);
     let entries = log_lines(&home);
     assert_eq!(entries.len(), 1, "a blank command should be recorded under --log");
@@ -272,7 +281,8 @@ fn a_blank_command_records_an_abstain() {
 #[test]
 fn the_log_is_created_owner_only() {
     use std::os::unix::fs::PermissionsExt;
-    let home = tmp_home("mode-bits");
+    let _home_guard = tmp_home("mode-bits");
+    let home = _home_guard.path().to_path_buf();
     hook(UNKNOWN, &home, &["--log"]);
     let meta = std::fs::metadata(home.join(".local/state/safe-chains/log.jsonl")).expect("stat");
     assert_eq!(meta.permissions().mode() & 0o777, 0o600);
@@ -283,7 +293,8 @@ fn the_log_is_created_owner_only() {
 #[test]
 fn concurrent_writers_produce_whole_lines() {
     const WRITERS: usize = 12;
-    let home = tmp_home("concurrent");
+    let _home_guard = tmp_home("concurrent");
+    let home = _home_guard.path().to_path_buf();
     let handles: Vec<_> = (0..WRITERS)
         .map(|i| {
             let home = home.clone();
