@@ -883,6 +883,12 @@ flags = { "-f" = "read", "--file" = "read" }
 [roles."git blame"]
 flags = { "--contents" = "read", "--ignore-revs-file" = "read", "-S" = "read" }
 
+# `git mv` moves files on disk, so every operand, source and destination, is judged as `mv`'s are by
+# the engine's one decision for a transfer; the handler hands it an `mv` of the same operands.
+# `git -C DIR` moves the cwd first through `[chdir.git]`.
+[roles."git mv"]
+handler = "git_mv"
+
 [roles."git add"]
 flags = { "--pathspec-from-file" = "read" }
 

@@ -7,17 +7,19 @@
 use super::{Role, gate};
 use crate::parse::Token;
 
+mod git_mv;
 pub(crate) mod jj;
 mod jq;
+mod ncu;
 mod pax;
 mod plist;
 
 /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
 #[cfg(test)]
 pub(super) const NAMES: &[&str] = &[
-    "ar_archive", "defaults_domain", "exiftool_mode", "jj_destination", "jj_repository", "jq_program", "jupytext_mode", "mtree_mode",
-    "ncu_mode", "pax_mode", "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode", "xcodebuild_settings",
-    "yq_program",
+    "ar_archive", "defaults_domain", "exiftool_mode", "git_mv", "jj_destination", "jj_repository", "jq_program", "jupytext_mode",
+    "mtree_mode", "ncu_mode", "pax_mode", "plutil_mode", "rdfind_mode", "textutil_mode", "tsc_response_file", "xattr_mode",
+    "xcodebuild_settings", "yq_program",
 ];
 
 pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
@@ -25,12 +27,13 @@ pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
         "ar_archive" => ar_archive(tokens),
         "defaults_domain" => plist::defaults_domain(tokens),
         "exiftool_mode" => exiftool_mode(tokens),
+        "git_mv" => git_mv::git_mv(tokens),
         "jj_destination" => jj::jj_destination(tokens),
         "jj_repository" => jj::jj_repository(tokens),
         "jq_program" => jq::jq_program(tokens),
         "jupytext_mode" => jupytext_mode(tokens),
         "mtree_mode" => mtree_mode(tokens),
-        "ncu_mode" => ncu_mode(tokens),
+        "ncu_mode" => ncu::ncu_mode(tokens),
         "pax_mode" => pax::pax_mode(tokens),
         "plutil_mode" => plist::plutil_mode(tokens),
         "rdfind_mode" => rdfind_mode(tokens),
@@ -271,26 +274,6 @@ fn mtree_mode(tokens: &[Token]) -> bool {
         }
         if VALUED.contains(&t) {
             it.next();
-        }
-    }
-    false
-}
-
-/// `ncu [--upgrade] [--packageFile FILE]` — npm-check-updates REPORTS available updates by
-/// default and only rewrites the manifest with `--upgrade`/`-u`, so the manifest's role follows
-/// the mode. Without this, `ncu --upgrade --packageFile /etc/package.json` wrote outside the
-/// workspace.
-fn ncu_mode(tokens: &[Token]) -> bool {
-    let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
-    let writes = args.iter().any(|a| matches!(*a, "--upgrade" | "-u"));
-    let role = if writes { Role::Write } else { Role::Read };
-    let mut it = args.iter().copied();
-    while let Some(t) = it.next() {
-        if t == "--packageFile"
-            && let Some(v) = it.next()
-            && gate(role, v)
-        {
-            return true;
         }
     }
     false

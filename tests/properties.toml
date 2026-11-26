@@ -564,6 +564,7 @@ owed = [
   "src/pathgate/handlers/plist.rs::plist_readers_are_never_laxer_than_cat",
 ]
 "src/pathgate/role.rs" = ["roles_parse_by_name_and_rank_along_the_ladder"]
+"src/pathgate/handlers/git_mv.rs" = ["git_flags_never_change_where_the_operands_land", "fewer_than_two_operands_is_never_judged_as_a_move"]
 "src/pathgate/handlers/jj.rs" = ["the_repository_is_read_only_with_the_flag_and_an_observing_sub"]
 "src/pathgate/handlers/jq.rs" = [
   "src/pathgate/handlers/jq_tests.rs::a_directive_at_any_directive_position_is_seen",
@@ -574,6 +575,7 @@ owed = [
   "src/pathgate/handlers/jq_tests.rs::checking_never_panics",
   "src/pathgate/handlers/jq_tests.rs::the_filter_is_found_behind_any_options",
 ]
+"src/pathgate/handlers/ncu.rs" = ["manifest_role_follows_upgrade_flag_in_every_position"]
 "src/pathgate/handlers/plist.rs" = ["plist_readers_are_never_laxer_than_cat", "a_non_option_dash_o_never_relaxes_a_rewrite"]
 "src/policy.rs" = ["src/handler_property_tests.rs::flag_forms_classify_identically"]
 "src/refusal.rs" = [
