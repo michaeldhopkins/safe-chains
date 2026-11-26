@@ -197,13 +197,15 @@ fn granted(secret: Option<&str>) -> Granted {
     // one) puts it below /private/var/folders, where a home's grant is not honoured, so the same
     // test would pass or fail by where the checkout lives.
     let base = tempfile::tempdir_in("/tmp").expect("scratch");
-    let root = base.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
+    let canonical = base.path().canonicalize().expect("canonical").to_str().expect("utf-8").to_string();
+    let root = canonical.strip_prefix("/private").unwrap_or(&canonical);
     let (home, work) = (format!("{root}/home"), format!("{root}/work"));
     for dir in [format!("{home}/.config"), format!("{home}/out2/inner"), work.clone()] {
         std::fs::create_dir_all(dir).expect("folder");
     }
     std::fs::write(format!("{home}/out2/inner/note"), "n").expect("outside file");
     if let Some(target) = secret {
+        let target = if target == "~" { home.as_str() } else { target };
         std::os::unix::fs::symlink(target, format!("{home}/out2/inner/k")).expect("link to a secret");
     }
     std::fs::write(format!("{home}/.config/safe-chains.toml"), "[[grant]]\npath = \"~/out2\"\nread = true\n").expect("grant");
@@ -246,8 +248,8 @@ impl Granted {
 
 #[test]
 fn a_readable_outside_folder_named_to_a_following_read_is_judged_by_the_links_inside_it() {
-    for secret in secrets() {
-        let machine = granted(Some(&secret));
+    for secret in ["/etc/ssh/not-a-real-key", "~"] {
+        let machine = granted(Some(secret));
         for cmd in machine.reads() {
             assert!(!machine.approves(&cmd), "{cmd} was approved over an outside tree holding a link to {secret}");
         }

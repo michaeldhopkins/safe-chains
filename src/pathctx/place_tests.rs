@@ -262,7 +262,7 @@ fn a_chained_link_and_one_that_leaves_and_returns_are_judged_where_they_end() {
     let _home = super::enter_home(home.clone());
     let root = format!("{home}/scfixture/app");
     symlink("glink", format!("{root}/chain")).unwrap();
-    symlink("../proj/glink", format!("{root}/back")).unwrap();
+    symlink("../app/glink", format!("{root}/back")).unwrap();
     let _ctx = enter(PathCtx { cwd: Some(root.clone()), root: Some(root.clone()), session_id: None });
     for link in ["chain", "back"] {
         for path in [format!("{link}/hooks/pre-commit"), format!("~/scfixture/app/{link}/hooks/pre-commit")] {
