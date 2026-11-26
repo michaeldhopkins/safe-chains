@@ -160,13 +160,10 @@ pub(crate) fn place(path: &str, use_: Option<anchor::Use>) -> Placed {
     let root = CURRENT.with(|c| c.borrow().root.clone()).filter(|r| r.starts_with('/') && !folder::is_unknown(r));
     if path.starts_with('~') {
         let spelled = home_path_inside_root(path).unwrap_or_else(|| path.to_string());
-        let real = expand_home(path)
-            .and_then(|abs| physical::resolve(&abs, follow_last))
-            .map(|real| {
-                root.as_deref()
-                    .map_or_else(|| real.clone(), |root| express_relative_to_root(&real, &physical::root(root)))
-            })
-            .filter(|placed| placed.starts_with('/'));
+        let real = expand_home(path).and_then(|abs| physical::resolve(&abs, follow_last)).map(|real| {
+            root.as_deref()
+                .map_or_else(|| real.clone(), |root| express_relative_to_root(&real, &physical::root(root)))
+        });
         return Placed::real(real.unwrap_or_else(|| spelled.clone()), spelled);
     }
     CURRENT.with(|c| {
