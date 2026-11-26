@@ -137,7 +137,7 @@ fn known_workspaces_and_user_grants_become_the_root_while_protected_or_outside_d
         home.join("work/.agents/agent-1/.git"),
         home.join("agent-workspaces/agent-1/.hidden"),
         home.join("scripts/job/.git"),
-        base.path().join("ungranted/app"),
+        home.join("ungranted/app"),
     ] {
         std::fs::create_dir_all(&rejected).expect("mkdir rejected");
         for write_cmd in ["echo hi > out.txt", "mise set FOO=bar"] {
@@ -191,8 +191,8 @@ fn round_four_unknown_root_and_readonly_grant_findings_are_all_refused() {
     let claude_hooks = home.join(".claude/hooks");
     let repo_git = home.join("projects/repo/.git");
     let evil_dir = tmp_base.path().join("evil-dir");
-    let ro_grant = base.path().join("ro-vendor");
-    let rw_grant = base.path().join("rw-vendor");
+    let ro_grant = home.join("ro-vendor");
+    let rw_grant = home.join("rw-vendor");
     let dot_under_grant = rw_grant.join(".secret/sub");
     for dir in [&ssh, &downloads, &claude_hooks, &repo_git, &evil_dir, &ro_grant, &dot_under_grant, &home.join(".config")] {
         std::fs::create_dir_all(dir).expect("mkdir");
